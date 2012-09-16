@@ -1,7 +1,4 @@
-extraTrees <- function(){
-   #hjw <- .jnew("ExtraTrees") # create instance of HelloJavaWorld class
-   #out <- .jcall(hjw, "S", "sayHello") # invoke sayHello method
-   return("not implemented")
-}
+extraTrees <- function(x, ...) UseMethod("extraTrees", x)
+
 
 

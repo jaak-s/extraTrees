@@ -24,7 +24,9 @@
   <target name="dist" depends="compile"
         description="generate the distribution" >
     <!-- Create the distribution directory -->
+    <!-- not needed for R:
     <mkdir dir="${dist}/lib"/>
+     -->
     
     <!-- Copy skeletong to the new directory -->
     <copy todir="${dist}">

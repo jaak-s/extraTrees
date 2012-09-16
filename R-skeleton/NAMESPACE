@@ -1,2 +1,7 @@
 import("rJava")
-export("extraTrees")
+
+export(extraTrees)
+S3method(print, extraTrees)
+S3method(extraTrees, default)
+
+
