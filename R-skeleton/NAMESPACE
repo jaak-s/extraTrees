@@ -1,7 +1,9 @@
 import("rJava")
 
-export(extraTrees)
-S3method(print, extraTrees)
+export(extraTrees, toRMatrix, toJavaMatrix)
+
+S3method(predict, extraTrees)
+S3method(print,   extraTrees)
 S3method(extraTrees, default)
 
 

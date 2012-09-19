@@ -11,6 +11,8 @@ public class ExtraTrees {
 	//BinaryTree trees;
 	ArrayList<Integer> cols;
 	
+	BinaryTree[] trees;
+	
 	
 	public ExtraTrees(Matrix input, double[] output) {
 		if (input.nrows!=output.length) {
@@ -27,6 +29,16 @@ public class ExtraTrees {
 		for (int i=0; i<input.ncols; i++) {
 			cols.add(i);
 		}
+	}
+	
+	/**
+	 * stores trees with the ExtraTrees object.
+	 * @param nmin
+	 * @param K
+	 * @param nTrees
+	 */
+	public void learnTrees(int nmin, int K, int nTrees) {
+		this.trees = buildTrees(nmin, K, nTrees);
 	}
 	
 	/**
@@ -74,6 +86,15 @@ public class ExtraTrees {
 			output += t.getValue(input, nmin);
 		}
 		return output/trees.length;
+	}
+	
+	/**
+	 * Object method, using the trees stored by learnTrees(...) method.
+	 * @param input
+	 * @return
+	 */
+	public double[] getValues(Matrix input) {
+		return getValues(this.trees, input);
 	}
 
 	/** Average of several trees for many samples */
