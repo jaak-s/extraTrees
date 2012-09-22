@@ -7,7 +7,7 @@ public class ExtraTrees {
 	Matrix input;
 	double[] output;
 	double[] outputSq;
-	static double zero=1e-4;
+	static double zero=1e-6;
 	//BinaryTree trees;
 	ArrayList<Integer> cols;
 	
