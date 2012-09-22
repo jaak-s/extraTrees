@@ -7,7 +7,7 @@ public class ExtraTrees {
 	Matrix input;
 	double[] output;
 	double[] outputSq;
-	static double zero=1e-6;
+	static double zero=1e-4;
 	//BinaryTree trees;
 	ArrayList<Integer> cols;
 	
@@ -139,9 +139,6 @@ public class ExtraTrees {
 		boolean leftConst = false, rightConst = false;
 		int countLeftBest = 0, countRightBest = 0;
 		double t_best=Double.NaN;
-		
-		ScoreResult result = new ScoreResult();
-		
 		for (int i=0; i<cols.size(); i++) {
 			int col = cols.get(i);
 			// calculating columns min and max:
@@ -159,41 +156,39 @@ public class ExtraTrees {
 			// picking random test point:
 			double t = Math.random()*(col_max-col_min) + col_min;
 			// calculating score:
-//			int countLeft=0, countRight=0;
-//			double sumLeft=0, sumRight=0;
-//			double sumSqLeft=0, sumSqRight=0;
-//			for (int n=0; n<ids.length; n++) {
-//				if (input.get(ids[n], col) < t) {
-//					countLeft++;
-//					sumLeft   += output[  ids[n]];
-//					sumSqLeft += outputSq[ids[n]];
-//				} else {
-//					countRight++;
-//					sumRight   += output[  ids[n]];
-//					sumSqRight += outputSq[ids[n]];
-//				}
-//			}
-//			// calculating score:
-//			double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
-//			double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
-//			double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-//			double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
-			scoreRegression(t, ids, col, result);
-			
+			int countLeft=0, countRight=0;
+			double sumLeft=0, sumRight=0;
+			double sumSqLeft=0, sumSqRight=0;
+			for (int n=0; n<ids.length; n++) {
+				if (input.get(ids[n], col) < t) {
+					countLeft++;
+					sumLeft   += output[  ids[n]];
+					sumSqLeft += outputSq[ids[n]];
+				} else {
+					countRight++;
+					sumRight   += output[  ids[n]];
+					sumSqRight += outputSq[ids[n]];
+				}
+			}
+			// calculating score:
+			double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
+			double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
+			double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
+			double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
 			
 			// if variance is 0
-			if (result.var<zero*zero) {
+			if (var<zero*zero) {
 				return makeLeaf(ids);
 			}
 			
-			if (result.score>score_best) {
-				score_best = result.score;
+			if (score>score_best) {
+				score_best = score;
 				col_best   = col;
 				t_best     = t;
-				leftConst  = (result.varLeft<zero*zero);
-				rightConst = (result.varRight<zero*zero);
-				countLeftBest  = result.countLeft;
-				countRightBest = result.countRight;
+				leftConst  = (varLeft<zero*zero);
+				rightConst = (varRight<zero*zero);
+				countLeftBest  = countLeft;
+				countRightBest = countRight;
 			}
 
 			k++;
@@ -240,34 +235,6 @@ public class ExtraTrees {
 		bt.value  = bt.left.value*bt.left.nSuccessors + bt.right.value*bt.right.nSuccessors;
 		bt.value /= bt.nSuccessors;
 		return bt;
-	}
-	
-	/**
-	 * 
-	 * @param t      site of the cut
-	 * @param ids    IDs of data points still used
-	 * @param col    input variable used (column)
-	 * @param result stores results for the scores
-	 */
-	void scoreRegression(double t, int[] ids, int col, ScoreResult result) {
-		double sumLeft=0, sumRight=0;
-		double sumSqLeft=0, sumSqRight=0;
-		for (int n=0; n<ids.length; n++) {
-			if (input.get(ids[n], col) < t) {
-				result.countLeft++;
-				sumLeft   += output[  ids[n]];
-				sumSqLeft += outputSq[ids[n]];
-			} else {
-				result.countRight++;
-				sumRight   += output[  ids[n]];
-				sumSqRight += outputSq[ids[n]];
-			}
-		}
-		// calculating score:
-		result.varLeft  = sumSqLeft/result.countLeft  - (sumLeft/result.countLeft)*(sumLeft/result.countLeft);
-		result.varRight = sumSqRight/result.countRight- (sumRight/result.countRight)*(sumRight/result.countRight);
-		result.var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-		result.score = 1 - (result.countLeft*result.varLeft + result.countRight*result.varRight) / ids.length / result.var;
 	}
 	
 	/**
@@ -431,16 +398,4 @@ public class ExtraTrees {
 //		System.out.println( Arrays.toString( bt.countColumns(m.ncols)) );
 	}
 
-	static class ScoreResult {
-		/** variance of left node (the bigger the worse: 0 means perfect) */
-		double varLeft;
-		/** variance of right node (the bigger the worse: 0 means perfect) */
-		double varRight;
-		/** total variance (the bigger the worse) */
-		double var;
-		/** score, the bigger the better */
-		double score;
-		int countLeft;
-		int countRight;
-	}
 }
