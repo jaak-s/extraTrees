@@ -1,0 +1,11 @@
+Installation:
+
+1) run ant (in Eclipse) and make dist
+
+2) install the files:
+cd ~/Documents/temp
+R CMD INSTALL extraTrees
+
+3) package extraTrees:
+R CMD build extraTrees  
+ 
