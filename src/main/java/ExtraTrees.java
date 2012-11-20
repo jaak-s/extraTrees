@@ -8,7 +8,7 @@ public class ExtraTrees {
 	double[] output;
 	double[] outputSq;
 	static double zero=1e-6;
-	//BinaryTree trees;
+	/** later shuffled and used for choosing random columns at each node: */
 	ArrayList<Integer> cols;
 	
 	BinaryTree[] trees;
@@ -32,20 +32,10 @@ public class ExtraTrees {
 	}
 	
 	/**
-	 * stores trees with the ExtraTrees object.
-	 * @param nmin
-	 * @param K
-	 * @param nTrees
-	 */
-	public void learnTrees(int nmin, int K, int nTrees) {
-		this.trees = buildTrees(nmin, K, nTrees);
-	}
-	
-	/**
  	 * good values:
 	 * n_min = 2 (size of tree element)
-	 * K = 5  (# of random choices)
-	 * M = 50 (# of trees)
+	 * K = 5     (# of random choices)
+	 * M = 50    (# of trees)
 	 * if n_min is chosen by CV, then we have pruned version
 
 	 * @param nmin   - size of tree element
@@ -278,6 +268,13 @@ public class ExtraTrees {
 		return et;
 	}
 	
+	/**
+	 * 
+	 * @param trees
+	 * @param testInput
+	 * @param testOutput
+	 * @return mean squared error on the test input and output.
+	 */
 	public static double getMeanSqError(BinaryTree[] trees, Matrix testInput, double[] testOutput) {
 		double error = 0;
 		//double[] output_hat = getValues(trees, testInput);
@@ -293,7 +290,11 @@ public class ExtraTrees {
 		return error/testOutput.length;
 	}
 
-	/** mean squared error for CV */
+	/** 
+	 * mean squared error for CV
+	 * @return mean squared error calculated only 
+	 *         using data rows in testIds as test input-output.
+	 **/
 	public static double getMeanSqError(BinaryTree[] trees, 
 			Matrix testInput, double[] testOutput, 
 			int nmin, int[] testIds)

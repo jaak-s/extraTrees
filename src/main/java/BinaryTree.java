@@ -60,7 +60,7 @@ public class BinaryTree {
 	 * @return value in the tree for <b>input</b>.
 	 */
 	public double getValue(double[] input, int nmin) {
-		if (this.left==null || this.nSuccessors<nmin) {
+		if (this.nSuccessors<nmin || this.left==null) {
 			return value; // leaf node OR below nmin
 		}
 		if (input[column]<threshold) {
@@ -88,14 +88,14 @@ public class BinaryTree {
 		return values;
 	}
 	
-	/** count the number of choices that each column is used for */
+	/** count the number of times each column is used */
 	public int[] countColumns(int ncols) {
 		int[] counts = new int[ncols];
 		this.countColumns( counts );
 		return(counts);
 	}
 	
-	/** count the number of choices that each column is used for */
+	/** counts the number of times each column is used recursively */
 	public void countColumns(int[] counts) {
 		if (left==null) {
 			return;
