@@ -32,6 +32,16 @@ public class ExtraTrees {
 	}
 	
 	/**
+	 * stores trees with the ExtraTrees object.
+	 * @param nmin
+	 * @param K
+	 * @param nTrees
+	 */
+	public void learnTrees(int nmin, int K, int nTrees) {
+		this.trees = buildTrees(nmin, K, nTrees);
+	}
+	
+	/**
  	 * good values:
 	 * n_min = 2 (size of tree element)
 	 * K = 5     (# of random choices)
