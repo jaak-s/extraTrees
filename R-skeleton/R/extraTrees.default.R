@@ -50,6 +50,7 @@ extraTrees.default <- function(x, y, xtest=NULL, ytest=NULL, ntree=500,
     et$nodesize = nodesize
     et$ndim     = p
     et$mtry     = mtry
+    et$factor   = is.factor(y)
     class(et) = "extraTrees"
     
     ## creating ExtraTree object with the data
