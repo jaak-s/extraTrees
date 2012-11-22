@@ -12,14 +12,19 @@ public class ExtraTrees {
 	ArrayList<Integer> cols;
 	
 	BinaryTree[] trees;
-	
-	
+	int numRepeatTries;
+
 	public ExtraTrees(Matrix input, double[] output) {
+		this(input, output, 2);
+	}
+	
+	public ExtraTrees(Matrix input, double[] output, int numRepeatTries) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
 		this.input = input;
 		this.output = output;
+		this.numRepeatTries = numRepeatTries;
 		this.outputSq = new double[output.length];
 		for (int i=0; i<output.length; i++) {
 			this.outputSq[i] = this.output[i]*this.output[i]; 
@@ -153,42 +158,44 @@ public class ExtraTrees {
 				// skipping, because column is constant
 				continue;
 			}
-			// picking random test point:
-			double t = Math.random()*(col_max-col_min) + col_min;
-			// calculating score:
-			int countLeft=0, countRight=0;
-			double sumLeft=0, sumRight=0;
-			double sumSqLeft=0, sumSqRight=0;
-			for (int n=0; n<ids.length; n++) {
-				if (input.get(ids[n], col) < t) {
-					countLeft++;
-					sumLeft   += output[  ids[n]];
-					sumSqLeft += outputSq[ids[n]];
-				} else {
-					countRight++;
-					sumRight   += output[  ids[n]];
-					sumSqRight += outputSq[ids[n]];
+			// picking random test point numRepeatTries:
+			for (int repeat=0; repeat<this.numRepeatTries; repeat++) {
+				double t = Math.random()*(col_max-col_min) + col_min;
+				// calculating score:
+				int countLeft=0, countRight=0;
+				double sumLeft=0, sumRight=0;
+				double sumSqLeft=0, sumSqRight=0;
+				for (int n=0; n<ids.length; n++) {
+					if (input.get(ids[n], col) < t) {
+						countLeft++;
+						sumLeft   += output[  ids[n]];
+						sumSqLeft += outputSq[ids[n]];
+					} else {
+						countRight++;
+						sumRight   += output[  ids[n]];
+						sumSqRight += outputSq[ids[n]];
+					}
 				}
-			}
-			// calculating score:
-			double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
-			double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
-			double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-			double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
-			
-			// if variance is 0
-			if (var<zero*zero) {
-				return makeLeaf(ids);
-			}
-			
-			if (score>score_best) {
-				score_best = score;
-				col_best   = col;
-				t_best     = t;
-				leftConst  = (varLeft<zero*zero);
-				rightConst = (varRight<zero*zero);
-				countLeftBest  = countLeft;
-				countRightBest = countRight;
+				// calculating score:
+				double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
+				double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
+				double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
+				double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
+				
+				// if variance is 0
+				if (var<zero*zero) {
+					return makeLeaf(ids);
+				}
+				
+				if (score>score_best) {
+					score_best = score;
+					col_best   = col;
+					t_best     = t;
+					leftConst  = (varLeft<zero*zero);
+					rightConst = (varRight<zero*zero);
+					countLeftBest  = countLeft;
+					countRightBest = countRight;
+				}
 			}
 
 			k++;
