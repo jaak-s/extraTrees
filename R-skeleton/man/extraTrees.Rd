@@ -1,15 +1,16 @@
 \name{extraTrees}
 \alias{extraTrees}
-\title{Function for training ExtraTree classifier.}
+\title{Function for training ExtraTree classifier or regression.}
 \description{
   This function executes ExtraTree building method (implemented in Java).
 }
 \usage{
-  extraTrees(x, y, ntree=500,
+  extraTrees(x, y, 
+             ntree=500,
              mtry = if (!is.null(y) && !is.factor(y))
                     max(floor(ncol(x)/3), 1) else floor(sqrt(ncol(x))),
              nodesize = if (!is.null(y) && !is.factor(y)) 5 else 1
-             )
+  )
 }
 \arguments{
   \item{x}{ a numberic input data matrix, each row is an input. }
@@ -28,11 +29,12 @@
 \author{Jaak Simm}
 \examples{
   ## Regression with ExtraTrees:
-  n = 1000  ## number of samples
-  p = 5     ## number of dimensions
-  x = matrix(runif(n*p), n, p)
-  y = (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4)
-  et = extraTrees(x, y, nodesize=3, mtry=p, numRandomCuts=2)
+  n <- 1000  ## number of samples
+  p <- 5     ## number of dimensions
+  x <- matrix(runif(n*p), n, p)
+  y <- (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.1*runif(nrow(x))
+  et <- extraTrees(x, y, nodesize=3, mtry=p, numRandomCuts=2)
+  yhat <- predict(et, x)
 }
 \keyword{regression,classification,trees}
 
