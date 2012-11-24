@@ -12,7 +12,7 @@ public class ExtraTrees {
 	ArrayList<Integer> cols;
 	
 	BinaryTree[] trees;
-	int numRepeatTries;
+	int numRandomCuts;
 
 	public ExtraTrees(Matrix input, double[] output) {
 		this(input, output, 1);
@@ -24,7 +24,7 @@ public class ExtraTrees {
 		}
 		this.input = input;
 		this.output = output;
-		this.numRepeatTries = numRandomCuts;
+		this.numRandomCuts = numRandomCuts;
 		this.outputSq = new double[output.length];
 		for (int i=0; i<output.length; i++) {
 			this.outputSq[i] = this.output[i]*this.output[i]; 
@@ -159,7 +159,7 @@ public class ExtraTrees {
 				continue;
 			}
 			// picking random test point numRepeatTries:
-			for (int repeat=0; repeat<this.numRepeatTries; repeat++) {
+			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
 				double t = Math.random()*(col_max-col_min) + col_min;
 				// calculating score:
 				int countLeft=0, countRight=0;
