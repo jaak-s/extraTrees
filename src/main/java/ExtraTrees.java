@@ -15,16 +15,16 @@ public class ExtraTrees {
 	int numRepeatTries;
 
 	public ExtraTrees(Matrix input, double[] output) {
-		this(input, output, 2);
+		this(input, output, 1);
 	}
 	
-	public ExtraTrees(Matrix input, double[] output, int numRepeatTries) {
+	public ExtraTrees(Matrix input, double[] output, int numRandomCuts) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
 		this.input = input;
 		this.output = output;
-		this.numRepeatTries = numRepeatTries;
+		this.numRepeatTries = numRandomCuts;
 		this.outputSq = new double[output.length];
 		for (int i=0; i<output.length; i++) {
 			this.outputSq[i] = this.output[i]*this.output[i]; 
