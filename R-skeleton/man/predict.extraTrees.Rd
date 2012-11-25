@@ -5,11 +5,12 @@
   This function makes predictions for regression/classification using the given trained ExtraTree object and provided input matrix (newdata).
 }
 \usage{
-  predict(et, newdata)
+  \method{predict}{extraTrees}(object, newdata, ...)
 }
 \arguments{
-  \item{et}{ ExtraTree (S3) object, created by extraTrees(). }
+  \item{object}{ extraTree (S3) object, created by extraTrees(). }
   \item{newdata}{ a new numberic input data matrix, for each row a prediction is made. }
+  \item{...}{ not used currently. }
 }
 \value{
   The vector of predictions from the ExtraTree et. The length of the vector is equal to the the number of rows in newdata.
