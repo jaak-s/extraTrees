@@ -218,7 +218,7 @@ public class FactorExtraTrees {
 		// trying K trees or the number of non-constant columns,
 		// whichever is smaller:
 		int k = 0, col_best=-1;
-		double score_best = Double.NEGATIVE_INFINITY;
+		double score_best = Double.POSITIVE_INFINITY;
 		boolean leftConst = false, rightConst = false;
 		int countLeftBest = 0, countRightBest = 0;
 		double t_best=Double.NaN;
@@ -274,7 +274,7 @@ public class FactorExtraTrees {
 	//				return makeLeaf(ids);
 	//			}
 				
-				if (score>score_best) {
+				if (score < score_best) {
 					score_best = score;
 					col_best   = col;
 					t_best     = t;

@@ -54,4 +54,18 @@ public class FactorTests {
 		assertEquals("number of factors",  3, fet.getnFactors()); 
 		fet.learnTrees(2, 4, 10);
 	}
+	
+	@Test
+	public void testBug() {
+		int ndata=20;
+		int[] output = new int[ndata];
+		Matrix m = new Matrix(ndata, 1);
+		for (int i=0; i<ndata; i++) {
+			m.set(i, 0, i/(double)ndata);
+			output[i] = i*2<ndata ?0 :1;
+		}
+		FactorExtraTrees fet = new FactorExtraTrees(m, output);
+		fet.setNumRandomCuts(4);
+		fet.learnTrees(1, 1, 1);
+	}
 }

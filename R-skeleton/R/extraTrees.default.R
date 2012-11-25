@@ -67,16 +67,26 @@ extraTrees.default <- function(x, y,
         stop("Need at least two classes to do classification.")
     }
     if (et$factor) {
-        stop("classification with extraTrees is not yet implemented.")
+        ## classification:
+        et$levels = levels(y)
+        #stop("classification with extraTrees is not yet implemented.")
+        ## creating FactorExtraTree object with the data
+        et$jobject  = .jnew(
+            "FactorExtraTrees",
+            toJavaMatrix(x),
+            .jarray( as.integer( as.integer(y)-1 ) )
+        )
+        .jcall( et$jobject, "V", "setnFactors", as.integer(length(et$levels)) )
+    } else {
+        ## regression:
+        ## creating ExtraTree object with the data
+        et$jobject  = .jnew(
+            "ExtraTrees",
+            toJavaMatrix(x),
+            .jarray(y)
+        )
     }
-    
-    
-    ## creating ExtraTree object with the data
-    et$jobject  = .jnew(
-        "ExtraTrees",
-        toJavaMatrix(x),
-        .jarray(y)
-    )
+    ## setting variables:
     .jcall( et$jobject, "V", "setNumRandomCuts", as.integer(et$numRandomCuts) )
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
     
