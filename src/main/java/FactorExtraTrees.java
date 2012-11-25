@@ -15,12 +15,17 @@ public class FactorExtraTrees {
 	
 	FactorBinaryTree[] trees;
 
+	/** number of random cuts tried for each feature */
+	int numRandomCuts = 1;
+	/** whether random cuts are totally uniform or evenly uniform */
+	boolean evenCuts = false;
+	
 	/**
 	 * @param input    - matrix of inputs, each row is an input vector
 	 * @param output   - array of ints from 0 to nFactors-1 (class label)
 	 * @param nFactors - number of factors (class labels)
 	 */
-	public FactorExtraTrees(Matrix input, int[] output, int nFactors) {
+	public FactorExtraTrees(Matrix input, int[] output) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
@@ -31,13 +36,50 @@ public class FactorExtraTrees {
 		//	this.outputSq[i] = this.output[i]*this.output[i]; 
 		//}
 		
-		this.nFactors = nFactors;
+		this.nFactors = 1;
+		for (int i=0; i<output.length; i++) {
+			if (output[i]<0) { 
+				throw new RuntimeException("Bug: negative output (factor) values.");
+			}
+			if (nFactors<=output[i]) {
+				nFactors = output[i]+1;
+			}
+		}
 		
 		// making cols list for later use:
 		this.cols = new ArrayList<Integer>(input.ncols);
 		for (int i=0; i<input.ncols; i++) {
 			cols.add(i);
 		}
+	}
+	
+	public int getnFactors() {
+		return nFactors;
+	}
+	
+	public void setnFactors(int nFactors) {
+		this.nFactors = nFactors;
+	}
+
+	public boolean isEvenCuts() {
+		return evenCuts;
+	}
+	
+	/**
+	 * @param evenCuts - whether the random cuts (if more than 1) are
+	 * sampled from fixed even intervals (true) 
+	 * or just sampled ordinary uniform way (false)
+	 */
+	public void setEvenCuts(boolean evenCuts) {
+		this.evenCuts = evenCuts;
+	}
+	
+	public int getNumRandomCuts() {
+		return numRandomCuts;
+	}
+	
+	public void setNumRandomCuts(int numRandomCuts) {
+		this.numRandomCuts = numRandomCuts;
 	}
 	
 	/**
@@ -194,46 +236,53 @@ public class FactorExtraTrees {
 				// skipping, because column is constant
 				continue;
 			}
-			// picking random test point:
-			double t = Math.random()*(col_max-col_min) + col_min;
-			// calculating QINI impurity index (0 - pure, 0 - noisy):
-			int countLeft=0, countRight=0;
-			int[] factorCountLeft  = new int[nFactors];
-			int[] factorCountRight = new int[nFactors];
-			//double sumLeft=0, sumRight=0;
-			//double sumSqLeft=0, sumSqRight=0;
-			for (int n=0; n<ids.length; n++) {
-				if (input.get(ids[n], col) < t) {
-					countLeft++;
-					factorCountLeft[ output[ids[n]] ]++;
+			double diff = (col_max-col_min);
+			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
+				// picking random test point:
+				double t;
+				if (evenCuts) {
+					double iStart = col_min + repeat*diff/numRandomCuts;
+					double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
+					t = Math.random()*(iStop-iStart) + iStart;
 				} else {
-					countRight++;
-					factorCountRight[ output[ids[n]] ]++;
+					t = Math.random()*diff + col_min;
 				}
-			}
-			// calculating score:
-			double giniLeft  = getGiniIndex(factorCountLeft);
-			double giniRight = getGiniIndex(factorCountRight);
 			
-//			double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
-//			double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
-//			double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-//			double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
-			double score = giniLeft*countLeft + giniRight*countRight;
-			
-			// pure node:
-//			if (score<zero*zero) {
-//				return makeLeaf(ids);
-//			}
-			
-			if (score>score_best) {
-				score_best = score;
-				col_best   = col;
-				t_best     = t;
-				leftConst  = (giniLeft<zero*zero);
-				rightConst = (giniRight<zero*zero);
-				countLeftBest  = countLeft;
-				countRightBest = countRight;
+				// calculating QINI impurity index (0 - pure, 0 - noisy):
+				int countLeft=0, countRight=0;
+				int[] factorCountLeft  = new int[nFactors];
+				int[] factorCountRight = new int[nFactors];
+				//double sumLeft=0, sumRight=0;
+				//double sumSqLeft=0, sumSqRight=0;
+				for (int n=0; n<ids.length; n++) {
+					if (input.get(ids[n], col) < t) {
+						countLeft++;
+						factorCountLeft[ output[ids[n]] ]++;
+					} else {
+						countRight++;
+						factorCountRight[ output[ids[n]] ]++;
+					}
+				}
+				// calculating score:
+				double giniLeft  = getGiniIndex(factorCountLeft);
+				double giniRight = getGiniIndex(factorCountRight);
+				
+				double score = giniLeft*countLeft + giniRight*countRight;
+				
+				// pure node:
+	//			if (score<zero*zero) {
+	//				return makeLeaf(ids);
+	//			}
+				
+				if (score>score_best) {
+					score_best = score;
+					col_best   = col;
+					t_best     = t;
+					leftConst  = (giniLeft<zero*zero);
+					rightConst = (giniRight<zero*zero);
+					countLeftBest  = countLeft;
+					countRightBest = countRight;
+				}
 			}
 
 			k++;

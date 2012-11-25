@@ -1,7 +1,12 @@
 
 
-predict.extraTrees <- function( et, newdata )
+predict.extraTrees <- function( object, newdata, ... )
 {
+    if (!inherits(object, "extraTrees")) {
+        stop("object not of class extraTrees")
+    }
+    et = object
+        
     #getValues(Matrix input)
     if (ncol(newdata)!=et$ndim) {
         stop( sprintf("newdata(ncol=%d) does not have the same dimensions as the original x (ncol=%d)", ncol(newdata), et$ndim) )

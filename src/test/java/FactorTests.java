@@ -44,7 +44,7 @@ public class FactorTests {
 			m.set(row, 2, 0.5);
 			output[row] = (int) Math.floor(m.get(row, 1)+2*m.get(row, 3));
 		}
-		FactorExtraTrees et = new FactorExtraTrees(m, output, 3);
+		FactorExtraTrees et = new FactorExtraTrees(m, output);
 		return et;
 	}
 

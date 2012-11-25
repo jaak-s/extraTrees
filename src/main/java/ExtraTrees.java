@@ -8,23 +8,21 @@ public class ExtraTrees {
 	double[] output;
 	double[] outputSq;
 	static double zero=1e-6;
-	/** later shuffled and used for choosing random columns at each node: */
+	/** later shuffled and used for choosing random columns at each node */
 	ArrayList<Integer> cols;
 	
 	BinaryTree[] trees;
-	int numRandomCuts;
+	/** number of random cuts tried for each feature */
+	int numRandomCuts = 1;
+	/** whether random cuts are totally uniform or evenly uniform */
+	boolean evenCuts = false;
 
 	public ExtraTrees(Matrix input, double[] output) {
-		this(input, output, 1);
-	}
-	
-	public ExtraTrees(Matrix input, double[] output, int numRandomCuts) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
 		this.input = input;
 		this.output = output;
-		this.numRandomCuts = numRandomCuts;
 		this.outputSq = new double[output.length];
 		for (int i=0; i<output.length; i++) {
 			this.outputSq[i] = this.output[i]*this.output[i]; 
@@ -34,6 +32,27 @@ public class ExtraTrees {
 		for (int i=0; i<input.ncols; i++) {
 			cols.add(i);
 		}
+	}
+	
+	public boolean isEvenCuts() {
+		return evenCuts;
+	}
+	
+	/**
+	 * @param evenCuts - whether the random cuts (if more than 1) are
+	 * sampled from fixed even intervals (true) 
+	 * or just sampled ordinary uniform way (false)
+	 */
+	public void setEvenCuts(boolean evenCuts) {
+		this.evenCuts = evenCuts;
+	}
+	
+	public int getNumRandomCuts() {
+		return numRandomCuts;
+	}
+	
+	public void setNumRandomCuts(int numRandomCuts) {
+		this.numRandomCuts = numRandomCuts;
 	}
 	
 	/**
@@ -159,8 +178,17 @@ public class ExtraTrees {
 				continue;
 			}
 			// picking random test point numRepeatTries:
+			double diff = (col_max-col_min);
 			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
-				double t = Math.random()*(col_max-col_min) + col_min;
+				double t;
+				if (evenCuts) {
+					double iStart = col_min + repeat*diff/numRandomCuts;
+					double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
+					t = Math.random()*(iStop-iStart) + iStart;
+				} else {
+					t = Math.random()*diff + col_min;
+				}
+				
 				// calculating score:
 				int countLeft=0, countRight=0;
 				double sumLeft=0, sumRight=0;

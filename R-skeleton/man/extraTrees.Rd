@@ -1,16 +1,19 @@
 \name{extraTrees}
 \alias{extraTrees}
+\alias{extraTrees.default}
 \title{Function for training ExtraTree classifier or regression.}
 \description{
   This function executes ExtraTree building method (implemented in Java).
 }
 \usage{
-  extraTrees(x, y, 
+  \method{extraTrees}{default}(x, y, 
              ntree=500,
              mtry = if (!is.null(y) && !is.factor(y))
                     max(floor(ncol(x)/3), 1) else floor(sqrt(ncol(x))),
-             nodesize = if (!is.null(y) && !is.factor(y)) 5 else 1
-  )
+             nodesize = if (!is.null(y) && !is.factor(y)) 5 else 1,
+             numRandomCuts = 1,
+             evenCuts = FALSE,
+             ...)
 }
 \arguments{
   \item{x}{ a numberic input data matrix, each row is an input. }
@@ -19,6 +22,8 @@
   \item{mtry}{ the number of features tried at each node (default is ncol(x)/3 for regression and sqrt(ncol(x)) for classification). }
   \item{nodesize}{ the size of leaves of the tree (default is 5 for regression and 1 for classification) }
   \item{numRandomCuts}{ the number of random cuts for each (randomly chosen) feature (default 1, which corresponds to the official ExtraTrees method). The higher the number of cuts the higher the chance of a good cut. }
+  \item{evenCuts}{ if FALSE then cutting thresholds are uniformly sampled (default). If TRUE then the range is split into even intervals (the number of intervals is numRandomCuts) and a cut is uniformly sampled from each interval. }
+  \item{...}{ not used currently. }
 }
 %\details{
 %  Details are given in the package vignette.
