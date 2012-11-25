@@ -51,6 +51,7 @@ public class FactorTests {
 	@Test
 	public void testFactorExtraTrees() {
 		FactorExtraTrees fet = getSampleData(100, 5);
+		assertEquals("number of factors",  3, fet.getnFactors()); 
 		fet.learnTrees(2, 4, 10);
 	}
 }
