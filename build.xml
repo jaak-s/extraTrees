@@ -7,6 +7,9 @@
   <property name="skeleton" location="R-skeleton"/>
   <property name="build" location="build"/>
   <property name="dist"  location="${user.home}/Documents/temp/extraTrees"/>
+  <!-- 
+  <property name="java6.boot.classpath" value="${env.JAVA6_BOOT_CLASSPATH}"/>
+  -->
 
   <target name="init">
     <!-- Create the time stamp -->
