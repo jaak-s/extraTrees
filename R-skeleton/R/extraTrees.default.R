@@ -9,8 +9,11 @@ toRMatrix <- function( javam ) {
     ))
 }
 
-## converts R matrix into Java matrix (doubles)
+## converts R matrix (or data.frame) into Java matrix (doubles)
 toJavaMatrix <- function( m ) {
+    if ( !is.matrix(m) ) {
+        m = as.matrix(m)
+    }
     return(.jnew(
         "Matrix", .jarray(m), nrow(m), ncol(m)
     ))
@@ -30,6 +33,8 @@ extraTrees.default <- function(x, y,
    #out <- .jcall(hjw, "S", "sayHello") # invoke sayHello method
    #x <- as.matrix(x)
    #y <- as.numeric(y)
+   
+    
     n <- nrow(x)
     p <- ncol(x)
     if (n == 0) stop("data (x) has 0 rows")
