@@ -8,7 +8,7 @@
 
 \title{Package for ExtraTrees method for classification and regression}
 \author{Jaak Simm}
-\date{2012-11-24}
+\date{2012-11-28}
 
 \maketitle
 
@@ -20,27 +20,28 @@ This document provides detailed guidance on using the package \texttt{extraTrees
 
 \section{Training and predicting}
 
-Usage of \texttt{extraTrees} was made similar to \texttt{randomForest} package.
-ExtraTrees (extremely randomized trees) method is similar RandomForest, except
-when at each node RandomForest chooses the best cutting threshold for the feature, 
-ExtraTrees instead chooses the cut (uniformly) randomly. Similarly to RandomForest
-the feature with the biggest gain (or best score) is chosen after cutting threshold
-has been fixed.
+Usage of \texttt{extraTrees} was made similar to \texttt{randomForest} package as
+ExtraTrees (extremely randomized trees) method is similar RandomForest. The main 
+difference is that when at each node RandomForest chooses the best cutting threshold
+for the feature, ExtraTrees instead chooses the cut (uniformly) randomly. Similarly to
+RandomForest the feature with the biggest gain (or best score) is chosen after the cutting
+threshold has been fixed.
 
-This package includes an extension to ExtraTrees that we found useful in experiments:
+This package includes an extension to ExtraTrees that we found useful in some experiments:
 instead of a single random cut we choose \textbf{several} random cuts for each feature. 
 This reduces the probability of making very poor cuts but still maintains the stochastic
-cutting advantages of ExtraTrees. Using more than one cut (e.g., 5 cuts) often improves
-the accuracy. In several experiments where the standard ExtraTrees performed worse than RandomTrees the multi-cut version outperforms it.
+cutting approach of ExtraTrees. Using more than one cut (e.g., 3-5 cuts) can improve
+the accuracy, usually when the standard ExtraTrees performs worse than RandomTrees.
 
-A simple usage example is given in Figure \ref{fig:basic.example}. Try changing the value of numRandomCuts to 1 and see how the performance changes.
+A simple usage example is given in Figure \ref{fig:basic.example}. Try changing the value of numRandomCuts to 5 and see how the performance changes. For some data also the value of mtry (the number of chosen features) should be increased.
 \begin{figure}
 \begin{verbatim}
+library(extraTrees)
 ## data:
 n <- 1000
-p <- 4
+p <- 10
 f <- function(x) {
-  (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.1*runif(nrow(x))
+  (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.2*x[,5] + 0.1*runif(nrow(x))
 }
 x <- matrix(runif(n*p), n, p)
 y <- as.numeric(f(x))
@@ -48,9 +49,10 @@ xtest <- matrix(runif(n*p), n, p)
 ytest <- f(xtest)
 
 ## extraTrees:
-et   <- extraTrees(x, y, nodesize=5, mtry=4, numRandomCuts=5)
+et   <- extraTrees(x, y, numRandomCuts=1)
 yhat <- predict(et, xtest)
 yerr <- mean( (ytest-yhat)^2 )
+print( sprintf("Squared error: %f", yerr) )
 \end{verbatim}
 \caption{Example of using \texttt{extraTrees} with 5 cuts.}
 \label{fig:basic.example}
@@ -64,6 +66,8 @@ There two main methods:
 \item \texttt{extraTrees} that does the training,
 \item \texttt{predict} that does the prediction after the trees have been trained.
 \end{itemize}
+
+For classification the cut that minimizes Gini impurity index is used and for regression the variance is minimized at each node.
 
 \section{Acknowledgements}
 

@@ -25,9 +25,11 @@
   \item{evenCuts}{ if FALSE then cutting thresholds are uniformly sampled (default). If TRUE then the range is split into even intervals (the number of intervals is numRandomCuts) and a cut is uniformly sampled from each interval. }
   \item{...}{ not used currently. }
 }
-%\details{
-%  Details are given in the package vignette.
-%}
+\details{
+  For classification ExtraTrees at each node chooses the cut based on minimizing the Gini impurity index and for regression the variance.
+
+  For more details see the package vignette, i.e. vignette("extraTrees").
+}
 \value{
   The trained model  from input x and output values y, stored in ExtraTree object.
 }
