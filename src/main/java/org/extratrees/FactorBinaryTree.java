@@ -1,3 +1,4 @@
+package org.extratrees;
 
 public class FactorBinaryTree {
 	/** tree for elements below threshold.

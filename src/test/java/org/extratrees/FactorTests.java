@@ -1,5 +1,8 @@
+package org.extratrees;
 import static org.junit.Assert.*;
 
+import org.extratrees.FactorExtraTrees;
+import org.extratrees.Matrix;
 import org.junit.Test;
 
 

@@ -1,3 +1,4 @@
+package org.extratrees;
 
 public class Matrix {
 	public double[] v;

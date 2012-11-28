@@ -11,11 +11,10 @@ toRMatrix <- function( javam ) {
 
 ## converts R matrix (or data.frame) into Java matrix (doubles)
 toJavaMatrix <- function( m ) {
-    if ( !is.matrix(m) ) {
-        m = as.matrix(m)
-    }
+    if ( !is.matrix(m) ) { m = as.matrix(m) }
+    if ( !is.double(m) ) { m = m + 0.0 }
     return(.jnew(
-        "Matrix", .jarray(m), nrow(m), ncol(m)
+        "org.extratrees.Matrix", .jarray(m), nrow(m), ncol(m)
     ))
 }
 
@@ -77,7 +76,7 @@ extraTrees.default <- function(x, y,
         #stop("classification with extraTrees is not yet implemented.")
         ## creating FactorExtraTree object with the data
         et$jobject  = .jnew(
-            "FactorExtraTrees",
+            "org.extratrees.FactorExtraTrees",
             toJavaMatrix(x),
             .jarray( as.integer( as.integer(y)-1 ) )
         )
@@ -86,7 +85,7 @@ extraTrees.default <- function(x, y,
         ## regression:
         ## creating ExtraTree object with the data
         et$jobject  = .jnew(
-            "ExtraTrees",
+            "org.extratrees.ExtraTrees",
             toJavaMatrix(x),
             .jarray(y)
         )

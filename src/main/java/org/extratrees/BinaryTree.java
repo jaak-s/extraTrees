@@ -1,3 +1,4 @@
+package org.extratrees;
 
 public class BinaryTree {
 	/** tree for elements below threshold.
