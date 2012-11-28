@@ -33,11 +33,11 @@ This reduces the probability of making very poor cuts but still maintains the st
 cutting approach of ExtraTrees. Using more than one cut (e.g., 3-5 cuts) can improve
 the accuracy, usually when the standard ExtraTrees performs worse than RandomTrees.
 
-A simple usage example is given in Figure \ref{fig:basic.example}. Try changing the value of numRandomCuts to 5 and see how the performance changes. For some data also the value of mtry (the number of chosen features) should be increased.
+A simple usage example is given in Figure \ref{fig:basic.example}. Try changing the value of numRandomCuts to 5 and see how the performance changes. For some data also the value of mtry (the number of chosen features at each node) should be increased.
 \begin{figure}
 \begin{verbatim}
 library(extraTrees)
-## data:
+## train and test data:
 n <- 1000
 p <- 10
 f <- function(x) {
@@ -54,7 +54,7 @@ yhat <- predict(et, xtest)
 yerr <- mean( (ytest-yhat)^2 )
 print( sprintf("Squared error: %f", yerr) )
 \end{verbatim}
-\caption{Example of using \texttt{extraTrees} with 5 cuts.}
+\caption{Example of using \texttt{extraTrees} with 1 cut (the default).}
 \label{fig:basic.example}
 \end{figure}
 
@@ -67,7 +67,7 @@ There two main methods:
 \item \texttt{predict} that does the prediction after the trees have been trained.
 \end{itemize}
 
-For classification the cut that minimizes Gini impurity index is used and for regression the variance is minimized at each node.
+For classification ExtraTrees at each node chooses the cut based on minimizing the Gini impurity index and for regression the variance.
 
 \section{Acknowledgements}
 
