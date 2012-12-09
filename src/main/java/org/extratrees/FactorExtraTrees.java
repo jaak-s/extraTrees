@@ -116,8 +116,9 @@ public class FactorExtraTrees {
 	/** Builds trees with ids */
 	public FactorBinaryTree[] buildTrees(int nmin, int K, int nTrees, int[] ids) {
 		FactorBinaryTree[] trees = new FactorBinaryTree[nTrees];
+		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
 		for (int t=0; t<trees.length; t++) {
-			trees[t] = this.buildTree(nmin, K, ids);
+			trees[t] = this.buildTree(nmin, K, ids, cols);
 		}
 		return trees;		
 	}
@@ -190,7 +191,8 @@ public class FactorExtraTrees {
 		for (int i=0; i<ids.length; i++) {
 			ids[i] = i;
 		}
-		return buildTree(nmin, K, ids);
+		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
+		return buildTree(nmin, K, ids, cols);
 	}
 	
 	/**
@@ -209,12 +211,12 @@ public class FactorExtraTrees {
 		return 1 - sum / (double)( total*total );
 	}
 	
-	public FactorBinaryTree buildTree(int nmin, int K, int[] ids) {
+	public FactorBinaryTree buildTree(int nmin, int K, int[] ids, ShuffledIterator<Integer> randomCols) {
 		if (ids.length<nmin) {
 			return makeLeaf(ids);
 		}
 		// doing a shuffle of cols:
-		Collections.shuffle(this.cols);
+		randomCols.reset();
 		
 		// trying K trees or the number of non-constant columns,
 		// whichever is smaller:
@@ -223,8 +225,9 @@ public class FactorExtraTrees {
 		boolean leftConst = false, rightConst = false;
 		int countLeftBest = 0, countRightBest = 0;
 		double t_best=Double.NaN;
-		for (int i=0; i<cols.size(); i++) {
-			int col = cols.get(i);
+		//for (int i=0; i<cols.size(); i++) {
+		while( randomCols.hasNext() ) {
+			int col = randomCols.next();
 			// calculating columns min and max:
 			double col_min = Double.POSITIVE_INFINITY;
 			double col_max = Double.NEGATIVE_INFINITY;
@@ -319,12 +322,12 @@ public class FactorExtraTrees {
 		if (leftConst) { 
 			bt.left = makeLeaf(idsLeft); // left child's output is constant 
 		} else {  
-			bt.left  = this.buildTree(nmin, K, idsLeft); 
+			bt.left  = this.buildTree(nmin, K, idsLeft, randomCols); 
 		}
 		if (rightConst) {
 			bt.right = makeLeaf(idsRight); // right child's output is constant
 		} else {
-			bt.right = this.buildTree(nmin, K, idsRight);
+			bt.right = this.buildTree(nmin, K, idsRight, randomCols);
 		}
 		// this value is used only for CV:
 		// TODO: add code for calculating value for intermediate nodes:
