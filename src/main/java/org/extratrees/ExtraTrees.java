@@ -3,6 +3,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ExtraTrees {
 	Matrix input;
@@ -17,6 +23,7 @@ public class ExtraTrees {
 	int numRandomCuts = 1;
 	/** whether random cuts are totally uniform or evenly uniform */
 	boolean evenCuts = false;
+	int numThreads = 1;
 
 	public ExtraTrees(Matrix input, double[] output) {
 		if (input.nrows!=output.length) {
@@ -56,14 +63,27 @@ public class ExtraTrees {
 		this.numRandomCuts = numRandomCuts;
 	}
 	
+	public int getNumThreads() {
+		return numThreads;
+	}
+	
+	public void setNumThreads(int numThreads) {
+		this.numThreads = numThreads;
+	}
+	
 	/**
-	 * stores trees with the ExtraTrees object.
+	 * stores trees with the ExtraTrees object. 
+	 * Uses multiple threads if set.
 	 * @param nmin
 	 * @param K
 	 * @param nTrees
 	 */
 	public void learnTrees(int nmin, int K, int nTrees) {
-		this.trees = buildTrees(nmin, K, nTrees);
+		if (numThreads<0) {	//if (numThreads<=1) {
+			this.trees = buildTrees(nmin, K, nTrees);
+		} else {
+			this.trees = buildTreesParallel(nmin, K, nTrees);
+		}
 	}
 	
 	/**
@@ -76,14 +96,72 @@ public class ExtraTrees {
 	 * @param nmin   - size of tree element
 	 * @param K      - # of random choices
 	 * @param nTrees - # of trees
-	 * @return
+	 * Single threaded computation.
+	 * @return learned trees
 	 */
 	public BinaryTree[] buildTrees(int nmin, int K, int nTrees) {
 		BinaryTree[] trees = new BinaryTree[nTrees];
+		// single-threading:
 		for (int t=0; t<trees.length; t++) {
 			trees[t] = this.buildTree(nmin, K);
 		}
 		return trees;
+	}
+	
+	/**
+	 * Same as buildTrees() except computes in parallel.
+	 * @param nmin
+	 * @param K
+	 * @param nTrees
+	 * @return
+	 */
+	public BinaryTree[] buildTreesParallel(int nmin, int K, int nTrees) {
+		// creating a thread pool and using it to compute nTrees:
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		List<TreeCallable> callables = new ArrayList<TreeCallable>();
+		
+		// adding tasks: using the same task for each tree
+		TreeCallable task = new TreeCallable(nmin, K);
+		for (int i=0; i<nTrees; i++) {
+			callables.add( task );
+		}
+		// computing and fetching results:
+		List<Future<BinaryTree>> results;
+		try {
+			results = executor.invokeAll(callables);
+		} catch (InterruptedException e) {
+			// not solving this error here:
+			throw new RuntimeException(e);
+		}
+		// fetching all BinaryTrees and storing them:
+		BinaryTree[] trees = new BinaryTree[nTrees];
+		int i = 0;
+		for (Future<BinaryTree> f : results) {
+			try {
+				trees[i] = f.get();
+				// incrementing i:
+				i++;
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		executor.shutdown();
+		return trees;
+	}
+	
+	/** Nested class for making BinaryTrees */
+	public class TreeCallable implements Callable<BinaryTree> {
+		int nmin, K;
+		public TreeCallable(int nmin, int K) {
+			this.nmin = nmin;
+			this.K    = K;
+		}
+		@Override
+		public BinaryTree call() throws Exception {
+			return ExtraTrees.this.buildTree(nmin, K);
+		}
 	}
 	
 	/** Builds trees with ids */
@@ -423,7 +501,7 @@ public class ExtraTrees {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int ndata  = 100000, ndim=7;
+		int ndata  = 10000, ndim=7;
 		int nTrees = 15;
 		
 		ExtraTrees et = getSampleData(ndata, ndim);
@@ -431,10 +509,11 @@ public class ExtraTrees {
 //		BinaryTree[] m = et.buildTreeCV(ndim, nTrees);
 		Date t4 = new Date();
 		System.out.println( "Took: " + (t4.getTime()-t3.getTime())/1000.0 + "s");
-		int x=1;
-		if (x==1) return;
+		//int x=1;
+		//if (x==1) return;
 		Date t1 = new Date();
-		BinaryTree[] trees = et.buildTrees(2, 6, nTrees);
+		et.learnTrees(2, 6, nTrees);
+		BinaryTree[] trees = et.trees;
 		Date t2 = new Date();
 		
 		ExtraTrees et2 = getSampleData(1000, ndim);

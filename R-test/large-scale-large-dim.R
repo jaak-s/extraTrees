@@ -3,7 +3,7 @@ library(randomForest)
 
 ## making data:
 n = 1000
-p = 200
+p = 100
 f = function(x) (x[,1]<0.4) + 0.8*rowSums(x[,2:20]>0.6) + 0.5*(x[,50]>0.4) + 0.1*runif(nrow(x))
 x = matrix(runif(n*p), n, p)
 y = as.numeric(f(x))
