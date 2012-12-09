@@ -3,14 +3,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-public class ExtraTrees {
+public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	Matrix input;
 	double[] output;
 	double[] outputSq;
@@ -18,12 +12,13 @@ public class ExtraTrees {
 	/** later shuffled and used for choosing random columns at each node */
 	ArrayList<Integer> cols;
 	
-	BinaryTree[] trees;
+	// defined in AbstractTrees:
+	//ArrayList<BinaryTree> trees;
+	
 	/** number of random cuts tried for each feature */
 	int numRandomCuts = 1;
 	/** whether random cuts are totally uniform or evenly uniform */
 	boolean evenCuts = false;
-	int numThreads = 1;
 
 	public ExtraTrees(Matrix input, double[] output) {
 		if (input.nrows!=output.length) {
@@ -99,97 +94,42 @@ public class ExtraTrees {
 	 * Single threaded computation.
 	 * @return learned trees
 	 */
-	public BinaryTree[] buildTrees(int nmin, int K, int nTrees) {
-		BinaryTree[] trees = new BinaryTree[nTrees];
+	public ArrayList<BinaryTree> buildTrees(int nmin, int K, int nTrees) {
+		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);
 		// single-threading:
-		for (int t=0; t<trees.length; t++) {
-			trees[t] = this.buildTree(nmin, K);
+		for (int t=0; t<nTrees; t++) {
+			trees.add( this.buildTree(nmin, K) );
 		}
 		return trees;
 	}
 	
-	/**
-	 * Same as buildTrees() except computes in parallel.
-	 * @param nmin
-	 * @param K
-	 * @param nTrees
-	 * @return
-	 */
-	public BinaryTree[] buildTreesParallel(int nmin, int K, int nTrees) {
-		// creating a thread pool and using it to compute nTrees:
-		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-		List<TreeCallable> callables = new ArrayList<TreeCallable>();
-		
-		// adding tasks: using the same task for each tree
-		TreeCallable task = new TreeCallable(nmin, K);
-		for (int i=0; i<nTrees; i++) {
-			callables.add( task );
-		}
-		// computing and fetching results:
-		List<Future<BinaryTree>> results;
-		try {
-			results = executor.invokeAll(callables);
-		} catch (InterruptedException e) {
-			// not solving this error here:
-			throw new RuntimeException(e);
-		}
-		// fetching all BinaryTrees and storing them:
-		BinaryTree[] trees = new BinaryTree[nTrees];
-		int i = 0;
-		for (Future<BinaryTree> f : results) {
-			try {
-				trees[i] = f.get();
-				// incrementing i:
-				i++;
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (ExecutionException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		executor.shutdown();
-		return trees;
-	}
-	
-	/** Nested class for making BinaryTrees */
-	public class TreeCallable implements Callable<BinaryTree> {
-		int nmin, K;
-		public TreeCallable(int nmin, int K) {
-			this.nmin = nmin;
-			this.K    = K;
-		}
-		@Override
-		public BinaryTree call() throws Exception {
-			return ExtraTrees.this.buildTree(nmin, K);
-		}
-	}
 	
 	/** Builds trees with ids */
-	public BinaryTree[] buildTrees(int nmin, int K, int nTrees, int[] ids) {
-		BinaryTree[] trees = new BinaryTree[nTrees];
+	public ArrayList<BinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
+		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		for (int t=0; t<trees.length; t++) {
-			trees[t] = this.buildTree(nmin, K, ids, cols);
+		for (int t=0; t<nTrees; t++) {
+			trees.add( this.buildTree(nmin, K, ids, cols) );
 		}
-		return trees;		
+		return trees;
 	}
 	
 	/** Average of several trees: */
-	public static double getValue(BinaryTree[] trees, double[] input) {
+	public static double getValue(ArrayList<BinaryTree> trees, double[] input) {
 		double output = 0;
 		for(BinaryTree t : trees) {
 			output += t.getValue(input);
 		}
-		return output/trees.length;
+		return output/trees.size();
 	}
 
 	/** Average of several trees, using nmin as depth */
-	public static double getValue(BinaryTree[] trees, double[] input, int nmin) {
+	public static double getValue(ArrayList<BinaryTree> trees, double[] input, int nmin) {
 		double output = 0;
 		for(BinaryTree t : trees) {
 			output += t.getValue(input, nmin);
 		}
-		return output/trees.length;
+		return output/trees.size();
 	}
 	
 	/**
@@ -202,7 +142,7 @@ public class ExtraTrees {
 	}
 
 	/** Average of several trees for many samples */
-	public static double[] getValues(BinaryTree[] trees, Matrix input) {
+	public static double[] getValues(ArrayList<BinaryTree> trees, Matrix input) {
 		double[] values = new double[input.nrows];
 		double[] temp = new double[input.ncols];
 		for (int row=0; row<input.nrows; row++) {
@@ -220,6 +160,7 @@ public class ExtraTrees {
 	 * @param nmin - number of elements in leaf node
 	 * @param K    - number of choices
 	 */
+	@Override
 	public BinaryTree buildTree(int nmin, int K) {
 		// generating full list of ids:
 		int[]    ids = new int[output.length];
@@ -410,7 +351,7 @@ public class ExtraTrees {
 	 * @param testOutput
 	 * @return mean squared error on the test input and output.
 	 */
-	public static double getMeanSqError(BinaryTree[] trees, Matrix testInput, double[] testOutput) {
+	public static double getMeanSqError(ArrayList<BinaryTree> trees, Matrix testInput, double[] testOutput) {
 		double error = 0;
 		//double[] output_hat = getValues(trees, testInput);
 		double[] temp = new double[testInput.ncols];
@@ -430,7 +371,7 @@ public class ExtraTrees {
 	 * @return mean squared error calculated only 
 	 *         using data rows in testIds as test input-output.
 	 **/
-	public static double getMeanSqError(BinaryTree[] trees, 
+	public static double getMeanSqError(ArrayList<BinaryTree> trees, 
 			Matrix testInput, double[] testOutput, 
 			int nmin, int[] testIds)
 	{
@@ -449,7 +390,7 @@ public class ExtraTrees {
 		return error/testIds.length;
 	}
 
-	public static double getMeanAbsError(BinaryTree[] trees, Matrix testInput, double[] testOutput) {
+	public static double getMeanAbsError(ArrayList<BinaryTree> trees, Matrix testInput, double[] testOutput) {
 		double error = 0;
 		double[] output_hat = getValues(trees, testInput);
 		for (int n=0; n<testOutput.length; n++) {
@@ -458,7 +399,7 @@ public class ExtraTrees {
 		return error/testOutput.length;
 	}
 	
-	public BinaryTree[] buildTreeCV(int K, int nTrees) {
+	public ArrayList<BinaryTree> buildTreeCV(int K, int nTrees) {
 		int[] nmins = {2, 3, 5, 9, 14};
 		int trainSize = (int)(2d/3d*output.length);
 		
@@ -478,7 +419,7 @@ public class ExtraTrees {
 		}
 		
 		// building model:
-		BinaryTree[] t = this.buildTrees(2, K, nTrees, idsTrain);
+		ArrayList<BinaryTree> t = this.buildTrees(2, K, nTrees, idsTrain);
 		double[] errors = new double[nmins.length];
 		double error_best = Double.POSITIVE_INFINITY;
 		int nmin_best = nmins[0];
@@ -492,7 +433,7 @@ public class ExtraTrees {
 		//System.out.println( Arrays.toString(errors) );
 		//System.out.println( String.format("Using nmin=%d based on CV.", nmin_best) );
 		// building full model:
-		BinaryTree[] trees = this.buildTrees(nmin_best, K, nTrees);
+		ArrayList<BinaryTree> trees = this.buildTrees(nmin_best, K, nTrees);
 		return trees;
 	}
 	
@@ -506,14 +447,14 @@ public class ExtraTrees {
 		
 		ExtraTrees et = getSampleData(ndata, ndim);
 		Date t3 = new Date();
-//		BinaryTree[] m = et.buildTreeCV(ndim, nTrees);
+//		ArrayList<BinaryTree> m = et.buildTreeCV(ndim, nTrees);
 		Date t4 = new Date();
 		System.out.println( "Took: " + (t4.getTime()-t3.getTime())/1000.0 + "s");
 		//int x=1;
 		//if (x==1) return;
 		Date t1 = new Date();
 		et.learnTrees(2, 6, nTrees);
-		BinaryTree[] trees = et.trees;
+		ArrayList<BinaryTree> trees = et.trees;
 		Date t2 = new Date();
 		
 		ExtraTrees et2 = getSampleData(1000, ndim);
