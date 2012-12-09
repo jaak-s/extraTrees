@@ -12,6 +12,7 @@ ytest = f(xtest)
 
 methods = c(
     extraTrees.1c = function(x,y) extraTrees(x,y, nodesize=5),
+    extraTrees.1c2t = function(x,y) extraTrees(x,y, nodesize=5, numThreads=2),
     extraTrees.2c = function(x,y) extraTrees(x,y, nodesize=5, numRandomCuts=2),
     extraTrees.5c = function(x,y) extraTrees(x,y, nodesize=5, numRandomCuts=5)
     #randomForest  = function(x,y) randomForest(x,y)

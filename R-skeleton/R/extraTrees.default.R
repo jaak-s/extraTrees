@@ -27,13 +27,8 @@ extraTrees.default <- function(x, y,
              nodesize = if (!is.null(y) && !is.factor(y)) 5 else 1,
              numRandomCuts = 1,
              evenCuts = FALSE,
+             numThreads = 1,
              ...) {
-   #hjw <- .jnew("ExtraTrees") # create instance of HelloJavaWorld class
-   #out <- .jcall(hjw, "S", "sayHello") # invoke sayHello method
-   #x <- as.matrix(x)
-   #y <- as.numeric(y)
-   
-    
     n <- nrow(x)
     p <- ncol(x)
     if (n == 0) stop("data (x) has 0 rows")
@@ -65,6 +60,7 @@ extraTrees.default <- function(x, y,
     et$factor   = is.factor(y)
     et$numRandomCuts = numRandomCuts
     et$evenCuts = evenCuts
+    et$numThreads = numThreads
     class(et) = "extraTrees"
 
     if (et$factor && length(unique(y)) < 2) {
@@ -93,6 +89,7 @@ extraTrees.default <- function(x, y,
     ## setting variables:
     .jcall( et$jobject, "V", "setNumRandomCuts", as.integer(et$numRandomCuts) )
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
+    .jcall( et$jobject, "V", "setNumThreads", as.integer(et$numThreads) )
     
     ## learning the trees (stored at the et$jobject)
     .jcall( et$jobject, "V", "learnTrees", as.integer(et$nodesize), as.integer(et$mtry), as.integer(et$ntree) )

@@ -13,6 +13,7 @@
              nodesize = if (!is.null(y) && !is.factor(y)) 5 else 1,
              numRandomCuts = 1,
              evenCuts = FALSE,
+             numThreads = 1,
              ...)
 }
 \arguments{
@@ -23,6 +24,7 @@
   \item{nodesize}{ the size of leaves of the tree (default is 5 for regression and 1 for classification) }
   \item{numRandomCuts}{ the number of random cuts for each (randomly chosen) feature (default 1, which corresponds to the official ExtraTrees method). The higher the number of cuts the higher the chance of a good cut. }
   \item{evenCuts}{ if FALSE then cutting thresholds are uniformly sampled (default). If TRUE then the range is split into even intervals (the number of intervals is numRandomCuts) and a cut is uniformly sampled from each interval. }
+  \item{numThreads}{ the number of CPU threads to use (default is 1). }
   \item{...}{ not used currently. }
 }
 \details{
@@ -37,7 +39,7 @@
   Change it as necessary.
 }
 \value{
-  The trained model  from input x and output values y, stored in ExtraTree object.
+  The trained model from input x and output values y, stored in ExtraTree object.
 }
 \author{Jaak Simm}
 \examples{
