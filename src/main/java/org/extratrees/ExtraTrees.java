@@ -58,52 +58,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		this.numRandomCuts = numRandomCuts;
 	}
 	
-	public int getNumThreads() {
-		return numThreads;
-	}
-	
-	public void setNumThreads(int numThreads) {
-		this.numThreads = numThreads;
-	}
-	
-	/**
-	 * stores trees with the ExtraTrees object. 
-	 * Uses multiple threads if set.
-	 * @param nmin
-	 * @param K
-	 * @param nTrees
-	 */
-	public void learnTrees(int nmin, int K, int nTrees) {
-		if (numThreads<0) {	//if (numThreads<=1) {
-			this.trees = buildTrees(nmin, K, nTrees);
-		} else {
-			this.trees = buildTreesParallel(nmin, K, nTrees);
-		}
-	}
-	
-	/**
- 	 * good values:
-	 * n_min = 2 (size of tree element)
-	 * K = 5     (# of random choices)
-	 * M = 50    (# of trees)
-	 * if n_min is chosen by CV, then we have pruned version
-
-	 * @param nmin   - size of tree element
-	 * @param K      - # of random choices
-	 * @param nTrees - # of trees
-	 * Single threaded computation.
-	 * @return learned trees
-	 */
-	public ArrayList<BinaryTree> buildTrees(int nmin, int K, int nTrees) {
-		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);
-		// single-threading:
-		for (int t=0; t<nTrees; t++) {
-			trees.add( this.buildTree(nmin, K) );
-		}
-		return trees;
-	}
-	
-	
 	/** Builds trees with ids */
 	public ArrayList<BinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
 		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);

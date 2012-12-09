@@ -1,9 +1,8 @@
 package org.extratrees;
 import java.util.ArrayList;
-import java.util.Collections;
 
 
-public class FactorExtraTrees {
+public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	Matrix input;
 	int[] output;
 	/** number of factors: */
@@ -14,7 +13,7 @@ public class FactorExtraTrees {
 	/** later shuffled and used for choosing random columns at each node: */
 	ArrayList<Integer> cols;
 	
-	FactorBinaryTree[] trees;
+	//ArrayList<FactorBinaryTree> trees;
 
 	/** number of random cuts tried for each feature */
 	int numRandomCuts = 1;
@@ -83,48 +82,18 @@ public class FactorExtraTrees {
 		this.numRandomCuts = numRandomCuts;
 	}
 	
-	/**
-	 * stores trees with the ExtraTrees object.
-	 * @param nmin   - size of leaf
-	 * @param K      - number of random choices
-	 * @param nTrees - number of trees
-	 */
-	public void learnTrees(int nmin, int K, int nTrees) {
-		this.trees = buildTrees(nmin, K, nTrees);
-	}
-	
-	/**
- 	 * good values:
-	 * n_min = 2 (size of tree element)
-	 * K = 5     (# of random choices)
-	 * M = 50    (# of trees)
-	 * if n_min is chosen by CV, then we have pruned version
-
-	 * @param nmin   - size of tree element
-	 * @param K      - # of random choices
-	 * @param nTrees - # of trees
-	 * @return
-	 */
-	public FactorBinaryTree[] buildTrees(int nmin, int K, int nTrees) {
-		FactorBinaryTree[] trees = new FactorBinaryTree[nTrees];
-		for (int t=0; t<trees.length; t++) {
-			trees[t] = this.buildTree(nmin, K);
-		}
-		return trees;
-	}
-
 	/** Builds trees with ids */
-	public FactorBinaryTree[] buildTrees(int nmin, int K, int nTrees, int[] ids) {
-		FactorBinaryTree[] trees = new FactorBinaryTree[nTrees];
+	public ArrayList<FactorBinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
+		ArrayList<FactorBinaryTree> trees = new ArrayList<FactorBinaryTree>(nTrees);
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		for (int t=0; t<trees.length; t++) {
-			trees[t] = this.buildTree(nmin, K, ids, cols);
+		for (int t=0; t<nTrees; t++) {
+			trees.add( this.buildTree(nmin, K, ids, cols) );
 		}
 		return trees;		
 	}
 
 	/** Average of several trees: */
-	public static int getValue(FactorBinaryTree[] trees, double[] input, int nFactors) {
+	public static int getValue(ArrayList<FactorBinaryTree> trees, double[] input, int nFactors) {
 		int[] counts = new int[nFactors];
 		for(FactorBinaryTree t : trees) {
 			counts[ t.getValue(input) ]++;
@@ -133,7 +102,7 @@ public class FactorExtraTrees {
 	}
 	
 	/** Average of several trees, using nmin as depth */
-	public static double getValue(FactorBinaryTree[] trees, double[] input, int nmin, int nFactors) {
+	public static double getValue(ArrayList<FactorBinaryTree> trees, double[] input, int nmin, int nFactors) {
 		int[] counts = new int[nFactors];
 		for(FactorBinaryTree t : trees) {
 			counts[ t.getValue(input, nmin) ]++;
@@ -168,7 +137,7 @@ public class FactorExtraTrees {
 	}
 
 	/** Average of several trees for many samples */
-	public static int[] getValues(FactorBinaryTree[] trees, Matrix input, int nFactors) {
+	public static int[] getValues(ArrayList<FactorBinaryTree> trees, Matrix input, int nFactors) {
 		int[]  values = new int[input.nrows];
 		double[] temp = new double[input.ncols];
 		for (int row=0; row<input.nrows; row++) {

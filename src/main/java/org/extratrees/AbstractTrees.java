@@ -14,6 +14,15 @@ public abstract class AbstractTrees<E> {
 	/** number of threads */
 	int numThreads = 1;
 
+	public int getNumThreads() {
+		return numThreads;
+	}
+	
+	public void setNumThreads(int numThreads) {
+		this.numThreads = numThreads;
+	}
+	
+
 	/**
 	 * Same as buildTrees() except computes in parallel.
 	 * @param nmin
@@ -67,6 +76,44 @@ public abstract class AbstractTrees<E> {
 			return AbstractTrees.this.buildTree(nmin, K);
 		}
 	}
+
+	/**
+ 	 * good values:
+	 * n_min = 2 (size of tree element)
+	 * K = 5     (# of random choices)
+	 * M = 50    (# of trees)
+	 * if n_min is chosen by CV, then we have pruned version
+
+	 * @param nmin   - size of tree element
+	 * @param K      - # of random choices
+	 * @param nTrees - # of trees
+	 * Single threaded computation.
+	 * @return learned trees
+	 */
+	public ArrayList<E> buildTrees(int nmin, int K, int nTrees) {
+		ArrayList<E> trees = new ArrayList<E>(nTrees);
+		// single-threading:
+		for (int t=0; t<nTrees; t++) {
+			trees.add( this.buildTree(nmin, K) );
+		}
+		return trees;
+	}
+
+	/**
+	 * stores trees with the ExtraTrees object. 
+	 * Uses multiple threads if set.
+	 * @param nmin
+	 * @param K
+	 * @param nTrees
+	 */
+	public void learnTrees(int nmin, int K, int nTrees) {
+		if (numThreads<0) {	//if (numThreads<=1) {
+			this.trees = buildTrees(nmin, K, nTrees);
+		} else {
+			this.trees = buildTreesParallel(nmin, K, nTrees);
+		}
+	}
+	
 
 	public abstract E buildTree(int nmin, int k);
 
