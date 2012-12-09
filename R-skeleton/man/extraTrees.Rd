@@ -29,6 +29,12 @@
   For classification ExtraTrees at each node chooses the cut based on minimizing the Gini impurity index and for regression the variance.
 
   For more details see the package vignette, i.e. vignette("extraTrees").
+  
+  If Java runs out of memory: \code{java.lang.OutOfMemoryError: Java heap space},
+  then  (assuming you have free memory) you can increase the heap size by:
+  \code{options( java.parameters = "-Xmx2g" )} before calling
+  \code{library( "extraTrees" )}, where 2g defines 2GB of heap size. 
+  Change it as necessary.
 }
 \value{
   The trained model  from input x and output values y, stored in ExtraTree object.
@@ -39,7 +45,8 @@
   n <- 1000  ## number of samples
   p <- 5     ## number of dimensions
   x <- matrix(runif(n*p), n, p)
-  y <- (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.1*runif(nrow(x))
+  y <- (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) +
+       0.1*runif(nrow(x))
   et <- extraTrees(x, y, nodesize=3, mtry=p, numRandomCuts=2)
   yhat <- predict(et, x)
 }
