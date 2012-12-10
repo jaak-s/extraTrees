@@ -41,7 +41,8 @@ library(extraTrees)
 n <- 1000
 p <- 10
 f <- function(x) {
-  (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.2*x[,5] + 0.1*runif(nrow(x))
+  (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.2*x[,5] +
+  0.1*runif(nrow(x))
 }
 x <- matrix(runif(n*p), n, p)
 y <- as.numeric(f(x))
@@ -68,6 +69,62 @@ There two main methods:
 \end{itemize}
 
 For classification ExtraTrees at each node chooses the cut based on minimizing the Gini impurity index and for regression the variance.
+
+
+\section{Large scale usage}
+Although ExtraTrees is quite fast (about 10 faster than randomForest
+on the same data and number of trees), there are cases when the
+data set is still too big for the default setup.
+
+\subsection{Increasing allocated memory}
+If your data has high number of data points and/or
+high number of dimensions, then you can run out of Java memory. 
+This causes following error:
+\begin{verbatim}
+  java.lang.OutOfMemoryError: Java heap space
+\end{verbatim} 
+To solve that you need to increase the memory by supplying "-Xmx1g" for 1GB
+or "-Xmx4g" for 4GB in R's Java options before loading \texttt{extraTrees}:
+\begin{verbatim}
+  options( java.parameters = "-Xmx1g" )
+  library(extraTrees)
+\end{verbatim} 
+This is shown in the first lines of Figure \ref{fig:large.scale}. 
+Make sure your machine 
+has enough free memory available before you do that.
+
+\subsection{Using multiple cores}
+Secondly, if the running time is too long you can use multi-core computation
+by increasing the \texttt{numThreads} option (default is 1) in \texttt{extraTrees}.
+This is shown the last lines in Figure \ref{fig:large.scale}.
+
+\begin{figure}
+\begin{verbatim}
+## To solve the problem give more memory to Java.
+## Using 1GB Java memory for extraTrees (specified by 1g):
+options( java.parameters = "-Xmx1g" )
+library(extraTrees)
+## train and test data:
+n <- 1000
+p <- 10
+f <- function(x) {
+  (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) + 0.2*x[,5] +
+  0.1*runif(nrow(x))
+}
+x <- matrix(runif(n*p), n, p)
+y <- as.numeric(f(x))
+xtest <- matrix(runif(n*p), n, p)
+ytest <- f(xtest)
+
+## extraTrees with 1 CPU thread (the default):
+system.time({et <- extraTrees(x, y, numThreads=1)})
+## extraTrees with 2 CPU thread:
+system.time({et <- extraTrees(x, y, numThreads=2)})
+\end{verbatim}
+\caption{Example of how to use \texttt{extraTrees} in large scale settings.}
+\label{fig:large.scale}
+\end{figure}
+
 
 \section{Acknowledgements}
 
