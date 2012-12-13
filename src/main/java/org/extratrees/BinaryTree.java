@@ -21,7 +21,22 @@ public class BinaryTree {
 	public BinaryTree() {
 		
 	}
-	
+
+
+	/**
+	 * @param input the vector of input values
+	 * @return the leaf node (BinaryTree) for the input
+	 */
+	public BinaryTree getLeaf(double[] input) {
+		if (left==null) {
+			return this;
+		}
+		if (input[column]<threshold) {
+			return left.getLeaf(input);
+		}
+		return right.getLeaf(input);
+	}
+
 	/**
 	 * Returns the value from the whole tree.
 	 * @param input
@@ -36,6 +51,8 @@ public class BinaryTree {
 		}
 		return right.getValue(input);
 	}
+	
+
 	
 	/**
 	 * Returns values for data points, each data point is a row of the matrix.

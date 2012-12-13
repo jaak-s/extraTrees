@@ -101,9 +101,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		double[] temp = new double[input.ncols];
 		for (int row=0; row<input.nrows; row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<input.ncols; col++) {
-				temp[col] = input.get(row, col);
-			}
+			input.copyRow(row, temp);
 			values[row] = getValue(trees, temp);
 		}
 		return values;

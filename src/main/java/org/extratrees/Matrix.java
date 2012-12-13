@@ -31,6 +31,17 @@ public class Matrix {
 	public double get(int row, int col) {
 		return this.v[row + col*nrows];
 	}
+	
+	/**
+	 * Copies values from given row to the vector. 
+	 * @param row
+	 * @param vector
+	 */
+	public void copyRow(int row, double[] vector) {
+		for (int col=0; col<this.ncols; col++) {
+			vector[col] = this.get(row, col);
+		}
+	}
 
 	public void square() {
 		for (int i=0; i<v.length; i++) {

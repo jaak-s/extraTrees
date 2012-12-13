@@ -100,14 +100,14 @@ public abstract class AbstractTrees<E> {
 	}
 
 	/**
-	 * stores trees with the ExtraTrees object. 
+	 * stores trees with the AbstractTrees object. 
 	 * Uses multiple threads if set.
 	 * @param nmin
 	 * @param K
 	 * @param nTrees
 	 */
 	public void learnTrees(int nmin, int K, int nTrees) {
-		if (numThreads<0) {	//if (numThreads<=1) {
+		if (numThreads<=1) {	//if (numThreads<=1) {
 			this.trees = buildTrees(nmin, K, nTrees);
 		} else {
 			this.trees = buildTreesParallel(nmin, K, nTrees);

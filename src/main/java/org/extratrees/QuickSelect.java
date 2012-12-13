@@ -3,6 +3,22 @@ package org.extratrees;
 import java.util.ArrayList;
 
 public class QuickSelect {
+	/**
+     * Quick selection algorithm.
+     * Places the item closest to the k-th quantile in a[k*size()-1] and returns it.
+     * @param a an ArrayList of Double items.
+     * @param k the desired rank (1 is minimum) in the entire ArrayList.
+     * @return the selected value, i.e. a[k-1].
+	 */
+	public static double quickSelect( ArrayList<Double> a, double k) {
+		int element = 1+(int)Math.round( k*a.size() );
+		if (element>a.size()) {
+			element = a.size();
+		}
+		return quickSelect(a, element );
+	}
+	
+	
     /**
      * Quick selection algorithm.
      * Places the kth smallest item in a[k-1] and returns it.
