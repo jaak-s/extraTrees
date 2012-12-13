@@ -29,13 +29,27 @@ public class QuantileTests {
 		qet.learnTrees(5, 3, 100);
 		QuantileExtraTrees qet2 = getSampleData(5, 5);
 		double[] values = qet.getValues(qet2.input);
+		double[] qs0_0 = qet.getQuantile( qet2.input, 0.0 );
 		double[] qs0_5 = qet.getQuantile( qet2.input, 0.5 );
 		double[] qs0_6 = qet.getQuantile( qet2.input, 0.6 );
 		double[] qs0_9 = qet.getQuantile( qet2.input, 0.9 );
+		double[] qs1_0 = qet.getQuantile( qet2.input, 1.0 );
 		System.out.println( Arrays.toString(values) );
+		System.out.println( Arrays.toString(qs0_0) );
 		System.out.println( Arrays.toString(qs0_5) );
 		System.out.println( Arrays.toString(qs0_6) );
 		System.out.println( Arrays.toString(qs0_9) );
+		System.out.println( Arrays.toString(qs1_0) );
+		// qs0_5 <= qs0_6 <= qs0_9
+		for (int i=0; i<qs0_0.length; i++) {
+			assertTrue( qs0_0[i] <= values[i] );
+			assertTrue( qs0_0[i] <= qs0_5[i] );
+			assertTrue( qs0_5[i] <= qs0_6[i] );
+			assertTrue( qs0_6[i] <= qs0_9[i] );
+			assertTrue( qs0_9[i] <= qs1_0[i] );
+			assertTrue( values[i] <= qs1_0[i] );
+		}
+		
 	}
 
 }
