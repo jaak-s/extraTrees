@@ -85,7 +85,7 @@ extraTrees.default <- function(x, y,
     } else if (et$quantile) {
         ## quantile regression:
         et$jobject = .jnew(
-            "org.extraTrees.QuantileExtraTrees",
+            "org.extratrees.QuantileExtraTrees",
             toJavaMatrix(x),
             .jarray(y)
         )
