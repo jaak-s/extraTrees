@@ -1,6 +1,6 @@
 Package: extraTrees
-Version: 0.3-1
-Date: 2012-12-10
+Version: 0.4-1
+Date: 2012-12-15
 Title: ExtraTrees method
 Author: Jaak Simm
 Maintainer: Jaak Simm <jaak.simm@gmail.com>
@@ -9,6 +9,6 @@ Description: A package implementing ExtraTrees method for classification and
 Depends: R (>= 2.7.0), rJava (>= 0.5-0)
 SystemRequirements: Java (>= 1.6)
 License: Apache License 2.0
-Packaged: 2012-12-10 00:00:00 UTC; jaak
+Packaged: 2012-12-15 00:00:00 UTC; jaak
 Repository: CRAN
-Date/Publication: 2012-12-10 00:00:00
+Date/Publication: 2012-12-15 00:00:00
