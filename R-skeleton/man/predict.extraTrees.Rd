@@ -5,15 +5,17 @@
   This function makes predictions for regression/classification using the given trained ExtraTree object and provided input matrix (newdata).
 }
 \usage{
-  \method{predict}{extraTrees}(object, newdata, ...)
+  \method{predict}{extraTrees}(object, newdata, quantile=NULL, ...)
 }
 \arguments{
   \item{object}{ extraTree (S3) object, created by extraTrees(). }
   \item{newdata}{ a new numberic input data matrix, for each row a prediction is made. }
+  \item{quantile}{ the quantile value between 0.0 and 1.0, only use for quantile regression. }
   \item{...}{ not used currently. }
 }
 \value{
-  The vector of predictions from the ExtraTree et. The length of the vector is equal to the the number of rows in newdata.
+  The vector of predictions from the ExtraTree et.
+  The length of the vector is equal to the the number of rows in newdata.
 }
 \author{Jaak Simm}
 \examples{

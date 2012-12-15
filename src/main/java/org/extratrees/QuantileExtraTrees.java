@@ -11,11 +11,10 @@ public class QuantileExtraTrees extends ExtraTrees {
 	/**
 	 * 
 	 * @param input
-	 * @param quantile
-	 * @return return k-th quantile for input (quantile is between 0.0 minimum and 1.0 maximum).
-	 * For median ask 0.5. 
+	 * @param quantile a value between 0.0 and 1.0. For median use 0.5
+	 * @return return quantiles for each input row. 
 	 */
-	public double[] getQuantile(Matrix input, double k) {
+	public double[] getQuantiles(Matrix input, double k) {
 		double[] quantileValues = new double[input.nrows];
 		ArrayList<Double> leafValues = new ArrayList<Double>(this.trees.size());
 		double[] temp = new double[input.ncols];
@@ -45,7 +44,8 @@ public class QuantileExtraTrees extends ExtraTrees {
 	
 
 	/**
-	 *  @param ids a list of ids in training data to make the leaf 
+	 *  @param ids a list of ids in training data to make the leaf, 
+	 *  stores double values in the node.  
 	 *  @return leaf node
 	 */
 	@Override

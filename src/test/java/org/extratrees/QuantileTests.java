@@ -29,11 +29,11 @@ public class QuantileTests {
 		qet.learnTrees(5, 3, 100);
 		QuantileExtraTrees qet2 = getSampleData(5, 5);
 		double[] values = qet.getValues(qet2.input);
-		double[] qs0_0 = qet.getQuantile( qet2.input, 0.0 );
-		double[] qs0_5 = qet.getQuantile( qet2.input, 0.5 );
-		double[] qs0_6 = qet.getQuantile( qet2.input, 0.6 );
-		double[] qs0_9 = qet.getQuantile( qet2.input, 0.9 );
-		double[] qs1_0 = qet.getQuantile( qet2.input, 1.0 );
+		double[] qs0_0 = qet.getQuantiles( qet2.input, 0.0 );
+		double[] qs0_5 = qet.getQuantiles( qet2.input, 0.5 );
+		double[] qs0_6 = qet.getQuantiles( qet2.input, 0.6 );
+		double[] qs0_9 = qet.getQuantiles( qet2.input, 0.9 );
+		double[] qs1_0 = qet.getQuantiles( qet2.input, 1.0 );
 		System.out.println( Arrays.toString(values) );
 		System.out.println( Arrays.toString(qs0_0) );
 		System.out.println( Arrays.toString(qs0_5) );

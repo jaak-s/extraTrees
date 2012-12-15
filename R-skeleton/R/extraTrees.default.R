@@ -28,6 +28,7 @@ extraTrees.default <- function(x, y,
              numRandomCuts = 1,
              evenCuts = FALSE,
              numThreads = 1,
+             quantile = F,
              ...) {
     n <- nrow(x)
     p <- ncol(x)
@@ -61,26 +62,37 @@ extraTrees.default <- function(x, y,
     et$numRandomCuts = numRandomCuts
     et$evenCuts = evenCuts
     et$numThreads = numThreads
+    et$quantile = quantile
     class(et) = "extraTrees"
 
     if (et$factor && length(unique(y)) < 2) {
         stop("Need at least two classes to do classification.")
     }
     if (et$factor) {
+        if (quantile) {
+            stop("Option quantile cannot be used for classification.")
+        }
         ## classification:
         et$levels = levels(y)
         #stop("classification with extraTrees is not yet implemented.")
         ## creating FactorExtraTree object with the data
-        et$jobject  = .jnew(
+        et$jobject = .jnew(
             "org.extratrees.FactorExtraTrees",
             toJavaMatrix(x),
             .jarray( as.integer( as.integer(y)-1 ) )
         )
         .jcall( et$jobject, "V", "setnFactors", as.integer(length(et$levels)) )
+    } else if (et$quantile) {
+        ## quantile regression:
+        et$jobject = .jnew(
+            "org.extraTrees.QuantileExtraTrees",
+            toJavaMatrix(x),
+            .jarray(y)
+        )
     } else {
         ## regression:
         ## creating ExtraTree object with the data
-        et$jobject  = .jnew(
+        et$jobject = .jnew(
             "org.extratrees.ExtraTrees",
             toJavaMatrix(x),
             .jarray(y)
