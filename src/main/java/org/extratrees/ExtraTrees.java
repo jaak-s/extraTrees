@@ -87,6 +87,25 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	}
 	
 	/**
+	 * @param input
+	 * @return matrix of predictions where
+	 * output[i, j] gives prediction made for i-th row of input by j-th tree. 
+	 */
+	public Matrix getAllValues(Matrix input) {
+		Matrix out = new Matrix( input.nrows, trees.size() );
+		// temporary vector:
+		double[] temp = new double[input.ncols];
+		for (int row=0; row<input.nrows; row++) {
+			input.copyRow(row, temp);
+			for (int j=0; j<trees.size(); j++) {
+				out.set( row, j, trees.get(j).getValue(temp) );
+			}
+		}
+		return out;
+	}
+	
+
+	/**
 	 * Object method, using the trees stored by learnTrees(...) method.
 	 * @param input
 	 * @return
