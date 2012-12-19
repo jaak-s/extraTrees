@@ -102,13 +102,14 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	}
 	
 	/** Average of several trees, using nmin as depth */
+	/*
 	public static double getValue(ArrayList<FactorBinaryTree> trees, double[] input, int nmin, int nFactors) {
 		int[] counts = new int[nFactors];
 		for(FactorBinaryTree t : trees) {
 			counts[ t.getValue(input, nmin) ]++;
 		}
 		return getMaxIndex(counts);
-	}
+	}*/
 
 	/**
 	 * @param values

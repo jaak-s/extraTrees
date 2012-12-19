@@ -10,7 +10,7 @@
 \arguments{
   \item{object}{ extraTree (S3) object, created by extraTrees(). }
   \item{newdata}{ a new numberic input data matrix, for each row a prediction is made. }
-  \item{quantile}{ the quantile value between 0.0 and 1.0, only use for quantile regression. }
+  \item{quantile}{ the quantile value between 0.0 and 1.0 for quantile regression, or NULL (default) for standard predictions. }
   \item{...}{ not used currently. }
 }
 \value{
