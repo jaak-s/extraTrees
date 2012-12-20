@@ -31,7 +31,7 @@ public class ExtraTreeTests {
 		Matrix all = et.getAllValues(et.input);
 		double[] yhat = et.getValues(et.input);
 		// check if their mean is equal to extraTree predictions:
-		System.out.println(all);
+		//System.out.println(all);
 		for (int row=0; row<yhat.length; row++) {
 			double sum = 0;
 			for (int j=0; j<all.ncols; j++) {
