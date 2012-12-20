@@ -71,4 +71,26 @@ public class FactorTests {
 		fet.setNumRandomCuts(4);
 		fet.learnTrees(1, 1, 1);
 	}
+	
+	/** testing {@code et.getAllValues(input)} */
+	@Test
+	public void testGetAll() {
+		int ndata = 40;
+		FactorExtraTrees et = getSampleData(ndata, 5);
+		et.learnTrees(5, 4, 10);
+		// get all predictions by trees:
+		Matrix all = et.getAllValues(et.input);
+		int[] yhat = et.getValues(et.input);
+		// check if their mean is equal to extraTree predictions:
+		System.out.println(all);
+		/*
+		for (int row=0; row<yhat.length; row++) {
+			double sum = 0;
+			for (int j=0; j<all.ncols; j++) {
+				sum += all.get(row, j);
+			}
+			assertEquals("row="+row, yhat[row], sum/all.ncols, 1e-6);
+		}*/
+	}
+
 }
