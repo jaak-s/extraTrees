@@ -40,5 +40,37 @@ public class ExtraTreeTests {
 			assertEquals("row="+row, yhat[row], sum/all.ncols, 1e-6);
 		}
 	}
+	
+	@Test
+	public void testSelectTrees() {
+		int ndata = 50;
+		int ndim  = 5;
+		ExtraTrees et = getSampleData(ndata, ndim);
+		int ntrees = 10;
+		et.learnTrees(5, 4, ntrees);
+		boolean[] selection = new boolean[ntrees];
+		int[] treeIds = {0, 5};
+		for (int i=0; i<selection.length; i++) {
+			selection[ i ] = false;
+		}
+		for (int i=0; i<treeIds.length; i++) {
+			selection[ treeIds[i] ] = true;
+		}
+		// making sub-extraTree based on selection:
+		ExtraTrees et2 = et.selectTrees(selection);
+		
+		Matrix m  = et.getAllValues(et.input);
+		Matrix m2 = et2.getAllValues(et2.input);
+		
+		// checking that the chosen trees are the same:
+		assertEquals( treeIds.length, et2.trees.size() );
+		assertEquals( treeIds.length, m2.ncols );
+		for (int i=0; i<treeIds.length; i++) {
+			assertTrue( et2.trees.get(i)==et.trees.get(treeIds[i]) );
+			// checking the getAll: (first)
+			assertEquals( m2.get(0, i), m.get(0, treeIds[i]), 1e-6);
+		}
+		
+	}
 
 }

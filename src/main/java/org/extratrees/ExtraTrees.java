@@ -58,6 +58,23 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		this.numRandomCuts = numRandomCuts;
 	}
 	
+	/**
+	 * @param selection
+	 * @return new ExtraTrees object with the same input and output data with
+	 * only the selected trees specified by {@code selection}.
+	 */
+	public ExtraTrees selectTrees(boolean[] selection) {
+		ExtraTrees newET = new ExtraTrees(input, output);
+		newET.trees = new ArrayList<BinaryTree>();
+		for (int i=0; i<selection.length; i++) {
+			if (!selection[i]) {
+				continue;
+			}
+			newET.trees.add(this.trees.get(i));
+		}
+		return newET;
+	}
+	
 	/** Builds trees with ids */
 	public ArrayList<BinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
 		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);
