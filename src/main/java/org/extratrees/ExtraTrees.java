@@ -8,7 +8,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	Matrix input;
 	double[] output;
 	double[] outputSq;
-	static double zero=1e-6;
+	static double zero=1e-7;
 	/** later shuffled and used for choosing random columns at each node */
 	ArrayList<Integer> cols;
 	

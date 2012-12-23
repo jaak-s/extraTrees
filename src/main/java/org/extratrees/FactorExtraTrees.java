@@ -8,7 +8,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	/** number of factors: */
 	int nFactors;
 	//String[] factorNames;
-	static double zero=1e-6;
+	static double zero=1e-7;
 	
 	/** later shuffled and used for choosing random columns at each node: */
 	ArrayList<Integer> cols;
