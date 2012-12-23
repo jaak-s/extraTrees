@@ -93,4 +93,37 @@ public class FactorTests {
 		}*/
 	}
 
+	@Test
+	public void testSelectTrees() {
+		int ndata = 50;
+		int ndim  = 5;
+		FactorExtraTrees et = getSampleData(ndata, ndim);
+		int ntrees = 10;
+		et.learnTrees(5, 4, ntrees);
+		boolean[] selection = new boolean[ntrees];
+		int[] treeIds = {0, 5};
+		for (int i=0; i<selection.length; i++) {
+			selection[ i ] = false;
+		}
+		for (int i=0; i<treeIds.length; i++) {
+			selection[ treeIds[i] ] = true;
+		}
+		// making sub-extraTree based on selection:
+		FactorExtraTrees et2 = et.selectTrees(selection);
+		
+		Matrix m  = et.getAllValues(et.input);
+		Matrix m2 = et2.getAllValues(et2.input);
+		
+		// checking that the chosen trees are the same:
+		assertEquals( treeIds.length, et2.trees.size() );
+		assertEquals( treeIds.length, m2.ncols );
+		for (int i=0; i<treeIds.length; i++) {
+			assertTrue( et2.trees.get(i)==et.trees.get(treeIds[i]) );
+			// checking the getAll: (first)
+			for (int row=0; row<m.nrows; row++) {
+				assertEquals( m2.get(row, i), m.get(row, treeIds[i]), 1e-6);
+			}
+		}
+	}
+
 }

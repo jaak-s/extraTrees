@@ -82,6 +82,24 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		this.numRandomCuts = numRandomCuts;
 	}
 	
+	/**
+	 * @param selection
+	 * @return new ExtraTrees object with the same input and output data with
+	 * only the selected trees specified by {@code selection}.
+	 */
+	public FactorExtraTrees selectTrees(boolean[] selection) {
+		FactorExtraTrees newET = new FactorExtraTrees(input, output);
+		newET.trees = new ArrayList<FactorBinaryTree>();
+		for (int i=0; i<selection.length; i++) {
+			if (!selection[i]) {
+				continue;
+			}
+			newET.trees.add(this.trees.get(i));
+		}
+		return newET;
+	}
+
+	
 	/** Builds trees with ids */
 	public ArrayList<FactorBinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
 		ArrayList<FactorBinaryTree> trees = new ArrayList<FactorBinaryTree>(nTrees);
