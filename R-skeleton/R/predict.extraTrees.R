@@ -1,6 +1,6 @@
 
 
-predict.extraTrees <- function( object, newdata, quantile=NULL, ... )
+predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, ... )
 {
     if (!inherits(object, "extraTrees")) {
         stop("object not of class extraTrees")
@@ -17,8 +17,31 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, ... )
         if (quantile[1] < 0.0 || quantile[1] > 1.0) {
             stop("quantile has to be between 0.0 and 1.0.")
         }
+        if (allTrees) {
+            stop("Can't use allTrees=T with quantile.")
+        }
         ## quantile regression:
         return( .jcall( et$jobject, "[D", "getQuantiles", toJavaMatrix(newdata), quantile[1] ) )
+    }
+    if (allValues) {
+        ## returning allTree prediction:
+        m = toRMatrix( .jcall( et$jobject, "Lorg/extratrees/Matrix;", "getAllValues", toJavaMatrix(newdata) ) )
+        if (!et$factor) {
+            ## regression model:
+            return(m)
+        }
+        ## factor model: convert double matrix into data.frame of factors
+        lvls = 0:(length(et$levels)-1)
+        m = round(m)
+        mlist = lapply( 1:ncol(m), function(j) factor(round(m[,j]), levels=lvls, labels=et$levels) )
+        ## changing list to data.frame:
+        attributes(mlist) <- list(
+            row.names=c(NA_integer_,nrow(m)), 
+            class="data.frame",
+            names=make.names(names(mlist)),
+            unique=TRUE
+        )
+        return(mlist)
     }
     if (!et$factor) {
         ## regression:
