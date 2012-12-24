@@ -22,6 +22,12 @@ public abstract class AbstractTrees<E> {
 		this.numThreads = numThreads;
 	}
 	
+	/**
+	 * @return number of trees used in ExtraTrees
+	 */
+	public int getNumTrees() {
+		return trees.size();
+	}
 
 	/**
 	 * Same as buildTrees() except computes in parallel.

@@ -17,14 +17,14 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, ...
         if (quantile[1] < 0.0 || quantile[1] > 1.0) {
             stop("quantile has to be between 0.0 and 1.0.")
         }
-        if (allTrees) {
-            stop("Can't use allTrees=T with quantile.")
+        if (allValues) {
+            stop("Can't use allValues=T with quantile.")
         }
         ## quantile regression:
         return( .jcall( et$jobject, "[D", "getQuantiles", toJavaMatrix(newdata), quantile[1] ) )
     }
     if (allValues) {
-        ## returning allTree prediction:
+        ## returning allValues prediction:
         m = toRMatrix( .jcall( et$jobject, "Lorg/extratrees/Matrix;", "getAllValues", toJavaMatrix(newdata) ) )
         if (!et$factor) {
             ## regression model:
