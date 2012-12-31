@@ -143,7 +143,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		return values;
 	}
 	
-
 	/**
 	 * @param nmin - number of elements in leaf node
 	 * @param K    - number of choices
@@ -167,7 +166,8 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * @param randomCols - passed to save memory (maybe not needed)
 	 * @return
 	 */
-	public BinaryTree buildTree(int nmin, int K, int[] ids, ShuffledIterator<Integer> randomCols) {
+	public BinaryTree buildTree(int nmin, int K, int[] ids, 
+			ShuffledIterator<Integer> randomCols) {
 		if (ids.length<nmin) {
 			return makeLeaf(ids);
 		}
