@@ -20,7 +20,7 @@ public class MarginCriteriaTest {
 
 	@Test
 	public void test() {
-		MarginCriteria mc = new MarginCriteria();
+		HardMargin mc = new HardMargin();
 		int ndata = 21;
 		int[] ids = new int[ndata];
 		for (int i=0; i<ids.length; i++) {

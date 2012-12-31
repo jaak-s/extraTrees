@@ -1,6 +1,6 @@
 package org.extratrees;
 
-public class MarginCriteria {
+public class HardMargin {
 	
 	/**
 	 * @param inputs NxD matrix of inputs (unlabeled)
