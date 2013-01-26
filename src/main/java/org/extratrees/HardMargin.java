@@ -1,5 +1,10 @@
 package org.extratrees;
 
+/**
+ * Computes hard margin (distance from cutting point to closest point on the given dimension).
+ * 
+ * @author Jaak Simm
+ */
 public class HardMargin {
 	
 	/**

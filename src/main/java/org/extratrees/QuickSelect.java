@@ -7,7 +7,7 @@ public class QuickSelect {
      * Quick selection algorithm.
      * Places the item closest to the k-th quantile in a[k*size()-1] and returns it.
      * @param a an ArrayList of Double items.
-     * @param k the desired rank (1 is minimum) in the entire ArrayList.
+     * @param k the desired rank from 0 (smallest) to 1 (largest).
      * @return the selected value, i.e. a[k-1].
 	 */
 	public static double quickSelect( ArrayList<Double> a, double k) {
