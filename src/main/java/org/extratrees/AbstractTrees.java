@@ -13,6 +13,30 @@ public abstract class AbstractTrees<E> {
 
 	/** number of threads */
 	int numThreads = 1;
+	
+	// for semi-supervised learning:
+	/** unsupervised points, used for semi-supervised learning */
+	Matrix unlabeled;
+	/** weight of unsupervised learning (used to make semi-supervised signal) */
+	double weightOfUSL = 1.0;
+	
+	HardMargin margin = new HardMargin();
+	
+	public void setUnlabeled(Matrix unlabeled) {
+		this.unlabeled = unlabeled;
+	}
+	
+	public Matrix getUnlabeled() {
+		return unlabeled;
+	}
+	
+	public void setWeightOfUSL(double weightOfUSL) {
+		this.weightOfUSL = weightOfUSL;
+	}
+	
+	public double getWeightOfUSL() {
+		return weightOfUSL;
+	}
 
 	public int getNumThreads() {
 		return numThreads;
@@ -27,6 +51,24 @@ public abstract class AbstractTrees<E> {
 	 */
 	public int getNumTrees() {
 		return trees.size();
+	}
+	
+	/**
+	 * @param inputs
+	 * @param ids
+	 * @param dim
+	 * @param cut
+	 * @return score of unsupervised error (the bigger the worse), i.e., 
+	 * how far the margin is from the best margin (0.5).
+	 * Gives 0 if unlabeled is null. 
+	 * Uses <b>weightOfSSL</b> to adjust the result.
+	 */
+	public double calculateUSL(Matrix inputs, int[] ids, int dim, double cut) {
+		if (unlabeled==null) {
+			return 0;
+		}
+		// best margin is 0.5
+		return weightOfUSL * ( 0.5 - margin.getCriteria(inputs, ids, dim, cut) );
 	}
 
 	/**
@@ -124,4 +166,38 @@ public abstract class AbstractTrees<E> {
 	public abstract E buildTree(int nmin, int k);
 
 
+	/**
+	 * @param m
+	 * @param ids
+	 * @param dim
+	 * @param cut
+	 * @return filters Matrix m into two subsets, one that is lower than cut
+	 * and other that is higher than cut in dimension <b>dim</b>.
+	 */
+	public static int[][] splitIds(Matrix m, int[] ids, int dim, double cut) {
+		int[][] out = new int[2][];
+		int lenLower = 0;
+		for (int i=0; i<ids.length; i++) {
+			if (m.get(ids[i], dim)<cut) {
+				lenLower++;
+			}
+		}
+		// two vectors: lower and higher
+		out[0] = new int[lenLower];
+		out[1] = new int[ids.length - lenLower];
+		
+		int i0 = 0;
+		int i1 = 0;
+		for (int i=0; i<ids.length; i++) {
+			if (m.get(ids[i], dim)<cut) {
+				out[0][i0] = ids[i];
+				i0++;
+			} else {
+				out[1][i1] = ids[i];
+				i1++;
+			}
+		}
+		
+		return out;
+	}
 }

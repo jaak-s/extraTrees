@@ -1,6 +1,8 @@
 package org.extratrees;
 import static org.junit.Assert.*;
 
+import java.util.Random;
+
 import org.extratrees.FactorExtraTrees;
 import org.extratrees.Matrix;
 import org.junit.Test;
@@ -124,6 +126,37 @@ public class FactorTests {
 				assertEquals( m2.get(row, i), m.get(row, treeIds[i]), 1e-6);
 			}
 		}
+	}
+	
+	public FactorExtraTrees getSampleData2(int ndata) {
+		int[] output = new int[ndata];
+		int ndim = 3;
+		Random random = new Random();
+		Matrix m = new Matrix(ndata, ndim);
+		for (int i=0; i<m.nrows; i++) {
+			output[i] = Math.random()>0.5 ?1 :0;
+			if (output[i]==1) {
+				m.set(i, 0, random.nextGaussian() + 1 );
+				m.set(i, 1, random.nextGaussian() + 3 );
+				m.set(i, 2, random.nextGaussian() + 5 );
+			} else {
+				m.set(i, 0, random.nextGaussian() );
+				m.set(i, 1, random.nextGaussian() );
+				m.set(i, 2, random.nextGaussian() );
+			}
+		}
+		FactorExtraTrees et = new FactorExtraTrees(m, output);
+		return et;
+	}
+
+	@Test
+	public void testSSL() {
+		int ndata = 50;
+		int nUnlabeled = 500;
+		FactorExtraTrees et = getSampleData2(ndata);
+		et.setUnlabeled( getSampleData2(nUnlabeled).input );
+		int ntrees = 10;
+		et.learnTrees(5, 4, ntrees);
 	}
 
 }

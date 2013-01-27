@@ -2,6 +2,10 @@ package org.extratrees;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.junit.Test;
 
 public class ExtraTreeTests {
@@ -21,6 +25,8 @@ public class ExtraTreeTests {
 		ExtraTrees et = new ExtraTrees(m, output);
 		return et;
 	}
+	
+
 
 	/** testing {@code et.getAllValues(input)} */
 	@Test
@@ -71,6 +77,30 @@ public class ExtraTreeTests {
 			assertEquals( m2.get(0, i), m.get(0, treeIds[i]), 1e-6);
 		}
 		
+	}
+
+	public static Matrix getSampleData(int ndata) {
+		int ndim = 3;
+		Matrix m = new Matrix(ndata, ndim);
+		for (int i=0; i<ndata; i++) {
+			m.set(i, 0, i);
+			m.set(i, 1, i<ndata/2 ?1.0 :2.0);
+			m.set(i, 2, -1);
+		}
+		// generate values for all outputs
+		return m;
+	}
+	
+	@Test
+	public void testSplitIds() {
+		Matrix x = getSampleData(20);
+		int[] ids = new int[10];
+		for (int i=0; i<ids.length; i++) {
+			ids[i] = i*2;
+		}
+		int[][] split = AbstractTrees.splitIds(x, ids, 0, 9.9);
+		assertArrayEquals(new int[]{0,2,4,6,8}, split[0] );
+		assertArrayEquals(new int[]{10,12,14,16,18}, split[1] );
 	}
 
 }
