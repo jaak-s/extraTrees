@@ -82,7 +82,7 @@ public class FactorTests {
 		et.learnTrees(5, 4, 10);
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
-		int[] yhat = et.getValues(et.input);
+		//int[] yhat = et.getValues(et.input);
 		// check if their mean is equal to extraTree predictions:
 		System.out.println(all);
 		/*
