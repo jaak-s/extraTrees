@@ -339,6 +339,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		bt.nSuccessors = ids.length;
 		int[] uIdsLeft = null;
 		int[] uIdsRight= null;
+		// splitting unlabeled IDs:
 		if (unlabeled!=null) {
 			// finding ids:
 			int[][] temp = AbstractTrees.splitIds(unlabeled, ids, bt.column, bt.threshold);

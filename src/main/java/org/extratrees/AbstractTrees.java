@@ -167,12 +167,12 @@ public abstract class AbstractTrees<E> {
 
 
 	/**
-	 * @param m
-	 * @param ids
-	 * @param dim
-	 * @param cut
-	 * @return filters Matrix m into two subsets, one that is lower than cut
-	 * and other that is higher than cut in dimension <b>dim</b>.
+	 * @param m    data matrix
+	 * @param ids  row numbers to be split
+	 * @param dim  which dimension to use for splitting
+	 * @param cut  splitting value
+	 * @return filters ids <b>ids</b> into two arrays, one whose values in data values
+	 * {@code m[id, dim]} are below cut and others whose values are higher. 
 	 */
 	public static int[][] splitIds(Matrix m, int[] ids, int dim, double cut) {
 		int[][] out = new int[2][];
