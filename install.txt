@@ -5,9 +5,13 @@ Installation:
      -> Key: JAVA6_BOOT_CLASSPATH
      -> Val: /usr/lib/jvm/java-6-openjdk/jre/lib/rt.jar
 
-2) install the files:
+2a) install the files:
 cd ~/Documents/temp
 R CMD INSTALL extraTrees
+
+2b) install in windows:
+run R
+install.packages("C:\\Users\\...\\extraTrees", type="source", repos=NULL)
 
 3) package extraTrees:
 R CMD build extraTrees  
