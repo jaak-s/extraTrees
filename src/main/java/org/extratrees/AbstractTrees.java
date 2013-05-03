@@ -16,19 +16,20 @@ public abstract class AbstractTrees<E> {
 	
 	// for semi-supervised learning:
 	/** unsupervised points, used for semi-supervised learning */
-	Matrix unlabeled;
+	//Matrix unlabeled;
 	/** weight of unsupervised learning (used to make semi-supervised signal) */
 	double weightOfUSL = 1.0;
 	
 	HardMargin margin = new HardMargin();
 	
+	/*
 	public void setUnlabeled(Matrix unlabeled) {
 		this.unlabeled = unlabeled;
 	}
 	
 	public Matrix getUnlabeled() {
 		return unlabeled;
-	}
+	}*/
 	
 	public void setWeightOfUSL(double weightOfUSL) {
 		this.weightOfUSL = weightOfUSL;
@@ -63,6 +64,7 @@ public abstract class AbstractTrees<E> {
 	 * Gives 0 if unlabeled is null. 
 	 * Uses <b>weightOfSSL</b> to adjust the result.
 	 */
+	/*
 	public double calculateUSL(Matrix inputs, int[] ids, int dim, double cut) {
 		if (unlabeled==null) {
 			return 0;
@@ -70,7 +72,8 @@ public abstract class AbstractTrees<E> {
 		// best margin is 0.5
 		return weightOfUSL * ( 0.5 - margin.getCriteria(inputs, ids, dim, cut) );
 	}
-
+	*/
+	
 	/**
 	 * Same as buildTrees() except computes in parallel.
 	 * @param nmin

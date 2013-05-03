@@ -199,15 +199,17 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		for (int i=0; i<ids.length; i++) {
 			ids[i] = i;
 		}
-		int[] unlabeledIds = null;
+		//int[] unlabeledIds = null;
+		/*
 		if (unlabeled!=null) {
 			unlabeledIds = new int[unlabeled.nrows];
 			for (int i=0; i<unlabeledIds.length; i++) {
 				unlabeledIds[i] = i;
 			}
-		}
+		}*/
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		return buildTree(nmin, K, ids, unlabeledIds, cols);
+		return buildTree(nmin, K, ids, cols);
+		//return buildTree(nmin, K, ids, unlabeledIds, cols);
 	}
 	
 	/**
@@ -226,7 +228,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return 1 - sum / (double)( total*total );
 	}
 	
-	public FactorBinaryTree buildTree(int nmin, int K, int[] ids, int[] unlabeledIds,
+	public FactorBinaryTree buildTree(int nmin, int K, int[] ids, /*int[] unlabeledIds,*/
 			ShuffledIterator<Integer> randomCols) 
 	{
 		if (ids.length<nmin) {
@@ -289,8 +291,9 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 				double giniRight = getGiniIndex(factorCountRight);
 				
 				double score = (giniLeft*countLeft + giniRight*countRight) / ids.length;
-				double scoreUSL = this.calculateUSL(unlabeled, unlabeledIds, col, t);
-				score += scoreUSL;
+				// removed because unsupervised learning is not implemented
+				//double scoreUSL = this.calculateUSL(unlabeled, unlabeledIds, col, t);
+				//score += scoreUSL;
 				// pure node:
 	//			if (score<zero*zero) {
 	//				return makeLeaf(ids);
@@ -337,24 +340,27 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		bt.column    = col_best;
 		bt.threshold = t_best;
 		bt.nSuccessors = ids.length;
-		int[] uIdsLeft = null;
-		int[] uIdsRight= null;
+//		int[] uIdsLeft = null;
+//		int[] uIdsRight= null;
 		// splitting unlabeled IDs:
+		/*
 		if (unlabeled!=null) {
 			// finding ids:
 			int[][] temp = AbstractTrees.splitIds(unlabeled, ids, bt.column, bt.threshold);
 			uIdsLeft  = temp[0];
 			uIdsRight = temp[1];
-		}
+		}*/
 		if (leftConst) { 
 			bt.left = makeLeaf(idsLeft); // left child's output is constant 
 		} else {  
-			bt.left  = this.buildTree(nmin, K, idsLeft, uIdsLeft, randomCols); 
+			//bt.left  = this.buildTree(nmin, K, idsLeft, uIdsLeft, randomCols); 
+			bt.left  = this.buildTree(nmin, K, idsLeft, randomCols);
 		}
 		if (rightConst) {
 			bt.right = makeLeaf(idsRight); // right child's output is constant
 		} else {
-			bt.right = this.buildTree(nmin, K, idsRight, uIdsRight, randomCols);
+			//bt.right = this.buildTree(nmin, K, idsRight, uIdsRight, randomCols);
+			bt.right = this.buildTree(nmin, K, idsRight, randomCols);
 		}
 		// this value is used only for CV:
 		// TODO: add code for calculating value for intermediate nodes:

@@ -149,6 +149,7 @@ public class FactorTests {
 		return et;
 	}
 
+	/*
 	@Test
 	public void testSSL() {
 		int ndata = 50;
@@ -157,6 +158,6 @@ public class FactorTests {
 		et.setUnlabeled( getSampleData2(nUnlabeled).input );
 		int ntrees = 10;
 		et.learnTrees(5, 4, ntrees);
-	}
+	}*/
 
 }
