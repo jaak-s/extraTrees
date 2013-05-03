@@ -205,6 +205,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 					double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
 					t = Math.random()*(iStop-iStart) + iStart;
 				} else {
+					// generate uniform value between col_min and col_max 
 					t = Math.random()*diff + col_min;
 				}
 				
@@ -226,6 +227,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 				// calculating score:
 				double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
 				double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
+				// TODO: move var and var<zero*zero outside this loop:
 				double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
 				double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
 				
@@ -272,7 +274,9 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			}
 		}
 		BinaryTree bt = new BinaryTree();
+		// col_best is the feature to cut
 		bt.column    = col_best;
+		// threshold is the cut value
 		bt.threshold = t_best;
 		bt.nSuccessors = ids.length;
 		if (leftConst) { 

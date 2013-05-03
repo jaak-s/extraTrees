@@ -269,7 +269,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 					t = Math.random()*diff + col_min;
 				}
 			
-				// calculating QINI impurity index (0 - pure, 0 - noisy):
+				// calculating GINI impurity index (0 - pure, 1 - noisy):
 				int countLeft=0, countRight=0;
 				int[] factorCountLeft  = new int[nFactors];
 				int[] factorCountRight = new int[nFactors];
