@@ -238,22 +238,16 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		while( randomCols.hasNext() ) {
 			int col = randomCols.next();
 			// calculating columns min and max:
-			double col_min = Double.POSITIVE_INFINITY;
-			double col_max = Double.NEGATIVE_INFINITY;
-			for (int n=0; n<ids.length; n++) {
-				double v = input.get(ids[n], col);
-				if ( v<col_min ) { col_min = v; }
-				if ( v>col_max ) { col_max = v; }
-			}
-			if (col_max-col_min < zero) {
+			double[] range = getRange(ids, col, input);
+			if (range[1]-range[0] < zero) {
 				// skipping, because column is constant
 				continue;
 			}
-			double diff = (col_max-col_min);
+			double diff = (range[1]-range[0]);
 			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
 				// picking random test point:
 				double t;
-				t = getRandomCut(col_min, diff, repeat);
+				t = getRandomCut(range[0], diff, repeat);
 			
 				// calculating GINI impurity index (0 - pure, 1 - noisy):
 				int countLeft=0, countRight=0;

@@ -126,6 +126,23 @@ public abstract class AbstractTrees<E> {
 		return t;
 	}
 	
+	/**
+	 * @param ids
+	 * @param col
+	 * @param input
+	 * @return array of min and max values.
+	 */
+	protected double[] getRange(int[] ids, int col, Matrix input) {
+		double[] range = new double[2];
+		range[0] = Double.POSITIVE_INFINITY;
+		range[1] = Double.NEGATIVE_INFINITY;
+		for (int n=0; n<ids.length; n++) {
+			double v = input.get(ids[n], col);
+			if ( v<range[0] ) { range[0] = v; }
+			if ( v>range[1] ) { range[1] = v; }
+		}
+		return range;
+	}
 
 	
 	/**
