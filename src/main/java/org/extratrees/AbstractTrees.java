@@ -14,6 +14,18 @@ public abstract class AbstractTrees<E> {
 	/** number of threads */
 	int numThreads = 1;
 	
+	/** number of times task cut is tried */
+	int numRandomTaskCuts = 1;
+	
+	/** probability of trying task cutting (lambda) */
+	double probOfTaskCuts = 1.0;
+
+	/** number of random cuts tried for each feature */
+	int numRandomCuts = 1;
+	/** whether random cuts are totally uniform or evenly uniform */
+	boolean evenCuts = false;
+
+
 	// for semi-supervised learning:
 	/** unsupervised points, used for semi-supervised learning */
 	//Matrix unlabeled;
@@ -47,12 +59,74 @@ public abstract class AbstractTrees<E> {
 		this.numThreads = numThreads;
 	}
 	
+	public int getNumRandomTaskCuts() {
+		return numRandomTaskCuts;
+	}
+	/** sets the number of times random cut for tasks is tried (assuming multitask setting).  
+	 *  default is 1.
+	 * */
+	public void setNumRandomTaskCuts(int numRandomTaskCuts) {
+		this.numRandomTaskCuts = numRandomTaskCuts;
+	}
+	
+	public double getProbOfTaskCuts() {
+		return probOfTaskCuts;
+	}
+	/**
+	 * sets the probability of trying task cutting.
+	 * @param probOfTaskCuts
+	 */
+	public void setProbOfTaskCuts(double probOfTaskCuts) {
+		this.probOfTaskCuts = probOfTaskCuts;
+	}
+	
 	/**
 	 * @return number of trees used in ExtraTrees
 	 */
 	public int getNumTrees() {
 		return trees.size();
 	}
+	
+	public boolean isEvenCuts() {
+		return evenCuts;
+	}
+	
+	/**
+	 * @param evenCuts - whether the random cuts (if more than 1) are
+	 * sampled from fixed even intervals (true) 
+	 * or just sampled ordinary uniform way (false)
+	 */
+	public void setEvenCuts(boolean evenCuts) {
+		this.evenCuts = evenCuts;
+	}
+	
+	public int getNumRandomCuts() {
+		return numRandomCuts;
+	}
+	
+	public void setNumRandomCuts(int numRandomCuts) {
+		this.numRandomCuts = numRandomCuts;
+	}
+
+	/**
+	 * @param col_min
+	 * @param diff
+	 * @param repeat  only used when evenCuts==true.
+	 * @return random cut from col_min to col_min+diff.
+	 */
+	protected double getRandomCut(double col_min, double diff, int repeat) {
+		double t;
+		if (evenCuts) {
+			double iStart = col_min + repeat*diff/numRandomCuts;
+			double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
+			t = Math.random()*(iStop-iStart) + iStart;
+		} else {
+			t = Math.random()*diff + col_min;
+		}
+		return t;
+	}
+	
+
 	
 	/**
 	 * @param inputs

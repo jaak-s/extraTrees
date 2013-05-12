@@ -14,11 +14,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	
 	// defined in AbstractTrees:
 	//ArrayList<BinaryTree> trees;
-	
-	/** number of random cuts tried for each feature */
-	int numRandomCuts = 1;
-	/** whether random cuts are totally uniform or evenly uniform */
-	boolean evenCuts = false;
 
 	public ExtraTrees(Matrix input, double[] output) {
 		if (input.nrows!=output.length) {
@@ -35,27 +30,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		for (int i=0; i<input.ncols; i++) {
 			cols.add(i);
 		}
-	}
-	
-	public boolean isEvenCuts() {
-		return evenCuts;
-	}
-	
-	/**
-	 * @param evenCuts - whether the random cuts (if more than 1) are
-	 * sampled from fixed even intervals (true) 
-	 * or just sampled ordinary uniform way (false)
-	 */
-	public void setEvenCuts(boolean evenCuts) {
-		this.evenCuts = evenCuts;
-	}
-	
-	public int getNumRandomCuts() {
-		return numRandomCuts;
-	}
-	
-	public void setNumRandomCuts(int numRandomCuts) {
-		this.numRandomCuts = numRandomCuts;
 	}
 	
 	/**
@@ -200,14 +174,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			double diff = (col_max-col_min);
 			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
 				double t;
-				if (evenCuts) {
-					double iStart = col_min + repeat*diff/numRandomCuts;
-					double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
-					t = Math.random()*(iStop-iStart) + iStart;
-				} else {
-					// generate uniform value between col_min and col_max 
-					t = Math.random()*diff + col_min;
-				}
+				t = getRandomCut(col_min, diff, repeat);
 				
 				// calculating score:
 				int countLeft=0, countRight=0;

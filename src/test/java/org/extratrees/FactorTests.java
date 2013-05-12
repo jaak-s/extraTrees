@@ -78,21 +78,23 @@ public class FactorTests {
 	@Test
 	public void testGetAll() {
 		int ndata = 40;
+		int nTrees = 10;
 		FactorExtraTrees et = getSampleData(ndata, 5);
-		et.learnTrees(5, 4, 10);
+		et.learnTrees(5, 4, nTrees);
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
-		//int[] yhat = et.getValues(et.input);
+		assertEquals(et.input.nrows, all.nrows);
+		assertEquals(nTrees, all.ncols);
+		int[] yhat = et.getValues(et.input);
 		// check if their mean is equal to extraTree predictions:
-		System.out.println(all);
-		/*
+		//System.out.println(all);
+		int errors = 0;
 		for (int row=0; row<yhat.length; row++) {
-			double sum = 0;
-			for (int j=0; j<all.ncols; j++) {
-				sum += all.get(row, j);
+			if (yhat[row] != et.output[row]) {
+				errors++;
 			}
-			assertEquals("row="+row, yhat[row], sum/all.ncols, 1e-6);
-		}*/
+		}
+		System.out.println( String.format("Error rate: %1.3f", errors / (double) yhat.length) );
 	}
 
 	@Test

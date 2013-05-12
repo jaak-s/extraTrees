@@ -1,5 +1,6 @@
 package org.extratrees;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
@@ -7,6 +8,10 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	int[] output;
 	/** number of factors: */
 	int nFactors;
+	/** for multi-task learning, stores task indeces (null if not present) */
+	int[] tasks;
+	/** number of tasks: */
+	HashSet<Integer> taskNames;
 	//String[] factorNames;
 	static double zero=1e-7;
 	
@@ -15,26 +20,25 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	
 	//ArrayList<FactorBinaryTree> trees;
 
-	/** number of random cuts tried for each feature */
-	int numRandomCuts = 1;
-	/** whether random cuts are totally uniform or evenly uniform */
-	boolean evenCuts = false;
+	public FactorExtraTrees(Matrix input, int[] output) {
+		this(input, output, null);
+	}
 	
 	/**
 	 * @param input    - matrix of inputs, each row is an input vector
 	 * @param output   - array of ints from 0 to nFactors-1 (class label)
-	 * @param nFactors - number of factors (class labels)
+	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
 	 */
-	public FactorExtraTrees(Matrix input, int[] output) {
+	public FactorExtraTrees(Matrix input, int[] output, int[] tasks) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
-		this.input = input;
+		if (tasks!=null && input.nrows!=tasks.length) {
+			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
+		}
+		this.input  = input;
 		this.output = output;
-		//this.outputSq = new double[output.length];
-		//for (int i=0; i<output.length; i++) {
-		//	this.outputSq[i] = this.output[i]*this.output[i]; 
-		//}
+		this.tasks  = tasks;
 		
 		this.nFactors = 1;
 		for (int i=0; i<output.length; i++) {
@@ -43,6 +47,13 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			}
 			if (nFactors<=output[i]) {
 				nFactors = output[i]+1;
+			}
+		}
+		// making a list of tasks:
+		this.taskNames = new HashSet<Integer>();
+		if (tasks!=null) {
+			for (int i=0; i<tasks.length; i++) {
+				taskNames.add(tasks[i]);
 			}
 		}
 		
@@ -60,27 +71,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	public void setnFactors(int nFactors) {
 		this.nFactors = nFactors;
 	}
-
-	public boolean isEvenCuts() {
-		return evenCuts;
-	}
-	
-	/**
-	 * @param evenCuts - whether the random cuts (if more than 1) are
-	 * sampled from fixed even intervals (true) 
-	 * or just sampled ordinary uniform way (false)
-	 */
-	public void setEvenCuts(boolean evenCuts) {
-		this.evenCuts = evenCuts;
-	}
-	
-	public int getNumRandomCuts() {
-		return numRandomCuts;
-	}
-	
-	public void setNumRandomCuts(int numRandomCuts) {
-		this.numRandomCuts = numRandomCuts;
-	}
 	
 	/**
 	 * @param selection
@@ -88,7 +78,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * only the selected trees specified by {@code selection}.
 	 */
 	public FactorExtraTrees selectTrees(boolean[] selection) {
-		FactorExtraTrees newET = new FactorExtraTrees(input, output);
+		FactorExtraTrees newET = new FactorExtraTrees(input, output, tasks);
 		newET.trees = new ArrayList<FactorBinaryTree>();
 		for (int i=0; i<selection.length; i++) {
 			if (!selection[i]) {
@@ -263,13 +253,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
 				// picking random test point:
 				double t;
-				if (evenCuts) {
-					double iStart = col_min + repeat*diff/numRandomCuts;
-					double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
-					t = Math.random()*(iStop-iStart) + iStart;
-				} else {
-					t = Math.random()*diff + col_min;
-				}
+				t = getRandomCut(col_min, diff, repeat);
 			
 				// calculating GINI impurity index (0 - pure, 1 - noisy):
 				int countLeft=0, countRight=0;
@@ -368,7 +352,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		//bt.value /= bt.nSuccessors;
 		return bt;
 	}
-	
+
 	/**
 	 * @param ids
 	 * @return builds a leaf node and returns it with the given ids.
