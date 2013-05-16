@@ -13,7 +13,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	/** number of tasks: */
 	HashSet<Integer> taskNames;
 	//String[] factorNames;
-	static double zero=1e-7;
 	
 	/** later shuffled and used for choosing random columns at each node: */
 	ArrayList<Integer> cols;
@@ -204,7 +203,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	
 	/**
 	 * @param counts
-	 * @return Gini index ( 1 - sum(f_i) ), where f_i is 
+	 * @return Gini index ( 1 - sum(f_i ^ 2) ), where f_i is 
 	 *         the proportion of label i.<br>
 	 *         Value 0 implies pure, high values mean noisy.  
 	 */

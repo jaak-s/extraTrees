@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public abstract class AbstractTrees<E> {
+	protected final static double zero=1e-7;
+
 	ArrayList<E> trees;
 
 	/** number of threads */
