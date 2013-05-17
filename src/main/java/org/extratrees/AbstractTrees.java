@@ -167,6 +167,62 @@ public abstract class AbstractTrees<E> {
 	}
 	*/
 	
+	static protected class CutResult {
+		double score;
+		boolean leftConst;
+		boolean rightConst;
+		int countLeft;
+		int countRight;
+		
+		public CutResult() {}
+		
+		public int getCountLeft() {
+			return countLeft;
+		}
+		public void setCountLeft(int countLeft) {
+			this.countLeft = countLeft;
+		}
+		public int getCountRight() {
+			return countRight;
+		}
+		public void setCountRight(int countRight) {
+			this.countRight = countRight;
+		}
+		
+		public boolean isLeftConstant() {
+			return leftConst;
+		}
+		public void setLeftConstant(boolean leftConstant) {
+			this.leftConst = leftConstant;
+		}
+		
+		public boolean isRightConstant() {
+			return rightConst;
+		}
+		public void setRightConstant(boolean rightConstant) {
+			this.rightConst = rightConstant;
+		}
+		
+		public double getScore() {
+			return score;
+		}
+		public void setScore(double score) {
+			this.score = score;
+		}
+		
+		/**
+		 * Copies a CutResult to this object.
+		 * @param cr
+		 */
+		public void copyFrom(CutResult cr) {
+			this.countLeft  = cr.countLeft;
+			this.countRight = cr.countRight;
+			this.leftConst  = cr.leftConst;
+			this.rightConst = cr.rightConst;
+			this.score = cr.score;
+		}
+	}
+	
 	/**
 	 * Same as buildTrees() except computes in parallel.
 	 * @param nmin

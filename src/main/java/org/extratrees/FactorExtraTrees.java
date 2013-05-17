@@ -229,10 +229,12 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		// trying K trees or the number of non-constant columns,
 		// whichever is smaller:
 		int k = 0, col_best=-1;
-		double score_best = Double.POSITIVE_INFINITY;
-		boolean leftConst = false, rightConst = false;
-		int countLeftBest = 0, countRightBest = 0;
 		double t_best=Double.NaN;
+		CutResult bestResult = new CutResult();
+		bestResult.score = Double.POSITIVE_INFINITY;
+		//double score_best = Double.POSITIVE_INFINITY;
+		//boolean leftConst = false, rightConst = false;
+		//int countLeftBest = 0, countRightBest = 0;
 		//for (int i=0; i<cols.size(); i++) {
 		while( randomCols.hasNext() ) {
 			int col = randomCols.next();
@@ -249,41 +251,18 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 				t = getRandomCut(range[0], diff, repeat);
 			
 				// calculating GINI impurity index (0 - pure, 1 - noisy):
-				int countLeft=0, countRight=0;
-				int[] factorCountLeft  = new int[nFactors];
-				int[] factorCountRight = new int[nFactors];
-				//double sumLeft=0, sumRight=0;
-				//double sumSqLeft=0, sumSqRight=0;
-				for (int n=0; n<ids.length; n++) {
-					if (input.get(ids[n], col) < t) {
-						countLeft++;
-						factorCountLeft[ output[ids[n]] ]++;
-					} else {
-						countRight++;
-						factorCountRight[ output[ids[n]] ]++;
-					}
-				}
-				// calculating score:
-				double giniLeft  = getGiniIndex(factorCountLeft);
-				double giniRight = getGiniIndex(factorCountRight);
+				CutResult result = new CutResult();
+				calculateCutScore(ids, col, t, result);
 				
-				double score = (giniLeft*countLeft + giniRight*countRight) / ids.length;
-				// removed because unsupervised learning is not implemented
-				//double scoreUSL = this.calculateUSL(unlabeled, unlabeledIds, col, t);
-				//score += scoreUSL;
-				// pure node:
-	//			if (score<zero*zero) {
-	//				return makeLeaf(ids);
-	//			}
-				
-				if (score < score_best) {
-					score_best = score;
+				if (result.score < bestResult.score) {
 					col_best   = col;
 					t_best     = t;
-					leftConst  = (giniLeft<zero*zero);
-					rightConst = (giniRight<zero*zero);
-					countLeftBest  = countLeft;
-					countRightBest = countRight;
+					
+					bestResult.score = result.score;
+					bestResult.leftConst  = result.leftConst;
+					bestResult.rightConst = result.rightConst;
+					bestResult.countLeft  = result.countLeft;
+					bestResult.countRight = result.countRight;
 				}
 			}
 
@@ -299,8 +278,8 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		
 		// outputting the tree using the best score cut:
-		int[] idsLeft  = new int[countLeftBest];
-		int[] idsRight = new int[countRightBest];
+		int[] idsLeft  = new int[bestResult.countLeft];
+		int[] idsRight = new int[bestResult.countRight];
 		int nLeft=0, nRight=0;
 		for (int n=0; n<ids.length; n++) {
 			if (input.get(ids[n], col_best) < t_best) {
@@ -327,13 +306,13 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 //			uIdsLeft  = temp[0];
 //			uIdsRight = temp[1];
 //		}
-		if (leftConst) { 
+		if (bestResult.leftConst) { 
 			bt.left = makeLeaf(idsLeft); // left child's output is constant 
 		} else {  
 			//bt.left  = this.buildTree(nmin, K, idsLeft, uIdsLeft, randomCols); 
 			bt.left  = this.buildTree(nmin, K, idsLeft, randomCols);
 		}
-		if (rightConst) {
+		if (bestResult.rightConst) {
 			bt.right = makeLeaf(idsRight); // right child's output is constant
 		} else {
 			//bt.right = this.buildTree(nmin, K, idsRight, uIdsRight, randomCols);
@@ -344,6 +323,30 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		//bt.value  = bt.left.value*bt.left.nSuccessors + bt.right.value*bt.right.nSuccessors;
 		//bt.value /= bt.nSuccessors;
 		return bt;
+	}
+
+	private void calculateCutScore(int[] ids, int col, double t,
+			CutResult result) {
+		int[] factorCountLeft  = new int[nFactors];
+		int[] factorCountRight = new int[nFactors];
+		//double sumLeft=0, sumRight=0;
+		//double sumSqLeft=0, sumSqRight=0;
+		for (int n=0; n<ids.length; n++) {
+			if (input.get(ids[n], col) < t) {
+				result.countLeft++;
+				factorCountLeft[ output[ids[n]] ]++;
+			} else {
+				result.countRight++;
+				factorCountRight[ output[ids[n]] ]++;
+			}
+		}
+		// calculating score:
+		double giniLeft  = getGiniIndex(factorCountLeft);
+		double giniRight = getGiniIndex(factorCountRight);
+		
+		result.score = (giniLeft*result.countLeft + giniRight*result.countRight) / ids.length;
+		result.leftConst  = giniLeft  < zero*zero;
+		result.rightConst = giniRight < zero*zero;
 	}
 
 	/**
