@@ -8,7 +8,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.extratrees.AbstractTrees.CutResult;
+
 public abstract class AbstractTrees<E> {
+	Matrix input;
 	protected final static double zero=1e-7;
 
 	ArrayList<E> trees;
@@ -173,6 +176,7 @@ public abstract class AbstractTrees<E> {
 		boolean rightConst;
 		int countLeft;
 		int countRight;
+		Object value;
 		
 		public CutResult() {}
 		
@@ -210,18 +214,9 @@ public abstract class AbstractTrees<E> {
 			this.score = score;
 		}
 		
-		/**
-		 * Copies a CutResult to this object.
-		 * @param cr
-		 */
-		public void copyFrom(CutResult cr) {
-			this.countLeft  = cr.countLeft;
-			this.countRight = cr.countRight;
-			this.leftConst  = cr.leftConst;
-			this.rightConst = cr.rightConst;
-			this.score = cr.score;
-		}
 	}
+	
+	abstract public E makeLeaf(int[] ids);
 	
 	/**
 	 * Same as buildTrees() except computes in parallel.
@@ -316,7 +311,7 @@ public abstract class AbstractTrees<E> {
 	
 
 	public abstract E buildTree(int nmin, int k);
-
+	protected abstract void calculateCutScore(int[] ids, int col, double t, CutResult result);
 
 	/**
 	 * @param m    data matrix
@@ -352,4 +347,107 @@ public abstract class AbstractTrees<E> {
 		
 		return out;
 	}
+
+	abstract protected E makeFilledTree(E leftTree, E rightTree, 
+			int col_best, double t_best,
+			int nSuccessors);
+	
+	/**
+	 * 
+	 * @param nmin
+	 * @param K
+	 * @param ids
+	 * @param randomCols - passed to save memory (maybe not needed)
+	 * @return
+	 */
+	public E buildTree(int nmin, int K, int[] ids, 
+			ShuffledIterator<Integer> randomCols) {
+		if (ids.length<nmin) {
+			return makeLeaf(ids);
+		}
+		// doing a shuffle of cols:
+		randomCols.reset();
+		
+		// trying K trees or the number of non-constant columns,
+		// whichever is smaller:
+		int k = 0, col_best=-1;
+		double t_best=Double.NaN;
+		CutResult bestResult = new CutResult();
+		bestResult.score = Double.POSITIVE_INFINITY;
+		
+		while( randomCols.hasNext() ) {
+			int col = randomCols.next();
+			// calculating columns min and max:
+			double[] range = getRange(ids, col, input);
+			if (range[1]-range[0] < zero) {
+				// skipping, because column is constant
+				continue;
+			}
+			// picking random test point numRepeatTries:
+			double diff = (range[1]-range[0]);
+			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
+				double t;
+				t = getRandomCut(range[0], diff, repeat);
+				
+				CutResult result = new CutResult();
+				calculateCutScore(ids, col, t, result);
+				
+				if (result.score < bestResult.score) {
+					col_best   = col;
+					t_best     = t;
+					
+					bestResult.score = result.score;
+					bestResult.leftConst  = result.leftConst;
+					bestResult.rightConst = result.rightConst;
+					bestResult.countLeft  = result.countLeft;
+					bestResult.countRight = result.countRight;
+				}
+			}
+
+			k++;
+			if (k>=K) {
+				// checked enough columns, stopping:
+				break;
+			}
+		}
+		// no score has been found, all inputs are constant:
+		if (col_best<0) {
+			return makeLeaf(ids);
+		}
+		
+		// outputting the tree using the best score cut:
+		int[] idsLeft  = new int[bestResult.countLeft];
+		int[] idsRight = new int[bestResult.countRight];
+		int nLeft=0, nRight=0;
+		for (int n=0; n<ids.length; n++) {
+			if (input.get(ids[n], col_best) < t_best) {
+				// element goes to the left tree:
+				idsLeft[nLeft] = ids[n];
+				nLeft++;
+			} else {
+				// element goes to the right tree:
+				idsRight[nRight] = ids[n];
+				nRight++;
+			}
+		}
+		E leftTree, rightTree;
+		if (bestResult.leftConst) { 
+			 // left child's output is constant
+			leftTree = makeLeaf(idsLeft); 
+		} else {  
+			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols); 
+		}
+		if (bestResult.rightConst) {
+			// right child's output is constant
+			rightTree = makeLeaf(idsRight);
+		} else {
+			rightTree = this.buildTree(nmin, K, idsRight, randomCols);
+		}
+		
+		E bt = makeFilledTree(leftTree, rightTree, 
+				col_best, t_best, ids.length);
+		return bt;
+	}
+
+
 }

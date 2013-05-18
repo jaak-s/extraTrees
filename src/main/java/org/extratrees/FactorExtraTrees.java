@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 
 public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
-	Matrix input;
 	int[] output;
 	/** number of factors: */
 	int nFactors;
@@ -217,7 +216,8 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return 1 - sum / (double)( total*total );
 	}
 	
-	public FactorBinaryTree buildTree(int nmin, int K, int[] ids, /*int[] unlabeledIds,*/
+	/*
+	public FactorBinaryTree buildTree(int nmin, int K, int[] ids, 
 			ShuffledIterator<Integer> randomCols) 
 	{
 		if (ids.length<nmin) {
@@ -232,10 +232,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		double t_best=Double.NaN;
 		CutResult bestResult = new CutResult();
 		bestResult.score = Double.POSITIVE_INFINITY;
-		//double score_best = Double.POSITIVE_INFINITY;
-		//boolean leftConst = false, rightConst = false;
-		//int countLeftBest = 0, countRightBest = 0;
-		//for (int i=0; i<cols.size(); i++) {
+		
 		while( randomCols.hasNext() ) {
 			int col = randomCols.next();
 			// calculating columns min and max:
@@ -276,7 +273,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		if (col_best<0) {
 			return makeLeaf(ids);
 		}
-		
+
 		// outputting the tree using the best score cut:
 		int[] idsLeft  = new int[bestResult.countLeft];
 		int[] idsRight = new int[bestResult.countRight];
@@ -292,40 +289,65 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 				nRight++;
 			}
 		}
-		FactorBinaryTree bt = new FactorBinaryTree();
-		bt.column    = col_best;
-		bt.threshold = t_best;
-		bt.nSuccessors = ids.length;
-		// removed unsupervised learning code:
-//		int[] uIdsLeft = null;
-//		int[] uIdsRight= null;
-		// splitting unlabeled IDs:
-//		if (unlabeled!=null) {
-//			// finding ids:
-//			int[][] temp = AbstractTrees.splitIds(unlabeled, ids, bt.column, bt.threshold);
-//			uIdsLeft  = temp[0];
-//			uIdsRight = temp[1];
-//		}
+
+		// calculating sub trees:
+		FactorBinaryTree leftTree, rightTree;
 		if (bestResult.leftConst) { 
-			bt.left = makeLeaf(idsLeft); // left child's output is constant 
-		} else {  
-			//bt.left  = this.buildTree(nmin, K, idsLeft, uIdsLeft, randomCols); 
-			bt.left  = this.buildTree(nmin, K, idsLeft, randomCols);
+			// left child's output is constant
+			leftTree = makeLeaf(idsLeft); 
+		} else {
+			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols);
 		}
 		if (bestResult.rightConst) {
-			bt.right = makeLeaf(idsRight); // right child's output is constant
+			// right child's output is constant
+			rightTree = makeLeaf(idsRight);
 		} else {
-			//bt.right = this.buildTree(nmin, K, idsRight, uIdsRight, randomCols);
-			bt.right = this.buildTree(nmin, K, idsRight, randomCols);
+			rightTree = this.buildTree(nmin, K, idsRight, randomCols);
 		}
-		// this value is used only for CV:
-		// TODO: add code for calculating value for intermediate nodes:
+
+		FactorBinaryTree bt = makeFilledTree(leftTree, rightTree,
+				col_best, t_best, ids.length);
+		return bt;
+	}*/
+
+	/**
+	 * Makes tree that is filled with data.
+	 * 
+	 * @param leftTree
+	 * @param rightTree
+	 * @param col_best
+	 * @param t_best
+	 * @param nSuccessors
+	 * @return
+	 */
+	@Override
+	protected FactorBinaryTree makeFilledTree(FactorBinaryTree leftTree,
+			FactorBinaryTree rightTree, 
+			int col_best, double t_best, int nSuccessors) {
+		FactorBinaryTree bt = new FactorBinaryTree();
+		bt.column      = col_best;
+		bt.threshold   = t_best;
+		bt.nSuccessors = nSuccessors;
+		bt.left  = leftTree;
+		bt.right = rightTree;
+
+		// TODO: add code for calculating value for intermediate nodes (for CV):
+		// this feature needs refactoring
 		//bt.value  = bt.left.value*bt.left.nSuccessors + bt.right.value*bt.right.nSuccessors;
 		//bt.value /= bt.nSuccessors;
+
 		return bt;
 	}
-
-	private void calculateCutScore(int[] ids, int col, double t,
+	
+	/**
+	 * Calculates the score for the cut. The smaller the better.
+	 * @param ids
+	 * @param col
+	 * @param t
+	 * @param result
+	 */
+	@Override
+	protected void calculateCutScore(int[] ids, int col, double t,
 			CutResult result) {
 		int[] factorCountLeft  = new int[nFactors];
 		int[] factorCountRight = new int[nFactors];
@@ -353,6 +375,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * @param ids
 	 * @return builds a leaf node and returns it with the given ids.
 	 */
+	@Override
 	public FactorBinaryTree makeLeaf(int[] ids) {
 		// terminal node:
 		FactorBinaryTree bt = new FactorBinaryTree();

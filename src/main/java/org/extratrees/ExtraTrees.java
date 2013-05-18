@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Date;
 
 public class ExtraTrees extends AbstractTrees<BinaryTree> {
-	Matrix input;
 	double[] output;
 	double[] outputSq;
 	/** later shuffled and used for choosing random columns at each node */
@@ -131,134 +130,58 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		return buildTree(nmin, K, ids, cols);
 	}
 	
-	/**
-	 * 
-	 * @param nmin
-	 * @param K
-	 * @param ids
-	 * @param randomCols - passed to save memory (maybe not needed)
-	 * @return
-	 */
-	public BinaryTree buildTree(int nmin, int K, int[] ids, 
-			ShuffledIterator<Integer> randomCols) {
-		if (ids.length<nmin) {
-			return makeLeaf(ids);
-		}
-		// doing a shuffle of cols:
-		randomCols.reset();
-		
-		// trying K trees or the number of non-constant columns,
-		// whichever is smaller:
-		int k = 0, col_best=-1;
-		double score_best = Double.NEGATIVE_INFINITY;
-		boolean leftConst = false, rightConst = false;
-		int countLeftBest = 0, countRightBest = 0;
-		double t_best=Double.NaN;
-		//for (int i=0; i<randomCols.size(); i++) {
-		while( randomCols.hasNext() ) {
-			int col = randomCols.next();
-			// calculating columns min and max:
-			double[] range = getRange(ids, col, input);
-			if (range[1]-range[0] < zero) {
-				// skipping, because column is constant
-				continue;
-			}
-			// picking random test point numRepeatTries:
-			double diff = (range[1]-range[0]);
-			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
-				double t;
-				t = getRandomCut(range[0], diff, repeat);
-				
-				// calculating score:
-				int countLeft=0, countRight=0;
-				double sumLeft=0, sumRight=0;
-				double sumSqLeft=0, sumSqRight=0;
-				for (int n=0; n<ids.length; n++) {
-					if (input.get(ids[n], col) < t) {
-						countLeft++;
-						sumLeft   += output[  ids[n]];
-						sumSqLeft += outputSq[ids[n]];
-					} else {
-						countRight++;
-						sumRight   += output[  ids[n]];
-						sumSqRight += outputSq[ids[n]];
-					}
-				}
-				// calculating score:
-				double varLeft  = sumSqLeft/countLeft  - (sumLeft/countLeft)*(sumLeft/countLeft);
-				double varRight = sumSqRight/countRight- (sumRight/countRight)*(sumRight/countRight);
-				// TODO: move var and var<zero*zero outside this loop:
-				double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-				double score = 1 - (countLeft*varLeft + countRight*varRight) / ids.length / var;
-				
-				// if variance is 0
-				if (var<zero*zero) {
-					return makeLeaf(ids);
-				}
-				
-				if (score>score_best) {
-					score_best = score;
-					col_best   = col;
-					t_best     = t;
-					leftConst  = (varLeft<zero*zero);
-					rightConst = (varRight<zero*zero);
-					countLeftBest  = countLeft;
-					countRightBest = countRight;
-				}
-			}
 
-			k++;
-			if (k>=K) {
-				// checked enough columns, stopping:
-				break;
-			}
-		}
-		// no score has been found, all inputs are constant:
-		if (col_best<0) {
-			return makeLeaf(ids);
-		}
-		
-		// outputting the tree using the best score cut:
-		int[] idsLeft  = new int[countLeftBest];
-		int[] idsRight = new int[countRightBest];
-		int nLeft=0, nRight=0;
-		for (int n=0; n<ids.length; n++) {
-			if (input.get(ids[n], col_best) < t_best) {
-				// element goes to the left tree:
-				idsLeft[nLeft] = ids[n];
-				nLeft++;
-			} else {
-				// element goes to the right tree:
-				idsRight[nRight] = ids[n];
-				nRight++;
-			}
-		}
+	@Override
+	protected BinaryTree makeFilledTree(BinaryTree leftTree, BinaryTree rightTree,
+			int col_best, double t_best, int nSuccessors) {
 		BinaryTree bt = new BinaryTree();
-		// col_best is the feature to cut
 		bt.column    = col_best;
-		// threshold is the cut value
 		bt.threshold = t_best;
-		bt.nSuccessors = ids.length;
-		if (leftConst) { 
-			bt.left = makeLeaf(idsLeft); // left child's output is constant 
-		} else {  
-			bt.left  = this.buildTree(nmin, K, idsLeft, randomCols); 
-		}
-		if (rightConst) {
-			bt.right = makeLeaf(idsRight); // right child's output is constant
-		} else {
-			bt.right = this.buildTree(nmin, K, idsRight, randomCols);
-		}
-		// this value is used only for CV:
+		bt.nSuccessors = nSuccessors;
+		bt.left   = leftTree;
+		bt.right  = rightTree;
+		// value in intermediate nodes (used for CV):
 		bt.value  = bt.left.value*bt.left.nSuccessors + bt.right.value*bt.right.nSuccessors;
 		bt.value /= bt.nSuccessors;
 		return bt;
+	}
+
+	@Override
+	protected void calculateCutScore(int[] ids, int col, double t,
+			CutResult result) {
+		// calculating score:
+		double sumLeft=0, sumRight=0;
+		double sumSqLeft=0, sumSqRight=0;
+		for (int n=0; n<ids.length; n++) {
+			if (input.get(ids[n], col) < t) {
+				result.countLeft++;
+				sumLeft   += output[  ids[n]];
+				sumSqLeft += outputSq[ids[n]];
+			} else {
+				result.countRight++;
+				sumRight   += output[  ids[n]];
+				sumSqRight += outputSq[ids[n]];
+			}
+		}
+		// calculating score:
+		double varLeft  = sumSqLeft/result.countLeft  - 
+				(sumLeft/result.countLeft)*(sumLeft/result.countLeft);
+		double varRight = sumSqRight/result.countRight- 
+				(sumRight/result.countRight)*(sumRight/result.countRight);
+		// TODO: move var and var<zero*zero outside this loop:
+		double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
+		// the smaller the score the better:
+		result.score = (result.countLeft*varLeft + result.countRight*varRight) / ids.length / var;
+		result.leftConst  = (varLeft<zero*zero);
+		result.rightConst = (varRight<zero*zero);
+		// value in intermediate nodes (used for CV):
 	}
 	
 	/**
 	 * @param ids
 	 * @return builds a leaf node and returns it with the given ids.
 	 */
+	@Override
 	public BinaryTree makeLeaf(int[] ids) {
 		// terminal node:
 		BinaryTree bt = new BinaryTree();

@@ -102,5 +102,22 @@ public class ExtraTreeTests {
 		assertArrayEquals(new int[]{0,2,4,6,8}, split[0] );
 		assertArrayEquals(new int[]{10,12,14,16,18}, split[1] );
 	}
+	
+	@Test
+	public void testConstantY() {
+		Matrix input = getSampleData(20);
+		final double fixedOutput = 1.0;
+		double[] output = new double[input.nrows];
+		for (int i=0; i<output.length; i++) {
+			output[i] = fixedOutput;
+		}
+		int ntrees = 10;
+		ExtraTrees et = new ExtraTrees(input, output);
+		et.learnTrees(5, 4, ntrees);
+		double[] outputHat = et.getValues(input);
+		for (int i=0; i<output.length; i++) {
+			assertEquals(fixedOutput, outputHat[i], 1e-10);
+		}
+	}
 
 }
