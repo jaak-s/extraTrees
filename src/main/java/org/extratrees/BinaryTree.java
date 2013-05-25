@@ -1,6 +1,6 @@
 package org.extratrees;
 
-public class BinaryTree {
+public class BinaryTree extends AbstractBinaryTree {
 	/** tree for elements below threshold.
 	 * if left==null, it is a leaf node
      * if left!=null, not a leaf
@@ -8,12 +8,6 @@ public class BinaryTree {
 	public BinaryTree left;
 	/** tree for elements equal or above threshold. */
 	public BinaryTree right;
-	/** number of elements in the tree */
-	public int    nSuccessors;
-	/** feature ID used for cutting */
-	public int    column=-1;
-	/** threshold of cutting */
-	public double threshold; 
 	/** value of the node (estimated by its nodes), value of the node.
 	 *  Non-leaf nodes also store value, allowing to change size of final nodes on-the-fly. */
 	public double value=Double.NEGATIVE_INFINITY;  

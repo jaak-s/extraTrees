@@ -1,6 +1,6 @@
 package org.extratrees;
 
-public class FactorBinaryTree {
+public class FactorBinaryTree extends AbstractBinaryTree {
 	/** tree for elements below threshold.
 	 * if left==null, it is a leaf node
      * if left!=null, not a leaf
@@ -8,12 +8,6 @@ public class FactorBinaryTree {
 	public FactorBinaryTree left;
 	/** tree for elements equal or above threshold. */
 	public FactorBinaryTree right;
-	/** number of elements in the tree */
-	public int    nSuccessors;
-	/** feature ID used for cutting */
-	public int    column=-1;
-	/** threshold of cutting */
-	public double threshold; 
 	/** Value of the node (estimated by its nodes), value of the node: 
 	 *  from 0 to (#numFactors-1).
 	 *  Non-leaf nodes also store value, allowing to change size of final nodes on-the-fly. */
@@ -38,6 +32,32 @@ public class FactorBinaryTree {
 		}
 		return right.getValue(input);
 	}
+	
+
+	/**
+	 * @param x
+	 * @param task
+	 * @return return multitask value for given input and task
+	 */
+	public int getValueMT(double[] input, int task) {
+		if (left==null) {
+			return value;
+		}
+		if (column<0) {
+			// task cut:
+			if (left.tasks.contains(task)) {
+				return left.getValueMT(input, task);
+			}
+			return right.getValueMT(input, task);
+		}
+		// feature cut
+		if (input[column]<threshold) {
+			return left.getValueMT(input, task);
+		}
+		return right.getValueMT(input, task);
+
+	}
+
 
 	/**
 	 * Returns values for data points, each data point is a row of the matrix.
@@ -71,6 +91,8 @@ public class FactorBinaryTree {
 		}
 		return right.getValue(input, nmin);
 	}
+	
+
 
 	/**
 	 * uses nmin to choose the depth:

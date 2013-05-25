@@ -3,12 +3,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	double[] output;
 	double[] outputSq;
-	/** later shuffled and used for choosing random columns at each node */
-	ArrayList<Integer> cols;
 	
 	// defined in AbstractTrees:
 	//ArrayList<BinaryTree> trees;
@@ -52,7 +52,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
 		for (int t=0; t<nTrees; t++) {
-			trees.add( this.buildTree(nmin, K, ids, cols) );
+			trees.add( this.buildTree(nmin, K, ids, cols, getSequenceSet(nTasks)) );
 		}
 		return trees;
 	}
@@ -119,6 +119,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * @param nmin - number of elements in leaf node
 	 * @param K    - number of choices
 	 */
+	/*
 	@Override
 	public BinaryTree buildTree(int nmin, int K) {
 		// generating full list of ids:
@@ -128,7 +129,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		}
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
 		return buildTree(nmin, K, ids, cols);
-	}
+	}*/
 	
 
 	@Override
@@ -176,17 +177,25 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		result.rightConst = (varRight<zero*zero);
 		// value in intermediate nodes (used for CV):
 	}
+
+	@Override
+	protected TaskCutResult getTaskCut(int[] ids, HashSet<Integer> tasks,
+			double bestScore) {
+		throw new RuntimeException("Multitask learning is not yet implemented for regression.");
+	}
+	
 	
 	/**
 	 * @param ids
 	 * @return builds a leaf node and returns it with the given ids.
 	 */
 	@Override
-	public BinaryTree makeLeaf(int[] ids) {
+	public BinaryTree makeLeaf(int[] ids, Set<Integer> tasks) {
 		// terminal node:
 		BinaryTree bt = new BinaryTree();
 		bt.value = 0;
 		bt.nSuccessors = ids.length;
+		bt.tasks = tasks;
 		for (int n=0; n<ids.length; n++) {
 			bt.value += output[ids[n]];
 		}
@@ -350,5 +359,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 
 //		System.out.println( Arrays.toString( bt.countColumns(m.ncols)) );
 	}
+
 
 }

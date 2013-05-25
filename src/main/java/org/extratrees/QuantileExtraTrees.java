@@ -1,6 +1,7 @@
 package org.extratrees;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class QuantileExtraTrees extends ExtraTrees {
 
@@ -49,11 +50,12 @@ public class QuantileExtraTrees extends ExtraTrees {
 	 *  @return leaf node
 	 */
 	@Override
-	public BinaryTree makeLeaf(int[] ids) {
+	public BinaryTree makeLeaf(int[] ids, Set<Integer> tasks) {
 		// terminal node:
 		QuantileBinaryTree bt = new QuantileBinaryTree();
 		bt.value = 0;
 		bt.nSuccessors = ids.length;
+		bt.tasks = tasks;
 		bt.values = new ArrayList<Double>(ids.length);
 		for (int n=0; n<ids.length; n++) {
 			bt.value += output[ids[n]];

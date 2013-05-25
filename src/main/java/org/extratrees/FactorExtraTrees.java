@@ -1,20 +1,17 @@
 package org.extratrees;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
+
+import org.extratrees.AbstractTrees.CutResult;
 
 
 public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	int[] output;
 	/** number of factors: */
 	int nFactors;
-	/** for multi-task learning, stores task indeces (null if not present) */
-	int[] tasks;
-	/** number of tasks: */
-	HashSet<Integer> taskNames;
 	//String[] factorNames;
-	
-	/** later shuffled and used for choosing random columns at each node: */
-	ArrayList<Integer> cols;
 	
 	//ArrayList<FactorBinaryTree> trees;
 
@@ -36,7 +33,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		this.input  = input;
 		this.output = output;
-		this.tasks  = tasks;
 		
 		this.nFactors = 1;
 		for (int i=0; i<output.length; i++) {
@@ -48,10 +44,12 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			}
 		}
 		// making a list of tasks:
-		this.taskNames = new HashSet<Integer>();
-		if (tasks!=null) {
+		this.tasks  = tasks; 
+		this.nTasks = 1;
+		if (this.tasks!=null) {
 			for (int i=0; i<tasks.length; i++) {
-				taskNames.add(tasks[i]);
+				//taskNames.add(tasks[i]);
+				nTasks = tasks[i] + 1;
 			}
 		}
 		
@@ -162,7 +160,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	public int[] getValues(Matrix input) {
 		return getValues(this.trees, input, this.nFactors);
 	}
-
+	
 	/** Average of several trees for many samples */
 	public static int[] getValues(ArrayList<FactorBinaryTree> trees, Matrix input, int nFactors) {
 		int[]  values = new int[input.nrows];
@@ -176,29 +174,46 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		return values;
 	}
+	
+	public int[] getValuesMT(Matrix newInput, int[] tasks) {
+		int[] values = new int[newInput.nrows];
+		double[] temp = new double[newInput.ncols];
+		for (int row=0; row<newInput.nrows; row++) {
+			// copying matrix row to temp:
+			for (int col=0; col<newInput.ncols; col++) {
+				temp[col] = newInput.get(row, col);
+			}
+			values[row] = this.getValueMT(temp, tasks[row]);
+		}
+		return values;
+	}
+
+	public int getValueMT(double[] x, int task) {
+		int[] counts = new int[nFactors];
+		for(FactorBinaryTree t : trees) {
+			counts[ t.getValueMT(x, task) ]++;
+		}
+		return getMaxIndex(counts);
+	}
 
 	/**
 	 * @param nmin - number of elements in leaf node
 	 * @param K    - number of choices
-	 */
+	 *//*
 	public FactorBinaryTree buildTree(int nmin, int K) {
 		// generating full list of ids:
-		int[]    ids = new int[output.length];
+		int[]    ids = new int[input.nrows];
 		for (int i=0; i<ids.length; i++) {
 			ids[i] = i;
 		}
-		//int[] unlabeledIds = null;
-		/*
-		if (unlabeled!=null) {
-			unlabeledIds = new int[unlabeled.nrows];
-			for (int i=0; i<unlabeledIds.length; i++) {
-				unlabeledIds[i] = i;
-			}
-		}*/
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		return buildTree(nmin, K, ids, cols);
+		HashSet<Integer> taskSet = new HashSet<Integer>(tasks.length);
+		for (int n : tasks) {
+			taskSet.add(n);
+		}
+		return buildTree(nmin, K, ids, cols, new HashSet<Integer>() );
 		//return buildTree(nmin, K, ids, unlabeledIds, cols);
-	}
+	}*/
 	
 	/**
 	 * @param counts
@@ -339,6 +354,75 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return bt;
 	}
 	
+	@Override
+	protected TaskCutResult getTaskCut(int[] ids, HashSet<Integer> tasks, double bestScore) {
+		if (nFactors>2) {
+			throw new RuntimeException("Multitask learning is not implemented 3 or more factors (classes).");
+		}
+
+		int[][] factorTaskTable = getFactorTaskTable(ids);
+		double[] p = getTaskScores(factorTaskTable);
+		
+		// counting if there are at least 2 tasks with samples
+		int numNonEmptyTasks = 0;
+		for (int task=0; task<nTasks; task++) {
+			if (factorTaskTable[0][task]>0 || factorTaskTable[1][task]>0) {
+				numNonEmptyTasks++;
+				if (numNonEmptyTasks>1) {
+					break;
+				}
+			}
+		}
+		if (numNonEmptyTasks<=1) {
+			// not enough tasks to do splitting
+			return null;
+		}
+		
+		double[] range = getRange(p);
+		TaskCutResult bestResult = null;
+
+		for (int repeat=0; repeat<this.numRandomTaskCuts; repeat++) {
+			// get random cut:
+			double t = getRandom(range[0], range[1]);
+			TaskCutResult result = new TaskCutResult();
+			calculateTaskCutScore(p, factorTaskTable, t, result);
+			if (result.score < bestScore) {
+				bestResult = result;
+				bestScore = result.score;
+			}
+		}
+		return bestResult;
+	}
+	
+
+	private int[][] getFactorTaskTable(int[] ids) {
+		int[][] counts = new int[nFactors][nTasks];
+		for (int i=0; i<nFactors; i++) {
+			counts[i] = new int[nTasks];
+		}
+		for (int i=0; i<ids.length; i++) {
+			int n = ids[i];
+			counts[ output[n] ][ tasks[n] ]++;
+		}
+		return counts;
+	}
+	
+	/**
+	 * Assumes only 2 factors.
+	 * @param factorTaskTable
+	 * @return
+	 */
+	private double[] getTaskScores(int[][] factorTaskTable) {
+		int[][] counts = factorTaskTable;
+		double[] scores = new double[nTasks];
+		for (int task=0; task<nTasks; task++) {
+			// regularized estimate for each task probability
+			scores[task] = (counts[0][task] + 1) 
+					     / (double)(counts[0][task] + counts[1][task] + 2);
+		}
+		return scores;
+	}
+	
 	/**
 	 * Calculates the score for the cut. The smaller the better.
 	 * @param ids
@@ -351,36 +435,79 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			CutResult result) {
 		int[] factorCountLeft  = new int[nFactors];
 		int[] factorCountRight = new int[nFactors];
-		//double sumLeft=0, sumRight=0;
-		//double sumSqLeft=0, sumSqRight=0;
 		for (int n=0; n<ids.length; n++) {
 			if (input.get(ids[n], col) < t) {
-				result.countLeft++;
+				//result.countLeft++;
 				factorCountLeft[ output[ids[n]] ]++;
 			} else {
-				result.countRight++;
+				//result.countRight++;
 				factorCountRight[ output[ids[n]] ]++;
 			}
 		}
+		/* OLD CODE
 		// calculating score:
 		double giniLeft  = getGiniIndex(factorCountLeft);
 		double giniRight = getGiniIndex(factorCountRight);
 		
 		result.score = (giniLeft*result.countLeft + giniRight*result.countRight) / ids.length;
 		result.leftConst  = giniLeft  < zero*zero;
+		result.rightConst = giniRight < zero*zero;*/
+		cutResultFromCounts( result, factorCountLeft, factorCountRight );
+	}
+	
+	/**
+	 * @param taskScores      scores
+	 * @param factorTaskTable counts of factors and tasks
+	 * @param t               cut
+	 * @return GINI index for task cut: 1 - sum( (f_i)^2 )
+	 */
+	private void calculateTaskCutScore(double[] taskScores, int[][] factorTaskTable, double t, TaskCutResult result) {
+		int[] leftCounts  = new int[nFactors];
+		int[] rightCounts = new int[nFactors];
+		result.leftTasks  = new HashSet<Integer>();
+		result.rightTasks = new HashSet<Integer>();
+		for (int task=0; task<factorTaskTable[0].length; task++) {
+			if (taskScores[task] < t) {
+				// task is going to the left branch
+				for (int factor=0; factor<nFactors; factor++) {
+					leftCounts[factor] += factorTaskTable[factor][task];
+				}
+				result.leftTasks.add(task);
+			} else {
+				// task is going to the right branch
+				for (int factor=0; factor<nFactors; factor++) {
+					rightCounts[factor] += factorTaskTable[factor][task];
+				}
+				result.rightTasks.add(task);
+			}
+		}
+		cutResultFromCounts(result, leftCounts, rightCounts);
+	}
+
+	private void cutResultFromCounts(CutResult result, int[] leftCounts,
+			int[] rightCounts) {
+		double giniLeft  = getGiniIndex(leftCounts);
+		double giniRight = getGiniIndex(rightCounts);
+		result.countLeft  = sum(leftCounts);
+		result.countRight = sum(rightCounts);
+
+		result.score = (giniLeft*result.countLeft + giniRight*result.countRight) / (result.countLeft + result.countRight);
+		result.leftConst  = giniLeft  < zero*zero;
 		result.rightConst = giniRight < zero*zero;
 	}
+
 
 	/**
 	 * @param ids
 	 * @return builds a leaf node and returns it with the given ids.
 	 */
 	@Override
-	public FactorBinaryTree makeLeaf(int[] ids) {
+	public FactorBinaryTree makeLeaf(int[] ids, Set<Integer> tasks) {
 		// terminal node:
 		FactorBinaryTree bt = new FactorBinaryTree();
 		bt.value = 0;
 		bt.nSuccessors = ids.length;
+		bt.tasks = tasks;
 		// counting the factors:
 		int[] counts = new int[nFactors];
 		for (int n=0; n<ids.length; n++) {
@@ -389,4 +516,5 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		bt.value = getMaxIndex(counts);
 		return(bt);
 	}
+
 }

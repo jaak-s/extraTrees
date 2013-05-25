@@ -1,7 +1,9 @@
 package org.extratrees;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -10,9 +12,15 @@ import java.util.concurrent.Future;
 
 import org.extratrees.AbstractTrees.CutResult;
 
-public abstract class AbstractTrees<E> {
+public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	Matrix input;
 	protected final static double zero=1e-7;
+
+	/** for multi-task learning, stores task indeces (null if not present) */
+	int[] tasks;
+	
+	/** number of tasks: (tasks are indexed from 0 to (nTasks-1) */
+	int nTasks;
 
 	ArrayList<E> trees;
 
@@ -29,6 +37,9 @@ public abstract class AbstractTrees<E> {
 	int numRandomCuts = 1;
 	/** whether random cuts are totally uniform or evenly uniform */
 	boolean evenCuts = false;
+
+	/** later shuffled and used for choosing random columns at each node: */
+	ArrayList<Integer> cols;
 
 
 	// for semi-supervised learning:
@@ -124,9 +135,9 @@ public abstract class AbstractTrees<E> {
 		if (evenCuts) {
 			double iStart = col_min + repeat*diff/numRandomCuts;
 			double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
-			t = Math.random()*(iStop-iStart) + iStart;
+			t = getRandom()*(iStop-iStart) + iStart;
 		} else {
-			t = Math.random()*diff + col_min;
+			t = getRandom()*diff + col_min;
 		}
 		return t;
 	}
@@ -145,6 +156,21 @@ public abstract class AbstractTrees<E> {
 			double v = input.get(ids[n], col);
 			if ( v<range[0] ) { range[0] = v; }
 			if ( v>range[1] ) { range[1] = v; }
+		}
+		return range;
+	}
+
+	/**
+	 * @param input
+	 * @return array of size two: min and max values.
+	 */
+	protected double[] getRange(double[] input) {
+		double[] range = new double[2];
+		range[0] = Double.POSITIVE_INFINITY;
+		range[1] = Double.NEGATIVE_INFINITY;
+		for (int n=0; n<input.length; n++) {
+			if ( input[n]<range[0] ) { range[0] = input[n]; }
+			if ( input[n]>range[1] ) { range[1] = input[n]; }
 		}
 		return range;
 	}
@@ -216,7 +242,7 @@ public abstract class AbstractTrees<E> {
 		
 	}
 	
-	abstract public E makeLeaf(int[] ids);
+	abstract public E makeLeaf(int[] ids, Set<Integer> leftTaskSet);
 	
 	/**
 	 * Same as buildTrees() except computes in parallel.
@@ -310,8 +336,29 @@ public abstract class AbstractTrees<E> {
 	}
 	
 
-	public abstract E buildTree(int nmin, int k);
+	public E buildTree(int nmin, int K) {
+		int[]    ids = new int[input.nrows];
+		for (int i=0; i<ids.length; i++) {
+			ids[i] = i;
+		}
+		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
+		
+		// finding task set:
+		HashSet<Integer> taskSet = getSequenceSet(nTasks);
+		return buildTree(nmin, K, ids, cols, taskSet );
+	}
+
 	protected abstract void calculateCutScore(int[] ids, int col, double t, CutResult result);
+	//protected abstract double[] getTaskScores(int[] ids);
+	/**
+	 * @param ids
+	 * @param bestScore
+	 * @return array of booleans specifying the cut (true for left tree, false for left).
+	 *         Returns null if no cut better (smaller score) than bestScore was found.
+	 */
+	protected abstract TaskCutResult getTaskCut(int[] ids, 
+			HashSet<Integer> tasks, double bestScore);
+
 
 	/**
 	 * @param m    data matrix
@@ -347,6 +394,74 @@ public abstract class AbstractTrees<E> {
 		
 		return out;
 	}
+	
+	/**
+	 * 
+	 * @param ids
+	 * @param leftTasks
+	 * @return filters <b>ids</b> into two arrays, one whose tasks[i] is is 
+	 * in leftTasks and others whose values are not.
+	 */
+	public int[][] splitIdsByTask(int[] ids, Set<Integer> leftTasks) {
+		int[][] out = new int[2][];
+		int lenLower = 0;
+		for (int i=0; i<ids.length; i++) {
+			if ( leftTasks.contains(tasks[ids[i]]) ) {
+				lenLower++;
+			}
+		}
+		// two vectors: lower and higher
+		out[0] = new int[lenLower];
+		out[1] = new int[ids.length - lenLower];
+		
+		int i0 = 0;
+		int i1 = 0;
+		
+		for (int i=0; i<ids.length; i++) {
+			if ( leftTasks.contains(tasks[ids[i]]) ) {
+				out[0][i0] = ids[i];
+				i0++;
+			} else {
+				out[1][i1] = ids[i];
+				i1++;
+			}
+		}
+		return out;
+	}
+	
+	public static int sum(int[] array) {
+		int s = 0;
+		for (int i=0; i<array.length; i++) {
+			s += array[i];
+		}
+		return s;
+	}
+
+
+	public static HashSet<Integer> getSequenceSet(int n) {
+		HashSet<Integer> taskSet;
+		taskSet = new HashSet<Integer>(n);
+		for (int i=0; i<n; i++) {
+			taskSet.add(i);
+		}
+		return taskSet;
+	}
+
+	/**
+	 * @return random between 0.0 and 1.0.
+	 */
+	protected double getRandom() {
+		return Math.random();
+	}
+	
+	/**
+	 * @param xmin
+	 * @param xmax
+	 * @return uniformly random value between xmin and xmax.
+	 */
+	protected double getRandom(double xmin, double xmax) {
+		return xmin + getRandom()*(xmax - xmin);
+	}
 
 	abstract protected E makeFilledTree(E leftTree, E rightTree, 
 			int col_best, double t_best,
@@ -361,9 +476,9 @@ public abstract class AbstractTrees<E> {
 	 * @return
 	 */
 	public E buildTree(int nmin, int K, int[] ids, 
-			ShuffledIterator<Integer> randomCols) {
+			ShuffledIterator<Integer> randomCols, Set<Integer> taskSet) {
 		if (ids.length<nmin) {
-			return makeLeaf(ids);
+			return makeLeaf(ids, taskSet);
 		}
 		// doing a shuffle of cols:
 		randomCols.reset();
@@ -393,6 +508,7 @@ public abstract class AbstractTrees<E> {
 				calculateCutScore(ids, col, t, result);
 				
 				if (result.score < bestResult.score) {
+					// found a better scoring cut
 					col_best   = col;
 					t_best     = t;
 					
@@ -410,44 +526,64 @@ public abstract class AbstractTrees<E> {
 				break;
 			}
 		}
-		// no score has been found, all inputs are constant:
-		if (col_best<0) {
-			return makeLeaf(ids);
+		
+		// multi-task learning:
+		TaskCutResult taskCutResult = null;
+		if (taskSet.size() > 1) {
+			// checking whether to perform task splitting
+			if ( probOfTaskCuts > getRandom() ) {
+				// calculating task order:
+				taskCutResult = getTaskCut(ids, null, bestResult.score);
+			}
 		}
 		
 		// outputting the tree using the best score cut:
 		int[] idsLeft  = new int[bestResult.countLeft];
 		int[] idsRight = new int[bestResult.countRight];
-		int nLeft=0, nRight=0;
-		for (int n=0; n<ids.length; n++) {
-			if (input.get(ids[n], col_best) < t_best) {
-				// element goes to the left tree:
-				idsLeft[nLeft] = ids[n];
-				nLeft++;
-			} else {
-				// element goes to the right tree:
-				idsRight[nRight] = ids[n];
-				nRight++;
-			}
+		
+		if (col_best < 0 && taskCutResult==null) {
+			// no feature or task split found
+			return makeLeaf(ids, taskSet);
 		}
+		
+		int[][] split;
+		Set<Integer> leftTaskSet, rightTaskSet;
+		if (taskCutResult!=null) {
+			// task cut:
+			split = splitIdsByTask(ids, taskCutResult.leftTasks);
+			leftTaskSet  = taskCutResult.leftTasks;
+			rightTaskSet = taskCutResult.rightTasks;
+			col_best = -1;
+			t_best = Double.NaN;
+		} else {
+			// splitting according to feature:
+			split = splitIds(input, ids, col_best, t_best);
+			leftTaskSet  = taskSet;
+			rightTaskSet = taskSet;
+		}
+		idsLeft  = split[0];
+		idsRight = split[1];
+		
 		E leftTree, rightTree;
-		if (bestResult.leftConst) { 
+		if (bestResult.leftConst) {
 			 // left child's output is constant
-			leftTree = makeLeaf(idsLeft); 
-		} else {  
-			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols); 
+			leftTree = makeLeaf(idsLeft, leftTaskSet); 
+		} else {
+			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols, leftTaskSet); 
 		}
 		if (bestResult.rightConst) {
 			// right child's output is constant
-			rightTree = makeLeaf(idsRight);
+			rightTree = makeLeaf(idsRight, rightTaskSet);
 		} else {
-			rightTree = this.buildTree(nmin, K, idsRight, randomCols);
+			rightTree = this.buildTree(nmin, K, idsRight, randomCols, rightTaskSet);
 		}
 		
 		E bt = makeFilledTree(leftTree, rightTree, 
 				col_best, t_best, ids.length);
+		bt.tasks = taskSet;
 		return bt;
 	}
+	
 
 
 }
