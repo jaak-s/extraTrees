@@ -1,11 +1,19 @@
 
 
-predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, ... )
+predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, newtasks=NULL, ... )
 {
     if (!inherits(object, "extraTrees")) {
-        stop("object not of class extraTrees")
+        stop("Object not of class extraTrees")
     }
     et = object
+    
+    if (et$multitask && is.null(newtasks)) {
+        stop("Prediction requires list of newtasks.")
+    }
+    
+    if (!et$multitask && ! is.null(newtasks)) {
+        stop("to predict with newtasks extraTrees must be trained with tasks")
+    }
         
     if (ncol(newdata)!=et$ndim) {
         stop( sprintf("newdata(ncol=%d) does not have the same dimensions as the original x (ncol=%d)", ncol(newdata), et$ndim) )
@@ -25,7 +33,18 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, ...
     }
     if (allValues) {
         ## returning allValues prediction:
-        m = toRMatrix( .jcall( et$jobject, "Lorg/extratrees/Matrix;", "getAllValues", toJavaMatrix(newdata) ) )
+        if (et$multitask) {
+            ## multi-task version:
+            m = toRMatrix( .jcall( 
+                et$jobject,
+                "Lorg/extratrees/Matrix;", 
+                "getAllValuesMT", 
+                toJavaMatrix(newdata),
+                .jarray(as.integer(newtasks)-1)
+            ))
+        } else {
+            m = toRMatrix( .jcall( et$jobject, "Lorg/extratrees/Matrix;", "getAllValues", toJavaMatrix(newdata) ) )
+        }
         if (!et$factor) {
             ## regression model:
             return(m)
@@ -47,7 +66,12 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, ...
         ## regression:
         return( .jcall( et$jobject, "[D", "getValues", toJavaMatrix(newdata) ) )
     }
-    ## classification:
-    yhat = .jcall( et$jobject, "[I", "getValues", toJavaMatrix(newdata) )
+    if (et$multitask) {
+        ## multi-task classification:
+        yhat = .jcall( et$jobject, "[I", "getValuesMT", toJavaMatrix(newdata), .jarray(as.integer(newtasks-1)) )
+    } else {
+        ## single-task classification:
+        yhat = .jcall( et$jobject, "[I", "getValues", toJavaMatrix(newdata) )
+    }
     return( factor(yhat, levels=0:(length(et$levels)-1), labels=et$levels ) )
 }

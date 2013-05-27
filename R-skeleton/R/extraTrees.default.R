@@ -45,6 +45,7 @@ selectTrees <- function( object, selection ) {
     return(etNew)
 }
 
+## main extraTree training function
 extraTrees.default <- function(x, y, 
              #xtest=NULL, ytest=NULL, 
              ntree=500,
@@ -55,6 +56,9 @@ extraTrees.default <- function(x, y,
              evenCuts = FALSE,
              numThreads = 1,
              quantile = F,
+             tasks = NULL,
+             probOfTaskCuts = 1.0,
+             numRandomTaskCuts = 1,
              ...) {
     n <- nrow(x)
     p <- ncol(x)
@@ -63,13 +67,9 @@ extraTrees.default <- function(x, y,
     x.col.names <- if (is.null(colnames(x))) 1:ncol(x) else colnames(x)
     
     ## making sure no NAs:
-    if ( any(is.na(y)) ) {
-        stop("Output vector y contains NAs.")
-    }
-    if ( any(is.na(x)) ) {
-        stop("Input matrix x contains NAs.")
-    }
-
+    if ( any(is.na(y)) ) stop("Output vector y contains NAs.")
+    if ( any(is.na(x)) ) stop("Input matrix x contains NAs.")
+    
     ## uncomment when xtest/ytest are used:
     #testdat <- !is.null(xtest)
     #if (testdat) {
@@ -88,8 +88,31 @@ extraTrees.default <- function(x, y,
     et$numRandomCuts = numRandomCuts
     et$evenCuts = evenCuts
     et$numThreads = numThreads
-    et$quantile = quantile
+    et$quantile   = quantile
+    et$multitask  = ! is.null(tasks)
+    et$probOfTaskCuts = probOfTaskCuts
+    et$numRandomTaskCuts = numRandomTaskCuts
     class(et) = "extraTrees"
+
+    if (nrow(x)!=length(y)) {
+        stop(sprintf("Length of y (%d) is not equal to the number of inputs in x (%d).", length(y), nrow(x) ) )
+    }
+    
+    ## making sure if tasks is present there are only two factors
+    if ( ! is.null(tasks) ) {
+        if (nrow(x)!=length(tasks)) {
+            stop(sprintf("Length of tasks (%d) is not equal to the number of inputs in x (%d).", length(tasks), nrow(x) ) )
+        }
+        if (!et$factor) {
+            stop("Multi-task learning only works with factors.")
+        }
+        if ( length(unique(y)) != 2 ) {
+            stop("Multi-task learning only works with 2 factors (binary classification)")
+        }
+        if (min(tasks) < 1) {
+            stop("Tasks should be positive integers.")
+        }
+    }
 
     if (et$factor && length(unique(y)) < 2) {
         stop("Need at least two classes to do classification.")
@@ -100,7 +123,6 @@ extraTrees.default <- function(x, y,
         }
         ## classification:
         et$levels = levels(y)
-        #stop("classification with extraTrees is not yet implemented.")
         ## creating FactorExtraTree object with the data
         et$jobject = .jnew(
             "org.extratrees.FactorExtraTrees",
@@ -108,6 +130,9 @@ extraTrees.default <- function(x, y,
             .jarray( as.integer( as.integer(y)-1 ) )
         )
         .jcall( et$jobject, "V", "setnFactors", as.integer(length(et$levels)) )
+        if (et$multitask) {
+            .jcall( et$jobject, "V", "setTasks", .jarray(as.integer(tasks-1)) )
+        }
     } else if (et$quantile) {
         ## quantile regression:
         et$jobject = .jnew(
@@ -128,6 +153,9 @@ extraTrees.default <- function(x, y,
     .jcall( et$jobject, "V", "setNumRandomCuts", as.integer(et$numRandomCuts) )
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
     .jcall( et$jobject, "V", "setNumThreads", as.integer(et$numThreads) )
+    ## multitask variables:
+    .jcall( et$jobject, "V", "setProbOfTaskCuts", et$probOfTaskCuts )
+    .jcall( et$jobject, "V", "setNumRandomTaskCuts", as.integer(et$numRandomTaskCuts) )
     
     ## learning the trees (stored at the et$jobject)
     .jcall( et$jobject, "V", "learnTrees", as.integer(et$nodesize), as.integer(et$mtry), as.integer(et$ntree) )

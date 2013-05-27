@@ -123,6 +123,18 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	public void setNumRandomCuts(int numRandomCuts) {
 		this.numRandomCuts = numRandomCuts;
 	}
+	
+	public void setTasks(int[] tasks) {
+		// making a list of tasks:
+		this.tasks  = tasks; 
+		this.nTasks = 1;
+		if (this.tasks!=null) {
+			for (int i=0; i<tasks.length; i++) {
+				//taskNames.add(tasks[i]);
+				nTasks = tasks[i] + 1;
+			}
+		}
+	}
 
 	/**
 	 * @param col_min

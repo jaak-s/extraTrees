@@ -43,15 +43,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 				nFactors = output[i]+1;
 			}
 		}
-		// making a list of tasks:
-		this.tasks  = tasks; 
-		this.nTasks = 1;
-		if (this.tasks!=null) {
-			for (int i=0; i<tasks.length; i++) {
-				//taskNames.add(tasks[i]);
-				nTasks = tasks[i] + 1;
-			}
-		}
+		setTasks(tasks);
 		
 		// making cols list for later use:
 		this.cols = new ArrayList<Integer>(input.ncols);
@@ -151,7 +143,29 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		return out;
 	}
-	
+
+	/**
+	 * @param input
+	 * @return matrix of predictions where
+	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
+	 * All values are integers. 
+	 */
+	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
+		if (input.nrows!=tasks.length) {
+			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
+		}
+		Matrix out = new Matrix( input.nrows, trees.size() );
+		// temporary vector:
+		double[] temp = new double[input.ncols];
+		for (int row=0; row<input.nrows; row++) {
+			input.copyRow(row, temp);
+			for (int j=0; j<trees.size(); j++) {
+				out.set( row, j, trees.get(j).getValueMT(temp, tasks[row]) );
+			}
+		}
+		return out;
+	}
+
 	/**
 	 * Object method, using the trees stored by learnTrees(...) method.
 	 * @param input
@@ -196,24 +210,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return getMaxIndex(counts);
 	}
 
-	/**
-	 * @param nmin - number of elements in leaf node
-	 * @param K    - number of choices
-	 *//*
-	public FactorBinaryTree buildTree(int nmin, int K) {
-		// generating full list of ids:
-		int[]    ids = new int[input.nrows];
-		for (int i=0; i<ids.length; i++) {
-			ids[i] = i;
-		}
-		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		HashSet<Integer> taskSet = new HashSet<Integer>(tasks.length);
-		for (int n : tasks) {
-			taskSet.add(n);
-		}
-		return buildTree(nmin, K, ids, cols, new HashSet<Integer>() );
-		//return buildTree(nmin, K, ids, unlabeledIds, cols);
-	}*/
 	
 	/**
 	 * @param counts
@@ -231,99 +227,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return 1 - sum / (double)( total*total );
 	}
 	
-	/*
-	public FactorBinaryTree buildTree(int nmin, int K, int[] ids, 
-			ShuffledIterator<Integer> randomCols) 
-	{
-		if (ids.length<nmin) {
-			return makeLeaf(ids);
-		}
-		// doing a shuffle of cols:
-		randomCols.reset();
-		
-		// trying K trees or the number of non-constant columns,
-		// whichever is smaller:
-		int k = 0, col_best=-1;
-		double t_best=Double.NaN;
-		CutResult bestResult = new CutResult();
-		bestResult.score = Double.POSITIVE_INFINITY;
-		
-		while( randomCols.hasNext() ) {
-			int col = randomCols.next();
-			// calculating columns min and max:
-			double[] range = getRange(ids, col, input);
-			if (range[1]-range[0] < zero) {
-				// skipping, because column is constant
-				continue;
-			}
-			double diff = (range[1]-range[0]);
-			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
-				// picking random test point:
-				double t;
-				t = getRandomCut(range[0], diff, repeat);
-			
-				// calculating GINI impurity index (0 - pure, 1 - noisy):
-				CutResult result = new CutResult();
-				calculateCutScore(ids, col, t, result);
-				
-				if (result.score < bestResult.score) {
-					col_best   = col;
-					t_best     = t;
-					
-					bestResult.score = result.score;
-					bestResult.leftConst  = result.leftConst;
-					bestResult.rightConst = result.rightConst;
-					bestResult.countLeft  = result.countLeft;
-					bestResult.countRight = result.countRight;
-				}
-			}
-
-			k++;
-			if (k>=K) {
-				// checked enough columns, stopping:
-				break;
-			}
-		}
-		// no score has been found, all inputs are constant:
-		if (col_best<0) {
-			return makeLeaf(ids);
-		}
-
-		// outputting the tree using the best score cut:
-		int[] idsLeft  = new int[bestResult.countLeft];
-		int[] idsRight = new int[bestResult.countRight];
-		int nLeft=0, nRight=0;
-		for (int n=0; n<ids.length; n++) {
-			if (input.get(ids[n], col_best) < t_best) {
-				// element goes to the left tree:
-				idsLeft[nLeft] = ids[n];
-				nLeft++;
-			} else {
-				// element goes to the right tree:
-				idsRight[nRight] = ids[n];
-				nRight++;
-			}
-		}
-
-		// calculating sub trees:
-		FactorBinaryTree leftTree, rightTree;
-		if (bestResult.leftConst) { 
-			// left child's output is constant
-			leftTree = makeLeaf(idsLeft); 
-		} else {
-			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols);
-		}
-		if (bestResult.rightConst) {
-			// right child's output is constant
-			rightTree = makeLeaf(idsRight);
-		} else {
-			rightTree = this.buildTree(nmin, K, idsRight, randomCols);
-		}
-
-		FactorBinaryTree bt = makeFilledTree(leftTree, rightTree,
-				col_best, t_best, ids.length);
-		return bt;
-	}*/
 
 	/**
 	 * Makes tree that is filled with data.

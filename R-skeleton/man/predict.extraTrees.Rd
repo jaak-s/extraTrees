@@ -5,13 +5,14 @@
   This function makes predictions for regression/classification using the given trained ExtraTree object and provided input matrix (newdata).
 }
 \usage{
-  \method{predict}{extraTrees}(object, newdata, quantile=NULL, allValues=F, ...)
+  \method{predict}{extraTrees}(object, newdata, quantile=NULL, allValues=F, newtasks=NULL, ...)
 }
 \arguments{
   \item{object}{ extraTree (S3) object, created by extraTrees(). }
   \item{newdata}{ a new numberic input data matrix, for each row a prediction is made. }
   \item{quantile}{ the quantile value between 0.0 and 1.0 for quantile regression, or NULL (default) for standard predictions. }
   \item{allValues}{ whether or not to return outputs of all trees (default FALSE). }
+  \item{newtasks}{ list of tasks, for each input in newdata (default NULL). Must be NULL if no multi-task learning was used at training. }
   \item{...}{ not used currently. }
 }
 \value{

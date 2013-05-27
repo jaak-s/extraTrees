@@ -71,7 +71,7 @@ public class MultitaskTests {
 
 	@Test
 	public void testMT() {
-		int ndata  = 500;
+		int ndata  = 1000;
 		int ntasks = 50;
 		int ndim   = 10;
 		FactorExtraTrees et  = getData2(ndata, ndim, ntasks);
@@ -81,7 +81,7 @@ public class MultitaskTests {
 		int nmin = 7;
 		int K    = 5;
 		int nTrees = 10;
-		//et.setProbOfTaskCuts(0.000);
+		et.setProbOfTaskCuts(0.700);
 		et.learnTrees(nmin, K, nTrees);
 		et0.learnTrees(nmin, K, nTrees);
 		
@@ -102,5 +102,10 @@ public class MultitaskTests {
 		errors0 /= yhat0.length;
 		System.out.println(String.format("Error rate (multi-task): %1.3f", errors) );
 		System.out.println(String.format("Error rate (single-task): %1.3f", errors0) );
+		
+		// testing allValuesMT
+		Matrix all = et.getAllValuesMT(testing.input, testing.tasks);
+		assertEquals( testing.input.nrows, all.nrows );
+		assertEquals( et.getNumTrees(),    all.ncols );
 	}
 }
