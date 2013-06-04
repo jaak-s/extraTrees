@@ -40,7 +40,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
                 "Lorg/extratrees/Matrix;", 
                 "getAllValuesMT", 
                 toJavaMatrix(newdata),
-                .jarray(as.integer(newtasks)-1)
+                .jarray(as.integer(newtasks-1))
             ))
         } else {
             m = toRMatrix( .jcall( et$jobject, "Lorg/extratrees/Matrix;", "getAllValues", toJavaMatrix(newdata) ) )
