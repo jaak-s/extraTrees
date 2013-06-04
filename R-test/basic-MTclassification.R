@@ -24,7 +24,14 @@ makeData <- function(n = 1000, p = 10, ntasks = 50) {
 Dtrain = makeData()
 Dtest  = makeData()
 
-## learning extra trees:
+## learning extra trees with multi-task learning:
 et = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mTry=p, numRandomCuts=10, tasks=Dtrain$tasks)
+et0 = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mTry=p, numRandomCuts=10)
 yhat = predict(et, Dtest$x, newtasks=Dtest$tasks)
-print( sprintf( "accuracy(extraTrees): %f", mean(ytest==yhat) ) )
+## testing allValues
+yhatAll = predict(et, Dtest$x[1:10,], newtasks=Dtest$tasks[1:10], allValues=T)
+
+yhat0 = predict(et0, Dtest$x)
+print( sprintf( "accuracy(extraTreesMT): %f", mean(Dtest$y==yhat) ) )
+print( sprintf( "accuracy(plain extraTrees): %f", mean(Dtest$y==yhat0) ) )
+
