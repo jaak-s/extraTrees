@@ -311,7 +311,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	}
 	
 	/**
-	 * Assumes only 2 factors.
+	 * Assumes factors with 2 levels (binary classification).
 	 * @param factorTaskTable
 	 * @return
 	 */
