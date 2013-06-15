@@ -317,13 +317,31 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 */
 	private double[] getTaskScores(int[][] factorTaskTable) {
 		int[][] counts = factorTaskTable;
+
+		// calculate prior for regularization:
+		double[] sums = sumAlong2nd(counts);
+		double prior  = (sums[0]+1)/(sums[0] + sums[1] + 2) * 2;
+		
 		double[] scores = new double[nTasks];
 		for (int task=0; task<nTasks; task++) {
 			// regularized estimate for each task probability
-			scores[task] = (counts[0][task] + 1) 
+			scores[task] = (counts[0][task] + prior) 
 					     / (double)(counts[0][task] + counts[1][task] + 2);
 		}
 		return scores;
+	}
+	
+	/**
+	 * @param factorTaskTable  array of size 2 (of arrays)
+	 * @return
+	 */
+	public static double[] sumAlong2nd(int[][] factorTaskTable) {
+		double[] sum = new double[2];
+		for (int task=0; task<factorTaskTable[0].length; task++) {
+			sum[0] += factorTaskTable[0][task];
+			sum[1] += factorTaskTable[1][task];
+		}
+		return sum;
 	}
 	
 	/**
