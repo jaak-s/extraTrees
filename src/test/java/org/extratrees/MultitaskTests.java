@@ -218,10 +218,22 @@ public class MultitaskTests {
 
 	@Test
 	public void testRegressionMT() {
-		double[] r1 = doRegressionMT(500);
-		double[] r2 = doRegressionMT(1000);
+		int numRepeats = 50;
+		double[] r0={0,0}, r1={0,0}, r2={0,0};
+		for (int repeat=0; repeat<numRepeats; repeat++) {
+			add( r0, doRegressionMT(250), 1.0/numRepeats );
+			add( r1, doRegressionMT(500), 1.0/numRepeats );
+			add( r2, doRegressionMT(1000), 1.0/numRepeats );
+		}
 		
-		System.out.println(String.format("MSE rate:  (N= 500)\t[MT] %1.3f\t [ST] %1.3f", r1[0], r1[1]) );
-		System.out.println(String.format("MSE rate:  (N=1000)\t[MT] %1.3f\t [ST] %1.3f", r2[0], r2[1]) );
+		System.out.println(String.format("MSE rate:  (N= 250)\t[MT] %1.4f\t [ST] %1.4f", r0[0], r0[1]) );
+		System.out.println(String.format("MSE rate:  (N= 500)\t[MT] %1.4f\t [ST] %1.4f", r1[0], r1[1]) );
+		System.out.println(String.format("MSE rate:  (N=1000)\t[MT] %1.4f\t [ST] %1.4f", r2[0], r2[1]) );
+	}
+	
+	public static void add(double[] addTo, double[] what, double multiplier) {
+		for (int i=0; i<addTo.length; i++) {
+			addTo[i] += what[i] * multiplier;
+		}
 	}
 }
