@@ -258,26 +258,19 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	}
 	
 	@Override
-	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> tasks, double bestScore) {
+	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> nodeTasks, double bestScore) {
 		if (nFactors>2) {
 			throw new RuntimeException("Multitask learning is not implemented 3 or more factors (classes).");
+		}
+		if (nodeTasks.size() <= 1) {
+			return null;
 		}
 
 		int[][] factorTaskTable = getFactorTaskTable(ids);
 		double[] p = getTaskScores(factorTaskTable);
 		
 		// counting if there are at least 2 tasks with samples
-		int numNonEmptyTasks = 0;
-		for (int task=0; task<nTasks; task++) {
-			if (factorTaskTable[0][task]>0 || factorTaskTable[1][task]>0) {
-				numNonEmptyTasks++;
-				if (numNonEmptyTasks>1) {
-					break;
-				}
-			}
-		}
-		if (numNonEmptyTasks<=1) {
-			// not enough tasks to do splitting
+		if (! hasAtLeast2Tasks(nodeTasks, factorTaskTable) ) {
 			return null;
 		}
 		
@@ -295,6 +288,20 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			}
 		}
 		return bestResult;
+	}
+
+	protected boolean hasAtLeast2Tasks(Set<Integer> nodeTasks,
+			int[][] factorTaskTable) {
+		boolean has1Task = false;
+		for (int task : nodeTasks) {
+			if (factorTaskTable[0][task]>0 || factorTaskTable[1][task]>0) {
+				if (has1Task) {
+					return true;
+				}
+				has1Task = true;
+			}
+		}
+		return false;
 	}
 	
 

@@ -221,7 +221,7 @@ public class MultitaskTests {
 		double[] r1 = doRegressionMT(500);
 		double[] r2 = doRegressionMT(1000);
 		
-		System.out.println(String.format("Error rate (N= 500)\t[MT] %1.3f\t [ST] %1.3f", r1[0], r1[1]) );
-		System.out.println(String.format("Error rate (N=1000)\t[MT] %1.3f\t [ST] %1.3f", r2[0], r2[1]) );
+		System.out.println(String.format("MSE rate:  (N= 500)\t[MT] %1.3f\t [ST] %1.3f", r1[0], r1[1]) );
+		System.out.println(String.format("MSE rate:  (N=1000)\t[MT] %1.3f\t [ST] %1.3f", r2[0], r2[1]) );
 	}
 }
