@@ -395,6 +395,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		int[] rightCounts = new int[nFactors];
 		result.leftTasks  = new HashSet<Integer>();
 		result.rightTasks = new HashSet<Integer>();
+		// TODO change here to use set of tasks and priors
 		for (int task=0; task<factorTaskTable[0].length; task++) {
 			if (taskScores[task] < t) {
 				// task is going to the left branch
