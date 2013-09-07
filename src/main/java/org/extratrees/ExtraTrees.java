@@ -341,7 +341,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			double[] sumSq )
 	{
 		// calculate prior for regularization:
-		double alpha = 0.5;
+		double alpha = 1;
 		
 		double[] scores = new double[nTasks];
 		for (int i=0; i<ids.length; i++) {
