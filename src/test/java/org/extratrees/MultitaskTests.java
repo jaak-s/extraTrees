@@ -152,4 +152,76 @@ public class MultitaskTests {
 		//System.out.println(String.format("Error rate (single-task): %1.3f", errors0) );
 		
 	}
+	
+	public static ExtraTrees getDataET(int ndata, int ndim, int ntasks) {
+		if (ndim<2) {
+			ndim = 2;
+		}
+		
+		double[] output = new double[ndata];
+		int[] tasks  = new int[ndata];
+		double[] v   = new double[ndata*ndim];
+		for (int i=0; i<v.length; i++) {
+			v[i] = Math.random();
+		}
+		Matrix m = new Matrix(v, ndata, ndim);
+		for (int i=0; i<ndata; i++) {
+			tasks[i]  = i%ntasks;
+			if (m.get(i, 0) < 0.5) {
+				if (tasks[i]%2==0) {
+					// type 1 task:
+					output[i] = 1 + 0.05 * Math.random();
+				} else {
+					// type 2 task:
+					output[i] = 0 + 0.05 * Math.random();
+				}
+			} else {
+				// independeng of task:
+				output[i] = 0.5 + 0.05 * Math.random();
+				
+			}
+		}
+		return new ExtraTrees(m, output, tasks);
+	}
+
+	public double[] doRegressionMT(int ndata) {
+		int ndim   = 10;
+		int ntasks = 50;
+		ExtraTrees et = getDataET(ndata, ndim, ntasks);
+		assertEquals( et.nTasks, ntasks );
+		
+		ExtraTrees et0 = new ExtraTrees(et.input, et.output);
+		ExtraTrees testing = getDataET(1000, ndim, ntasks);
+		
+		// training:
+		int nmin = 7;
+		int K    = 5;
+		int nTrees = 100;
+		et.setProbOfTaskCuts(0.700);
+		et.learnTrees(nmin, K, nTrees);
+		et0.learnTrees(nmin, K, nTrees);
+		
+		double[] yhat  = et.getValuesMT(testing.input, testing.tasks);
+		double[] yhat0 = et0.getValues(testing.input);
+		
+		double meanSqErrors = 0;
+		double meanSqErrors0 = 0;
+		for (int i=0; i<testing.output.length; i++) {
+			meanSqErrors  += Math.pow(testing.output[i] - yhat[i], 2);
+			meanSqErrors0 += Math.pow(testing.output[i] - yhat0[i], 2);
+		}
+		meanSqErrors  /= yhat.length;
+		meanSqErrors0 /= yhat0.length;
+
+		return new double[]{ meanSqErrors, meanSqErrors0 };
+	}
+
+	@Test
+	public void testRegressionMT() {
+		double[] r1 = doRegressionMT(500);
+		double[] r2 = doRegressionMT(1000);
+		
+		System.out.println(String.format("Error rate (N= 500)\t[MT] %1.3f\t [ST] %1.3f", r1[0], r1[1]) );
+		System.out.println(String.format("Error rate (N=1000)\t[MT] %1.3f\t [ST] %1.3f", r2[0], r2[1]) );
+	}
 }

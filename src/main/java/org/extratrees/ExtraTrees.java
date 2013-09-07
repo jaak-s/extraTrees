@@ -12,10 +12,22 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	
 	// defined in AbstractTrees:
 	//ArrayList<BinaryTree> trees;
-
 	public ExtraTrees(Matrix input, double[] output) {
+		this(input, output, null);
+	}
+
+
+	/**
+	 * @param input    - matrix of inputs, each row is an input vector
+	 * @param output   - array of output values (doubles)
+	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
+	 */
+	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
+		}
+		if (tasks!=null && input.nrows!=tasks.length) {
+			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
 		}
 		this.input = input;
 		this.output = output;
@@ -23,6 +35,8 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		for (int i=0; i<output.length; i++) {
 			this.outputSq[i] = this.output[i]*this.output[i]; 
 		}
+		setTasks(tasks);
+		
 		// making cols list for later use:
 		this.cols = new ArrayList<Integer>(input.ncols);
 		for (int i=0; i<input.ncols; i++) {
@@ -115,21 +129,49 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		return values;
 	}
 	
-	/**
-	 * @param nmin - number of elements in leaf node
-	 * @param K    - number of choices
-	 */
-	/*
-	@Override
-	public BinaryTree buildTree(int nmin, int K) {
-		// generating full list of ids:
-		int[]    ids = new int[output.length];
-		for (int i=0; i<ids.length; i++) {
-			ids[i] = i;
+	public double[] getValuesMT(Matrix newInput, int[] tasks) {
+		double[] values = new double[newInput.nrows];
+		double[] temp = new double[newInput.ncols];
+		for (int row=0; row<newInput.nrows; row++) {
+			// copying matrix row to temp:
+			for (int col=0; col<newInput.ncols; col++) {
+				temp[col] = newInput.get(row, col);
+			}
+			values[row] = this.getValueMT(temp, tasks[row]);
 		}
-		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		return buildTree(nmin, K, ids, cols);
-	}*/
+		return values;
+	}
+
+	public double getValueMT(double[] x, int task) {
+		double mean = 0;
+		for(BinaryTree t : trees) {
+			mean += t.getValueMT(x, task);
+		}
+		mean /= trees.size();
+		return mean;
+	}
+
+	/**
+	 * @param input
+	 * @return matrix of predictions where
+	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
+	 */
+	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
+		if (input.nrows!=tasks.length) {
+			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
+		}
+		Matrix out = new Matrix( input.nrows, trees.size() );
+		// temporary vector:
+		double[] temp = new double[input.ncols];
+		for (int row=0; row<input.nrows; row++) {
+			input.copyRow(row, temp);
+			for (int j=0; j<trees.size(); j++) {
+				out.set( row, j, trees.get(j).getValueMT(temp, tasks[row]) );
+			}
+		}
+		return out;
+	}
+
 	
 
 	@Override
@@ -165,25 +207,170 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			}
 		}
 		// calculating score:
-		double varLeft  = sumSqLeft/result.countLeft  - 
-				(sumLeft/result.countLeft)*(sumLeft/result.countLeft);
-		double varRight = sumSqRight/result.countRight- 
-				(sumRight/result.countRight)*(sumRight/result.countRight);
-		// TODO: move var and var<zero*zero outside this loop:
-		double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-		// the smaller the score the better:
-		result.score = (result.countLeft*varLeft + result.countRight*varRight) / ids.length / var;
-		result.leftConst  = (varLeft<zero*zero);
-		result.rightConst = (varRight<zero*zero);
+		cutResultFromSums(result, sumLeft, sumRight, sumSqLeft, sumSqRight, result.countLeft, result.countRight);
 		// value in intermediate nodes (used for CV):
 	}
 
+	/**
+	 * 
+	 * @param result
+	 * @param sumLeft
+	 * @param sumRight
+	 * @param sumSqLeft
+	 * @param sumSqRight
+	 * @param countLeft   separate left  count (regularized in the case of task cut)
+	 * @param countRight  separate right count (regularized in the case of task cut)
+	 */
+	private void cutResultFromSums(CutResult result, double sumLeft,
+			double sumRight, double sumSqLeft, double sumSqRight, 
+			double countLeft, double countRight) {
+		double varLeft  = sumSqLeft/countLeft  - 
+				(sumLeft/countLeft)*(sumLeft/countLeft);
+		double varRight = sumSqRight/countRight- 
+				(sumRight/countRight)*(sumRight/countRight);
+		// TODO: move var and var<zero*zero outside this loop:
+		//double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
+		// the smaller the score the better:
+		result.score = (result.countLeft*varLeft + result.countRight*varRight);// / ids.length / var;
+		result.leftConst  = (varLeft<zero*zero);
+		result.rightConst = (varRight<zero*zero);
+	}
+
 	@Override
-	protected TaskCutResult getTaskCut(int[] ids, HashSet<Integer> tasks,
+	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> nodeTasks,
 			double bestScore) {
-		throw new RuntimeException("Multitask learning is not yet implemented for regression.");
+		// return null if not at least 2 tasks
+		if (nodeTasks.size() <= 1) {
+			return null;
+		}
+		
+		double mean  = getOutputMean(ids);
+		int[] counts   = new int[nTasks];
+		double[] regcounts= new double[nTasks];
+		double[] sums  = new double[nTasks];
+		double[] sumSq = new double[nTasks];
+		double[] p = getTaskScores(ids, mean, nodeTasks, counts, regcounts, sums, sumSq);
+
+		// check if there are at least two tasks
+		if (! hasAtLeast2Tasks(ids) ) {
+			return null;
+		}
+		
+		double[] range = getRange(p);
+		TaskCutResult bestResult = null;
+		
+		for (int repeat=0; repeat<this.numRandomTaskCuts; repeat++) {
+			// get random cut:
+			double t = getRandom(range[0], range[1]);
+			TaskCutResult result = new TaskCutResult();
+			calculateTaskCutScore(p, counts, regcounts, sums, sumSq, mean, t, result, nodeTasks);
+			if (result.score < bestScore) {
+				bestResult = result;
+				bestScore  = result.score;
+			}
+		}
+		return bestResult;
+	}
+
+	private void calculateTaskCutScore(double[] taskScores,
+			int[] counts,
+			double[] regcounts, 
+			double[] sums,
+			double[] sumSq,
+			double mean, 
+			double t,
+			TaskCutResult result, 
+			Set<Integer> nodeTasks) 
+	{
+		double sumLeft    = 0;
+		double sumRight   = 0;
+		double sumSqLeft  = 0;
+		double sumSqRight = 0;
+		double regcountLeft  = 0;
+		double regcountRight = 0;
+		result.leftTasks  = new HashSet<Integer>();
+		result.rightTasks = new HashSet<Integer>();
+		result.countLeft  = 0;
+		result.countRight = 0;
+		for (int task : nodeTasks) {
+			if (taskScores[task] < t) {
+				// left branch
+				result.leftTasks.add(task);
+				result.countLeft += counts[task];
+				regcountLeft += regcounts[task];
+				sumLeft   += sums[task];
+				sumSqLeft += sumSq[task];
+			} else {
+				// right branch
+				result.rightTasks.add(task);
+				result.countRight += counts[task];
+				regcountRight += regcounts[task];
+				sumRight   += sums[task];
+				sumSqRight += sumSq[task];
+			}
+		}
+		cutResultFromSums(result, sumLeft, sumRight, sumSqLeft, sumSqRight, 
+				regcountLeft, regcountRight);
+	}
+
+	private boolean hasAtLeast2Tasks(int[] ids) {
+		int task0 = this.tasks[ids[0]];
+		for (int i=1; i<ids.length; i++) {
+			if (task0 != this.tasks[ids[i]]) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
+	/**
+	 * 
+	 * @param ids
+	 * @param priorMean
+	 * @param nodeTasks
+	 * @param counts    filled by this method (NOT adjusted for regularization)
+	 * @param regcounts filled by this method (adjusted for regularization)
+	 * @param sums      filled by this method (adjusted for regularization)
+	 * @param sumSq     filled by this method (adjusted for regularization)
+	 * @return
+	 */
+	private double[] getTaskScores(int[] ids, double priorMean, Set<Integer> nodeTasks, 
+			int[] counts,
+			double[] regcounts,
+			double[] sums, 
+			double[] sumSq )
+	{
+		// calculate prior for regularization:
+		double alpha = 1;
+		
+		double[] scores = new double[nTasks];
+		for (int i=0; i<ids.length; i++) {
+			int n = ids[i];
+			counts[tasks[n]] += 1;
+			sums[tasks[n]]   += output[n];
+			sumSq[tasks[n]]  += outputSq[n];
+		}
+		for (int task : nodeTasks) {
+			// regularization:
+			sums[task]   += priorMean*alpha;
+			sumSq[task]  += priorMean*priorMean*alpha;
+			regcounts[task] = counts[task] + alpha;
+			// calculating regularized score:
+			scores[task]  = sums[task] / (counts[task] + alpha);
+		}
+		
+		return scores;
+	}
+
+	private double getOutputMean(int[] ids) {
+		double mean = 0;
+		
+		for (int i=0; i<ids.length; i++) {
+			mean += this.output[ids[i]];
+		}
+		mean /= ids.length;
+		return mean;
+	}
 	
 	/**
 	 * @param ids

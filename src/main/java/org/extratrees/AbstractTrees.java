@@ -369,7 +369,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	 *         Returns null if no cut better (smaller score) than bestScore was found.
 	 */
 	protected abstract TaskCutResult getTaskCut(int[] ids, 
-			HashSet<Integer> tasks, double bestScore);
+			Set<Integer> tasks, double bestScore);
 
 
 	/**
@@ -545,7 +545,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 			// checking whether to perform task splitting
 			if ( probOfTaskCuts > getRandom() ) {
 				// calculating task order:
-				taskCutResult = getTaskCut(ids, null, bestResult.score);
+				taskCutResult = getTaskCut(ids, taskSet, bestResult.score);
 			}
 		}
 		

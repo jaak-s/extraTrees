@@ -258,7 +258,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	}
 	
 	@Override
-	protected TaskCutResult getTaskCut(int[] ids, HashSet<Integer> tasks, double bestScore) {
+	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> tasks, double bestScore) {
 		if (nFactors>2) {
 			throw new RuntimeException("Multitask learning is not implemented 3 or more factors (classes).");
 		}
