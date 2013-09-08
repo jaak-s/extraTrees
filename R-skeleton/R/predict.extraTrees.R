@@ -63,7 +63,11 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
         return(mlist)
     }
     if (!et$factor) {
-        ## regression:
+        ## multi-task regression:
+        if (et$multitask) {
+            return( .jcall( et$jobject, "[D", "getValuesMT", toJavaMatrix(newdata), .jarray(as.integer(newtasks-1)) ) )
+        }
+        ## single-task regression:
         return( .jcall( et$jobject, "[D", "getValues", toJavaMatrix(newdata) ) )
     }
     if (et$multitask) {

@@ -103,14 +103,14 @@ extraTrees.default <- function(x, y,
         if (nrow(x)!=length(tasks)) {
             stop(sprintf("Length of tasks (%d) is not equal to the number of inputs in x (%d).", length(tasks), nrow(x) ) )
         }
-        if (!et$factor) {
-            stop("Multi-task learning only works with factors.")
-        }
-        if ( length(unique(y)) != 2 ) {
-            stop("Multi-task learning only works with 2 factors (binary classification)")
+        if ( et$factor && length(unique(y)) != 2 ) {
+            stop("Multi-task learning only works with 2 factors (binary classification). 3 or more classes is not supported.")
         }
         if (min(tasks) < 1) {
             stop("Tasks should be positive integers.")
+        }
+        if ( et$quantile ) {
+            stop("Quantile regression is not (yet) supported with multi-task learning.")
         }
     }
 
@@ -130,9 +130,6 @@ extraTrees.default <- function(x, y,
             .jarray( as.integer( as.integer(y)-1 ) )
         )
         .jcall( et$jobject, "V", "setnFactors", as.integer(length(et$levels)) )
-        if (et$multitask) {
-            .jcall( et$jobject, "V", "setTasks", .jarray(as.integer(tasks-1)) )
-        }
     } else if (et$quantile) {
         ## quantile regression:
         et$jobject = .jnew(
@@ -154,8 +151,11 @@ extraTrees.default <- function(x, y,
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
     .jcall( et$jobject, "V", "setNumThreads", as.integer(et$numThreads) )
     ## multitask variables:
-    .jcall( et$jobject, "V", "setProbOfTaskCuts", et$probOfTaskCuts )
-    .jcall( et$jobject, "V", "setNumRandomTaskCuts", as.integer(et$numRandomTaskCuts) )
+    if (et$multitask) {
+        .jcall( et$jobject, "V", "setTasks", .jarray(as.integer(tasks-1)) )
+        .jcall( et$jobject, "V", "setProbOfTaskCuts", et$probOfTaskCuts )
+        .jcall( et$jobject, "V", "setNumRandomTaskCuts", as.integer(et$numRandomTaskCuts) )
+    }
     
     ## learning the trees (stored at the et$jobject)
     .jcall( et$jobject, "V", "learnTrees", as.integer(et$nodesize), as.integer(et$mtry), as.integer(et$ntree) )

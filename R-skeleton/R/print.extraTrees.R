@@ -9,5 +9,6 @@ print.extraTrees <- function(x, ...) {
     	type="numeric (regression)"
     }
     cat( sprintf(" - type:       %s\n", type) )
+    cat( sprintf(" - multi-task: %s\n", ifelse(x$multitask, "yes", "no")) )
 }
 

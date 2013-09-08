@@ -326,7 +326,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		int[][] counts = factorTaskTable;
 
 		// calculate prior for regularization:
-		double alpha  = 2;
+		double alpha  = 1;
 		double[] sums = sumAlong2nd(counts);
 		double prior  = (sums[0]+1)/(sums[0] + sums[1] + 2) * alpha;
 		

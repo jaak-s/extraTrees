@@ -351,12 +351,17 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			sumSq[tasks[n]]  += outputSq[n];
 		}
 		for (int task : nodeTasks) {
+			// only regularization to scores (sumsq, sums, regcounts are unaffected):
+			regcounts[task] = counts[task];
+			scores[task]  = (sums[task]+priorMean*alpha) / (counts[task] + alpha);
+			
 			// regularization:
-			sums[task]   += priorMean*alpha;
-			sumSq[task]  += priorMean*priorMean*alpha;
-			regcounts[task] = counts[task] + alpha;
+			//sums[task]   += priorMean*alpha;
+			//sumSq[task]  += priorMean*priorMean*alpha;
+			// when regularization is used for comparison:
+			//regcounts[task] = counts[task] + alpha;
 			// calculating regularized score:
-			scores[task]  = sums[task] / (counts[task] + alpha);
+			//scores[task]  = sums[task] / (counts[task] + alpha);
 		}
 		
 		return scores;
