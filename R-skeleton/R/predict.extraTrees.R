@@ -14,6 +14,9 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
     if (!et$multitask && ! is.null(newtasks)) {
         stop("to predict with newtasks extraTrees must be trained with tasks")
     }
+    
+    ## making sure no NAs:
+    if ( any(is.na(newdata)) ) stop("Input matrix newdata contains NAs.")
         
     if (ncol(newdata)!=et$ndim) {
         stop( sprintf("newdata(ncol=%d) does not have the same dimensions as the original x (ncol=%d)", ncol(newdata), et$ndim) )

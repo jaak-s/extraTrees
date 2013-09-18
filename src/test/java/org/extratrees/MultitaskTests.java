@@ -166,7 +166,7 @@ public class MultitaskTests {
 		}
 		Matrix m = new Matrix(v, ndata, ndim);
 		for (int i=0; i<ndata; i++) {
-			tasks[i]  = i%ntasks;
+			tasks[i]  = (i+1)%ntasks;
 			if (m.get(i, 0) < 0.5) {
 				if (tasks[i]%2==0) {
 					// type 1 task:
@@ -218,7 +218,7 @@ public class MultitaskTests {
 
 	@Test
 	public void testRegressionMT() {
-		int numRepeats = 50;
+		int numRepeats = 2;
 		double[] r0={0,0}, r1={0,0}, r2={0,0};
 		for (int repeat=0; repeat<numRepeats; repeat++) {
 			add( r0, doRegressionMT(250), 1.0/numRepeats );

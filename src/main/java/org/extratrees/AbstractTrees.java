@@ -131,7 +131,9 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		if (this.tasks!=null) {
 			for (int i=0; i<tasks.length; i++) {
 				//taskNames.add(tasks[i]);
-				nTasks = tasks[i] + 1;
+				if (nTasks < tasks[i] + 1) {
+					nTasks = tasks[i] + 1;
+				}
 			}
 		}
 	}

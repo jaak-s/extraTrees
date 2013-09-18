@@ -69,6 +69,7 @@ extraTrees.default <- function(x, y,
     ## making sure no NAs:
     if ( any(is.na(y)) ) stop("Output vector y contains NAs.")
     if ( any(is.na(x)) ) stop("Input matrix x contains NAs.")
+    if ( !is.null(tasks) && any(is.na(tasks)) ) stop("Task vector contains NAs.")
     
     ## uncomment when xtest/ytest are used:
     #testdat <- !is.null(xtest)
