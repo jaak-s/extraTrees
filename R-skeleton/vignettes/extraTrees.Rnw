@@ -7,8 +7,8 @@
 % \VignetteIndexEntry{extraTrees}
 
 \title{Package for ExtraTrees method for classification and regression}
-\author{Jaak Simm}
-\date{2012-11-28}
+\author{Jaak Simm and Ildefons Magrans de Abril}
+\date{2013-10-05}
 
 \maketitle
 
@@ -126,9 +126,9 @@ system.time({et <- extraTrees(x, y, numThreads=2)})
 \end{figure}
 
 
-\section{Acknowledgements}
+%\section{Acknowledgements}
 
-We would like thank Ildefons Magrans de Abril for suggesting
-making this R package.
+%We would like thank Ildefons Magrans de Abril for suggesting
+%making this R package.
 
 \end{document}
