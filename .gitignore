@@ -5,3 +5,8 @@
 /target
 *~
 .Rhistory
+*.class
+# Package Files #
+*.jar
+*.war
+*.ear
