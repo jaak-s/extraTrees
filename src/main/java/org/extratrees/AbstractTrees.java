@@ -10,8 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.extratrees.AbstractTrees.CutResult;
-
 public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	Matrix input;
 	protected final static double zero=1e-7;
@@ -504,6 +502,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		CutResult bestResult = new CutResult();
 		bestResult.score = Double.POSITIVE_INFINITY;
 		
+		loopThroughColumns:
 		while( randomCols.hasNext() ) {
 			int col = randomCols.next();
 			// calculating columns min and max:
@@ -531,7 +530,12 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 					bestResult.rightConst = result.rightConst;
 					bestResult.countLeft  = result.countLeft;
 					bestResult.countRight = result.countRight;
+					if (bestResult.leftConst && bestResult.rightConst) {
+						// the result cannot be improved:
+						break loopThroughColumns;
+					}
 				}
+				
 			}
 
 			k++;
