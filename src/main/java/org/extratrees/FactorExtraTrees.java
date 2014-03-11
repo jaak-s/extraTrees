@@ -1,10 +1,7 @@
 package org.extratrees;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.extratrees.AbstractTrees.CutResult;
 
 
 public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
@@ -218,8 +215,8 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 *         Value 0 implies pure, high values mean noisy.  
 	 */
 	public static double getGiniIndex(int[] counts) {
-		int sum = 0;
-		int total = 0;
+		long sum = 0;
+		long total = 0;
 		for (int i=0; i<counts.length; i++) {
 			sum   += counts[i]*counts[i];
 			total += counts[i];
