@@ -1,11 +1,10 @@
 package org.extratrees;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-
+import org.extratrees.AbstractTrees.CutResult;
 import org.junit.Test;
 
 public class ExtraTreeTests {
@@ -26,7 +25,6 @@ public class ExtraTreeTests {
 		return et;
 	}
 	
-
 
 	/** testing {@code et.getAllValues(input)} */
 	@Test
@@ -118,6 +116,63 @@ public class ExtraTreeTests {
 		for (int i=0; i<output.length; i++) {
 			assertEquals(fixedOutput, outputHat[i], 1e-10);
 		}
+	}
+
+	// data for testing weights:
+	public static ExtraTrees getSampleDataW(boolean weights) {
+		int ndata = 10;
+		int ndim = 2;
+		double[] output = new double[ndata];
+		double[] v = new double[ndata*ndim];
+		double[] w = new double[ndata];
+		Matrix m = new Matrix(v, ndata, ndim);
+		for (int i=0; i < m.nrows; i++) {
+			m.set(i, 0, i);
+			m.set(i, 1, (i < m.nrows/2) ?1.0 :0.0 );
+			if (i < 5) {
+				output[i] = 1.0;
+			} else {
+				output[i] = 0.0;
+			}
+			w[i] = (i < m.nrows/2) ?1.0 :0.2;
+		}
+		ExtraTrees et;
+		if (weights) {
+			et = new ExtraTrees(m, output, null, w);
+		} else {
+			et = new ExtraTrees(m, output);
+		}
+		return et;
+	}
+
+
+	@Test
+	public void testWeights() {
+		ExtraTrees et = getSampleDataW(false);
+		ExtraTrees etw = getSampleDataW(true);
+		
+		assertTrue( ! et.useWeights );
+		assertTrue( etw.useWeights );
+		
+		int[] all = AbstractTrees.seq(etw.input.nrows);
+		CutResult resultw = new CutResult();
+		CutResult result  = new CutResult();
+		etw.calculateCutScore(all, 0, 5.5, resultw);
+		et.calculateCutScore(all, 0, 5.5, result);
+		// test sanity checks:
+		assertEquals(6, resultw.countLeft);
+		assertEquals(4, resultw.countRight);
+		assertTrue(resultw.rightConst);
+		assertTrue( ! resultw.leftConst);
+		
+		double mean   = 5.0 / 6.0;
+		double meanw  = 5.0 / 5.2;
+		// score for case of no weights:
+		double score  = (Math.pow(1.0-mean,  2)*5 + mean*mean);
+		// score for case of weights:
+		double scorew = (Math.pow(1.0-meanw, 2)*5 + meanw*meanw*0.2);
+		assertEquals(score,  result.score, 1e-7);
+		assertEquals(scorew, resultw.score, 1e-7);
 	}
 
 }

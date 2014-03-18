@@ -9,11 +9,17 @@ import java.util.Set;
 public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	double[] output;
 	double[] outputSq;
+	double[] weights;
+	final boolean useWeights;
 	
 	// defined in AbstractTrees:
 	//ArrayList<BinaryTree> trees;
 	public ExtraTrees(Matrix input, double[] output) {
 		this(input, output, null);
+	}
+	
+	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
+		this(input, output, tasks, null);
 	}
 
 
@@ -21,19 +27,23 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * @param input    - matrix of inputs, each row is an input vector
 	 * @param output   - array of output values (doubles)
 	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
+	 * @param weights  - weights of data points, null if no weights
 	 */
-	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
+	public ExtraTrees(Matrix input, double[] output, int[] tasks, double[] weights) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
 		if (tasks!=null && input.nrows!=tasks.length) {
 			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
 		}
+		if (weights!=null && input.nrows!=weights.length) {
+			throw(new IllegalArgumentException("Input and weights do not have the same number of data points."));
+		}
 		this.input = input;
 		this.output = output;
 		this.outputSq = new double[output.length];
 		for (int i=0; i<output.length; i++) {
-			this.outputSq[i] = this.output[i]*this.output[i]; 
+			this.outputSq[i] = this.output[i]*this.output[i];
 		}
 		setTasks(tasks);
 		
@@ -42,6 +52,8 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		for (int i=0; i<input.ncols; i++) {
 			cols.add(i);
 		}
+		this.weights = weights;
+		this.useWeights = (weights!=null);
 	}
 	
 	/**
@@ -195,19 +207,24 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		// calculating score:
 		double sumLeft=0, sumRight=0;
 		double sumSqLeft=0, sumSqRight=0;
+		double weightLeft=0, weightRight=0;
 		for (int n=0; n<ids.length; n++) {
-			if (input.get(ids[n], col) < t) {
+			int id = ids[n];
+			double w = useWeights ?weights[id] :1.0;
+			if (input.get(id, col) < t) {
 				result.countLeft++;
-				sumLeft   += output[  ids[n]];
-				sumSqLeft += outputSq[ids[n]];
+				weightLeft += w;
+				sumLeft    += output[  id] * w;
+				sumSqLeft  += outputSq[id] * w;
 			} else {
 				result.countRight++;
-				sumRight   += output[  ids[n]];
-				sumSqRight += outputSq[ids[n]];
+				weightRight += w;
+				sumRight    += output[  id] * w;
+				sumSqRight  += outputSq[id] * w;
 			}
 		}
 		// calculating score:
-		cutResultFromSums(result, sumLeft, sumRight, sumSqLeft, sumSqRight, result.countLeft, result.countRight);
+		cutResultFromSums(result, sumLeft, sumRight, sumSqLeft, sumSqRight, weightLeft, weightRight);
 		// value in intermediate nodes (used for CV):
 	}
 
@@ -231,7 +248,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		// TODO: move var and var<zero*zero outside this loop:
 		//double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
 		// the smaller the score the better:
-		result.score = (result.countLeft*varLeft + result.countRight*varRight);// / ids.length / var;
+		result.score = (countLeft*varLeft + countRight*varRight);// / ids.length / var;
 		result.leftConst  = (varLeft<zero*zero);
 		result.rightConst = (varRight<zero*zero);
 	}

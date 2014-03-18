@@ -3,6 +3,7 @@ package org.extratrees;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -12,6 +13,7 @@ import java.util.concurrent.Future;
 
 public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	Matrix input;
+	Random random = new Random();
 	protected final static double zero=1e-7;
 
 	/** for multi-task learning, stores task indeces (null if not present) */
@@ -347,6 +349,18 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		}
 	}
 	
+	/**
+	 * @param n
+	 * @return int array of [0, 1, ..., n-1].
+	 */
+	public static int[] seq(int n) {
+		int[] seq = new int[n];
+		for (int i=0; i < n; i++) {
+			seq[i] = i;
+		}
+		return seq;
+	}
+	
 
 	public E buildTree(int nmin, int K) {
 		int[]    ids = new int[input.nrows];
@@ -463,7 +477,11 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	 * @return random between 0.0 and 1.0.
 	 */
 	protected double getRandom() {
-		return Math.random();
+		return random.nextDouble();
+	}
+	
+	public void setSeed(long seed) {
+		this.random = new Random(seed);
 	}
 	
 	/**
