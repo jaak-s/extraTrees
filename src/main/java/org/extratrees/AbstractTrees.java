@@ -162,7 +162,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	 * @param input
 	 * @return array of min and max values.
 	 */
-	protected double[] getRange(int[] ids, int col, Matrix input) {
+	protected static double[] getRange(int[] ids, int col, Matrix input) {
 		double[] range = new double[2];
 		range[0] = Double.POSITIVE_INFINITY;
 		range[1] = Double.NEGATIVE_INFINITY;
@@ -178,7 +178,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	 * @param input
 	 * @return array of size two: min and max values.
 	 */
-	protected double[] getRange(double[] input) {
+	protected static double[] getRange(double[] input) {
 		double[] range = new double[2];
 		range[0] = Double.POSITIVE_INFINITY;
 		range[1] = Double.NEGATIVE_INFINITY;
