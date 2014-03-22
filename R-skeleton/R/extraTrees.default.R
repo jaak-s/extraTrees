@@ -56,6 +56,7 @@ extraTrees.default <- function(x, y,
              evenCuts = FALSE,
              numThreads = 1,
              quantile = F,
+             weights = NULL,
              tasks = NULL,
              probOfTaskCuts = 1.0,
              numRandomTaskCuts = 1,
@@ -90,13 +91,23 @@ extraTrees.default <- function(x, y,
     et$evenCuts = evenCuts
     et$numThreads = numThreads
     et$quantile   = quantile
+    et$useWeights = ! is.null(weights)
     et$multitask  = ! is.null(tasks)
     et$probOfTaskCuts = probOfTaskCuts
     et$numRandomTaskCuts = numRandomTaskCuts
     class(et) = "extraTrees"
 
-    if (nrow(x)!=length(y)) {
+    if (nrow(x) != length(y)) {
         stop(sprintf("Length of y (%d) is not equal to the number of inputs in x (%d).", length(y), nrow(x) ) )
+    }
+    
+    if ( ! is.null(weights) ) {
+      if (nrow(x) != length(weights)) {
+        stop(sprintf("Length of weights (%d) is not equal to the number of inputs in x (%d).", length(weights), nrow(x) ) )
+      }
+      if (any(weights <= 0)) {
+        stop("Weights have to be positive.")
+      }
     }
     
     ## making sure if tasks is present there are only two factors
@@ -112,6 +123,9 @@ extraTrees.default <- function(x, y,
         }
         if ( et$quantile ) {
             stop("Quantile regression is not (yet) supported with multi-task learning.")
+        }
+        if ( et$useWeights ) {
+            stop("Weights are not (yet) supported with multi-task learning.")
         }
     }
 
@@ -151,6 +165,12 @@ extraTrees.default <- function(x, y,
     .jcall( et$jobject, "V", "setNumRandomCuts", as.integer(et$numRandomCuts) )
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
     .jcall( et$jobject, "V", "setNumThreads", as.integer(et$numThreads) )
+    
+    ## if present set weights:
+    if (et$useWeights) {
+      .jcall( et$jobject, "V", "setWeights", .jarray(as.double(weights)) )
+    }
+    
     ## multitask variables:
     if (et$multitask) {
         .jcall( et$jobject, "V", "setTasks", .jarray(as.integer(tasks-1)) )

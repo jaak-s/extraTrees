@@ -15,6 +15,7 @@
              evenCuts = FALSE,
              numThreads = 1,
              quantile = F,
+             weights = NULL,
              tasks = NULL,
              probOfTaskCuts = 1.0,
              numRandomTaskCuts = 1,
@@ -31,6 +32,7 @@
   \item{numThreads}{ the number of CPU threads to use (default is 1). }
   \item{quantile}{ if TRUE then quantile regression is performed (default is FALSE), only for regression data.
                    Then use predict(et, newdata, quantile=k) to make predictions for k quantile. }
+  \item{weights}{ list of weights, positive real values. NULL means standard learning, i.e. equal weights. }
   \item{tasks}{ list of tasks, integers from 1 and up. NULL if no multi-task learning }
   \item{probOfTaskCuts}{ probability of task cut at a node (default 1.0). Used only if tasks is specified. } 
   \item{numRandomTaskCuts}{ number of times task cut is performed at a node (default 1). Used only if tasks is specified. }
