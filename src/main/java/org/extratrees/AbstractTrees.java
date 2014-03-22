@@ -473,6 +473,13 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		return s;
 	}
 
+	public static double sum(double[] array) {
+		double s = 0;
+		for (int i=0; i<array.length; i++) {
+			s += array[i];
+		}
+		return s;
+	}
 
 	public static HashSet<Integer> getSequenceSet(int n) {
 		HashSet<Integer> taskSet;

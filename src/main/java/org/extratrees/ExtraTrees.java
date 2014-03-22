@@ -287,6 +287,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			TaskCutResult result, 
 			Set<Integer> nodeTasks) 
 	{
+		// TODO: support weights
 		double sumLeft    = 0;
 		double sumRight   = 0;
 		double sumSqLeft  = 0;

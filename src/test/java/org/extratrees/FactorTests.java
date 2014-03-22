@@ -1,10 +1,10 @@
 package org.extratrees;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
-import org.extratrees.FactorExtraTrees;
-import org.extratrees.Matrix;
+import org.extratrees.AbstractTrees.CutResult;
 import org.junit.Test;
 
 
@@ -12,23 +12,26 @@ public class FactorTests {
 
 	@Test
 	public void testGini() {
-		int[] counts;
-		counts = new int[]{0,0,5,0,0};
+		double[] counts;
+		counts = new double[]{0,0,5,0,0};
 		assertEquals(0, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
 		
-		counts = new int[]{0,0,1,0,0};
+		counts = new double[]{0,0,1,0,0};
 		assertEquals(0, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
 		
-		counts = new int[]{1,0,1,0,0};
+		counts = new double[]{1,0,1,0,0};
 		assertEquals(0.5, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
 		
-		counts = new int[]{7,0,7,0,0};
+		counts = new double[]{1,0,1,0,1};
+		assertEquals(2.0/3.0, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
+		
+		counts = new double[]{7,0,7,0,0};
 		assertEquals(0.5, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
 		
-		counts = new int[]{7,7,7,7,7};
+		counts = new double[]{7,7,7,7,7};
 		assertEquals(0.8, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
 		
-		counts = new int[]{4,0,0,0,1};
+		counts = new double[]{4,0,0,0,1};
 		assertEquals(0.32, FactorExtraTrees.getGiniIndex(counts), 1e-6 );
 	}
 
@@ -151,15 +154,60 @@ public class FactorTests {
 		return et;
 	}
 
-	/*
+	// data for testing weights:
+	public static FactorExtraTrees getSampleDataW(boolean weights) {
+		int ndata = 10;
+		int ndim = 2;
+		int[] output = new int[ndata];
+		double[] v = new double[ndata*ndim];
+		double[] w = new double[ndata];
+		Matrix m = new Matrix(v, ndata, ndim);
+		for (int i=0; i < m.nrows; i++) {
+			m.set(i, 0, i);
+			m.set(i, 1, (i < m.nrows/2) ?1.0 :0.0 );
+			if (i < 5) {
+				output[i] = 1;
+			} else {
+				output[i] = 0;
+			}
+			w[i] = (i < m.nrows/2) ?1.0 :0.2;
+		}
+		FactorExtraTrees et = new FactorExtraTrees(m, output);
+		if (weights) {
+			et.setWeights(w);
+		}
+		return et;
+	}
+
 	@Test
-	public void testSSL() {
-		int ndata = 50;
-		int nUnlabeled = 500;
-		FactorExtraTrees et = getSampleData2(ndata);
-		et.setUnlabeled( getSampleData2(nUnlabeled).input );
-		int ntrees = 10;
-		et.learnTrees(5, 4, ntrees);
-	}*/
+	public void testWeights() {
+		FactorExtraTrees et = getSampleDataW(false);
+		FactorExtraTrees etw = getSampleDataW(true);
+		
+		assertTrue( ! et.useWeights );
+		assertTrue( etw.useWeights );
+		
+		int[] all = AbstractTrees.seq(etw.input.nrows);
+		CutResult resultw = new CutResult();
+		CutResult result  = new CutResult();
+		etw.calculateCutScore(all, 0, 5.5, resultw);
+		et.calculateCutScore(all, 0, 5.5, result);
+		// test sanity checks:
+		assertEquals(6, resultw.countLeft);
+		assertEquals(4, resultw.countRight);
+		assertTrue(resultw.rightConst);
+		assertTrue( ! resultw.leftConst);
+		assertTrue(result.rightConst);
+		assertTrue( ! result.leftConst);
+		
+		double giniLeft  = 1 - Math.pow(5.0/6.0, 2) - Math.pow(1.0/6, 2);
+		double giniLeftw = 1 - Math.pow(5.0/5.2, 2) - Math.pow(0.2/5.2, 2);
+		// score for case of no weights:
+		double score  = giniLeft * 6.0 / 10;
+		// score for case of weights:
+		double scorew = giniLeftw * 5.2 / 6.0;
+		assertEquals(score,  result.score, 1e-7);
+		assertEquals(scorew, resultw.score, 1e-7);
+	}
 
 }

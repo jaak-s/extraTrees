@@ -214,6 +214,23 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 *         the proportion of label i.<br>
 	 *         Value 0 implies pure, high values mean noisy.  
 	 */
+	public static double getGiniIndex(double[] counts) {
+		double sum = 0;
+		double total = 0;
+		for (int i=0; i<counts.length; i++) {
+			sum   += counts[i]*counts[i];
+			total += counts[i];
+		}
+		return 1 - sum / (double)( total*total );
+	}
+	
+
+	/**
+	 * @param counts
+	 * @return Gini index ( 1 - sum(f_i ^ 2) ), where f_i is 
+	 *         the proportion of label i.<br>
+	 *         Value 0 implies pure, high values mean noisy.  
+	 */
 	public static double getGiniIndex(int[] counts) {
 		long sum = 0;
 		long total = 0;
@@ -223,7 +240,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		return 1 - sum / (double)( total*total );
 	}
-	
 
 	/**
 	 * Makes tree that is filled with data.
@@ -359,26 +375,39 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	@Override
 	protected void calculateCutScore(int[] ids, int col, double t,
 			CutResult result) {
-		int[] factorCountLeft  = new int[nFactors];
-		int[] factorCountRight = new int[nFactors];
-		for (int n=0; n<ids.length; n++) {
-			if (input.get(ids[n], col) < t) {
-				//result.countLeft++;
-				factorCountLeft[ output[ids[n]] ]++;
-			} else {
-				//result.countRight++;
-				factorCountRight[ output[ids[n]] ]++;
+		if ( ! useWeights) {
+			int[][] factorCounts = new int[2][nFactors];
+			for (int n=0; n<ids.length; n++) {
+				factorCounts[input.get(ids[n], col) < t ?0 :1][ output[ids[n]] ]++;
 			}
+			result.countLeft  = sum(factorCounts[0]);
+			result.countRight = sum(factorCounts[1]);
+			double giniLeft  = getGiniIndex(factorCounts[0]);
+			double giniRight = getGiniIndex(factorCounts[1]);
+			result.score = (giniLeft*result.countLeft + giniRight*result.countRight) / (result.countLeft + result.countRight);
+			result.leftConst  = giniLeft  < zero*zero;
+			result.rightConst = giniRight < zero*zero;
+		} else {
+			// using weights, thus instead of counts we have weights, which are real numbers
+			double[][] factorWeights = new double[2][nFactors];
+			int[] branchCounts = new int[2];
+			for (int n=0; n<ids.length; n++) {
+				int id = ids[n];
+				int branch = input.get(id, col) < t ?0 :1;
+				factorWeights[ branch ][ output[id] ] += weights[id];
+				branchCounts[  branch ] ++;
+			}
+			result.countLeft  = branchCounts[0];
+			result.countRight = branchCounts[1];
+			double giniLeft  = getGiniIndex( factorWeights[0] );
+			double giniRight = getGiniIndex( factorWeights[1] );
+			double weightLeft  = sum(factorWeights[0]);
+			double weightRight = sum(factorWeights[1]);
+			result.score = (giniLeft*weightLeft + giniRight*weightRight) / (weightLeft + weightRight);
+			result.leftConst  = giniLeft  < zero*zero;
+			result.rightConst = giniRight < zero*zero;
 		}
-		/* OLD CODE
-		// calculating score:
-		double giniLeft  = getGiniIndex(factorCountLeft);
-		double giniRight = getGiniIndex(factorCountRight);
 		
-		result.score = (giniLeft*result.countLeft + giniRight*result.countRight) / ids.length;
-		result.leftConst  = giniLeft  < zero*zero;
-		result.rightConst = giniRight < zero*zero;*/
-		cutResultFromCounts( result, factorCountLeft, factorCountRight );
 	}
 	
 	/**
@@ -388,11 +417,11 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * @return GINI index for task cut: 1 - sum( (f_i)^2 )
 	 */
 	private void calculateTaskCutScore(double[] taskScores, int[][] factorTaskTable, double t, TaskCutResult result) {
-		int[] leftCounts  = new int[nFactors];
-		int[] rightCounts = new int[nFactors];
+		double[] leftCounts  = new double[nFactors];
+		double[] rightCounts = new double[nFactors];
 		result.leftTasks  = new HashSet<Integer>();
 		result.rightTasks = new HashSet<Integer>();
-		// TODO change here to use set of tasks and priors
+		// TODO: make it use weights (or make an alternative function for that)		
 		for (int task=0; task<factorTaskTable[0].length; task++) {
 			if (taskScores[task] < t) {
 				// task is going to the left branch
@@ -408,15 +437,18 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 				result.rightTasks.add(task);
 			}
 		}
+		// workaround for weights:
+		result.countLeft  = (int)sum(leftCounts);
+		result.countRight = (int)sum(rightCounts);
 		cutResultFromCounts(result, leftCounts, rightCounts);
 	}
 
-	private void cutResultFromCounts(CutResult result, int[] leftCounts,
-			int[] rightCounts) {
+	private void cutResultFromCounts(CutResult result, double[] leftCounts,
+			double[] rightCounts) {
 		double giniLeft  = getGiniIndex(leftCounts);
 		double giniRight = getGiniIndex(rightCounts);
-		result.countLeft  = sum(leftCounts);
-		result.countRight = sum(rightCounts);
+		//result.countLeft  = sum(leftCounts);
+		//result.countRight = sum(rightCounts);
 
 		result.score = (giniLeft*result.countLeft + giniRight*result.countRight) / (result.countLeft + result.countRight);
 		result.leftConst  = giniLeft  < zero*zero;
