@@ -213,7 +213,7 @@ public class FactorTests {
 	@Test
 	public void testWeightTraining() {
 		FactorExtraTrees etw = getSampleDataW(true);
-		etw.learnTrees(2, 2, 20);
+		etw.learnTrees(2, 1, 20);
 		etw.getValues(etw.input);
 	}
 

@@ -394,10 +394,13 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		bt.value = 0;
 		bt.nSuccessors = ids.length;
 		bt.tasks = tasks;
+		double sumWeights = 0;
 		for (int n=0; n<ids.length; n++) {
-			bt.value += output[ids[n]];
+			double w = useWeights ?weights[ids[n]] :1.0;
+			bt.value += output[ids[n]] * w;
+			sumWeights += w;
 		}
-		bt.value /= ids.length;
+		bt.value /= sumWeights;
 		return(bt);
 	}
 	

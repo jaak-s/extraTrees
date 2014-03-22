@@ -173,4 +173,11 @@ public class ExtraTreeTests {
 		assertEquals(scorew, resultw.score, 1e-7);
 	}
 
+	@Test
+	public void testWeightTraining() {
+		ExtraTrees etw = getSampleDataW(true);
+		etw.learnTrees(4, 1, 20);
+		etw.getValues(etw.input);
+	}
+
 }
