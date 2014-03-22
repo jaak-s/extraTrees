@@ -121,7 +121,24 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		return maxIndex;
 	}
-	
+
+	/**
+	 * @param values
+	 * @return index of the max value (first one if there are many)
+	 */
+	public static int getMaxIndex(double[] values) {
+		int maxIndex = -1;
+		double maxValue = Double.NEGATIVE_INFINITY;
+		// adding counts:
+		for (int i=0; i<values.length; i++) {
+			if (values[i]>maxValue) {
+				maxValue = values[i];
+				maxIndex = i;
+			}
+		}
+		return maxIndex;
+	}
+
 	/**
 	 * @param input
 	 * @return matrix of predictions where
@@ -468,11 +485,20 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		bt.nSuccessors = ids.length;
 		bt.tasks = tasks;
 		// counting the factors:
-		int[] counts = new int[nFactors];
-		for (int n=0; n<ids.length; n++) {
-			counts[ output[ids[n]] ]++;
+		if ( ! useWeights) {
+			int[] counts = new int[nFactors];
+			for (int n=0; n<ids.length; n++) {
+				counts[ output[ids[n]] ]++;
+			}
+			bt.value = getMaxIndex(counts);
+		} else {
+			// using weights to output the answer
+			double[] counts = new double[nFactors];
+			for (int n=0; n<ids.length; n++) {
+				counts[ output[ids[n]] ] += weights[ ids[n] ];
+			}
+			bt.value = getMaxIndex(counts);
 		}
-		bt.value = getMaxIndex(counts);
 		return(bt);
 	}
 

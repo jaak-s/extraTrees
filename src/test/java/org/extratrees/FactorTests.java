@@ -210,4 +210,11 @@ public class FactorTests {
 		assertEquals(scorew, resultw.score, 1e-7);
 	}
 
+	@Test
+	public void testWeightTraining() {
+		FactorExtraTrees etw = getSampleDataW(true);
+		etw.learnTrees(2, 2, 20);
+		etw.getValues(etw.input);
+	}
+
 }
