@@ -9,8 +9,6 @@ import java.util.Set;
 public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	double[] output;
 	double[] outputSq;
-	double[] weights;
-	final boolean useWeights;
 	
 	// defined in AbstractTrees:
 	//ArrayList<BinaryTree> trees;
@@ -18,26 +16,18 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		this(input, output, null);
 	}
 	
-	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
-		this(input, output, tasks, null);
-	}
-
 
 	/**
 	 * @param input    - matrix of inputs, each row is an input vector
 	 * @param output   - array of output values (doubles)
 	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
-	 * @param weights  - weights of data points, null if no weights
 	 */
-	public ExtraTrees(Matrix input, double[] output, int[] tasks, double[] weights) {
+	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
 		if (input.nrows!=output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
 		if (tasks!=null && input.nrows!=tasks.length) {
 			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
-		}
-		if (weights!=null && input.nrows!=weights.length) {
-			throw(new IllegalArgumentException("Input and weights do not have the same number of data points."));
 		}
 		this.input = input;
 		this.output = output;
@@ -52,8 +42,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		for (int i=0; i<input.ncols; i++) {
 			cols.add(i);
 		}
-		this.weights = weights;
-		this.useWeights = (weights!=null);
 	}
 	
 	/**

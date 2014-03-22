@@ -1,8 +1,6 @@
 package org.extratrees;
 
-import static org.junit.Assert.*;
-
-import java.util.Date;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -47,10 +45,9 @@ public class BenchmarkTests {
 		int nTrees = 100;
 		int inputDim = 800;
 		FactorExtraTrees et = getSampleData(ndata, inputDim);
-		long t1 = new Date().getTime();
+		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
-		long t2 = new Date().getTime();
-		System.out.println(String.format("FactorExtraTrees.learnTrees took %dms.", t2-t1));
+		Timer.toc("FactorExtraTrees.learnTrees");
 		
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
@@ -74,10 +71,9 @@ public class BenchmarkTests {
 		int nTrees = 100;
 		int inputDim = 800;
 		ExtraTrees et = getSampleDataRegression(ndata, inputDim);
-		long t1 = new Date().getTime();
+		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
-		long t2 = new Date().getTime();
-		System.out.println(String.format("ExtraTrees.learnTrees took %dms.", t2-t1));
+		Timer.toc("ExtraTrees.learnTrees");
 		
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);

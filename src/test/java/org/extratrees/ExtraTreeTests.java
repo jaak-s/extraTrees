@@ -136,11 +136,9 @@ public class ExtraTreeTests {
 			}
 			w[i] = (i < m.nrows/2) ?1.0 :0.2;
 		}
-		ExtraTrees et;
+		ExtraTrees et = new ExtraTrees(m, output);
 		if (weights) {
-			et = new ExtraTrees(m, output, null, w);
-		} else {
-			et = new ExtraTrees(m, output);
+			et.setWeights(w);
 		}
 		return et;
 	}

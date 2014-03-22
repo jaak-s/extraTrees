@@ -14,6 +14,8 @@ import java.util.concurrent.Future;
 public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	Matrix input;
 	Random random = new Random();
+	double[] weights;
+	boolean useWeights;
 	protected final static double zero=1e-7;
 
 	/** for multi-task learning, stores task indeces (null if not present) */
@@ -136,6 +138,14 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 				}
 			}
 		}
+	}
+	
+	public void setWeights(double[] weights) {
+		if (weights != null && input.nrows != weights.length) {
+			throw(new IllegalArgumentException("Input and weights do not have the same number of data points."));
+		}
+		this.weights = weights;
+		this.useWeights = (weights!=null);
 	}
 
 	/**
