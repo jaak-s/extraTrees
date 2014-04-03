@@ -16,6 +16,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	Random random = new Random();
 	double[] weights;
 	boolean useWeights;
+	int[] bagSizes = null;
+	int[][] bagElems = null;
 	protected final static double zero=1e-7;
 
 	/** for multi-task learning, stores task indeces (null if not present) */
@@ -146,6 +148,52 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		}
 		this.weights = weights;
 		this.useWeights = (weights!=null);
+	}
+	
+	/**
+	 * Sets bag size to bagSize, so each tree is only built with bagSize (randomly selected) samples.
+	 * @param bagSize
+	 */
+	public void setBagging(int bagSize) {
+		if (bagSize > input.nrows) {
+			throw( new IllegalArgumentException("Supplied bagSize exceeds the number of samples.") );
+		}
+		this.bagSizes = new int[]{ bagSize };
+	}
+
+	/**
+	 * Sets bag sizes for each bag label group. 
+	 * @param bagSizes   int[] size of the bag for each label
+	 * @param bagLabels  int[] bag label for each sample, all from 0 to (Nbags - 1)
+	 */
+	public void setBagging(int[] bagSizes, int[] bagLabels) {
+		if (bagLabels.length != input.nrows) {
+			throw( new IllegalArgumentException("size of bagLabels has to equal to the number of input rows.") );
+		}
+		this.bagSizes = bagSizes;
+		int[] counts = new int[bagSizes.length];
+		for (int i=0; i<input.nrows; i++) {
+			counts[ bagLabels[i] ]++;
+		}
+		// making sure all bags have enough elements:
+		this.bagElems = new int[counts.length][];
+		for (int bag=0; bag < counts.length; bag++) {
+			if (counts[bag] < bagSizes[bag]) {
+				throw( new IllegalArgumentException( 
+						String.format("Bag %d has less elements (%d) than requested by bag size (%d).",
+								bag, counts[bag], bagSizes[bag]
+						)));
+			}
+			this.bagElems[bag] = new int[ counts[bag] ];
+		}
+		// adding elements to the appropriate bags:
+		for (int i=0; i < input.nrows; i++) {
+			int bag = bagLabels[i];
+			int j = this.bagElems[bag].length - counts[bag];
+			counts[bag]--;
+			this.bagElems[bag][j] = i;
+		}
+
 	}
 
 	/**
@@ -370,18 +418,80 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		}
 		return seq;
 	}
-	
 
-	public E buildTree(int nmin, int K) {
-		int[]    ids = new int[input.nrows];
-		for (int i=0; i<ids.length; i++) {
-			ids[i] = i;
+	/**
+	 * @param nStart
+	 * @param nEnd
+	 * @return int array of [nStart, nStart+1, ..., nEnd-1].
+	 */
+	public static int[] seq(int nStart, int nEnd) {
+		int[] seq = new int[nEnd - nStart];
+		for (int i=nStart; i < nEnd; i++) {
+			seq[i-nStart] = i;
 		}
+		return seq;
+	}
+
+	/**
+	 * Main method that performs tree training.
+	 * @param nmin
+	 * @param K
+	 * @return
+	 */
+	public E buildTree(int nmin, int K) {
+		int[] ids = getInitialSamples();
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
 		
 		// finding task set:
 		HashSet<Integer> taskSet = getSequenceSet(nTasks);
 		return buildTree(nmin, K, ids, cols, taskSet );
+	}
+	
+	protected static ArrayList<Integer> arrayToList(int[] array) {
+		ArrayList<Integer> list = new ArrayList<Integer>(array.length);
+		for (int value : array) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	protected static int[] listToArray(ArrayList<Integer> list) {
+		int[] a = new int[ list.size() ];
+		for (int i=0; i < a.length; i++) {
+			a[i] = list.get(i);
+		}
+		return a;
+	}
+
+	protected int[] getInitialSamples() {
+		if (bagSizes == null) {
+			return seq( input.nrows );
+		}
+		if (bagSizes.length == 1) {
+			ArrayList<Integer> allIds = arrayToList( seq( input.nrows ) );
+			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds);
+			
+			int[] bag = new int[ bagSizes[0] ];
+			for (int i=0; i < bag.length; i++) {
+				bag[i] = shuffle.next();
+			}
+			return bag;
+		}
+		// selecting random samples from each bag:
+		int[] bag = new int[ sum(bagSizes) ];
+		int i = 0;
+		for (int b=0; b < bagSizes.length; b++) {
+			ArrayList<Integer> ids = arrayToList( bagElems[b] );
+			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(ids);
+
+			// filling with elements from bag[b]:
+			for (int n = i + bagSizes[b]; i < n; i++) {
+				bag[i] = shuffle.next();
+			}
+			
+		}
+		
+		return bag; 
 	}
 
 	protected abstract void calculateCutScore(int[] ids, int col, double t, CutResult result);
