@@ -1,6 +1,7 @@
 package org.extratrees;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -25,14 +26,14 @@ public class BagTests {
 	@Test
 	public void test() {
 		ExtraTrees et = getSampleData(100, 10);
-		assert( et.bagElems == null );
-		assert( et.bagSizes == null );
+		assertTrue( et.bagElems == null );
+		assertTrue( et.bagSizes == null );
 		
 		et.setBagging(90);
 		assertArrayEquals(new int[]{90}, et.bagSizes);
 		
 		int[] ids = et.getInitialSamples();
-		assert( ids.length == 90 ) : "Random bag should contain 90 samples.";
+		assertTrue("Random bag should contain 90 samples.", ids.length == 90);
 		
 		int[] bagLabels = new int[100];
 		for (int i = 0; i<bagLabels.length; i++) {
@@ -46,7 +47,7 @@ public class BagTests {
 		assertArrayEquals(AbstractTrees.seq(30, 100), et.bagElems[1]);
 
 		ids = et.getInitialSamples();
-		assert( ids.length == AbstractTrees.sum(bagSizes) ) : "Random bag should contain 59 samples.";
+		assertTrue("Random bag should contain 59 samples.", ids.length == AbstractTrees.sum(bagSizes) );
 		//System.out.println( AbstractTrees.arrayToList(ids));
 
 		et.learnTrees(5, 3, 10);
