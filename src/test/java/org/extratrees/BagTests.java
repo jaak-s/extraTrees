@@ -48,7 +48,6 @@ public class BagTests {
 
 		ids = et.getInitialSamples();
 		assertTrue("Random bag should contain 59 samples.", ids.length == AbstractTrees.sum(bagSizes) );
-		//System.out.println( AbstractTrees.arrayToList(ids));
 
 		et.learnTrees(5, 3, 10);
 	}

@@ -57,6 +57,8 @@ extraTrees.default <- function(x, y,
              numThreads = 1,
              quantile = F,
              weights = NULL,
+             bagSizes = NULL,
+             bagLabels = NULL,
              tasks = NULL,
              probOfTaskCuts = 1.0,
              numRandomTaskCuts = 1,
@@ -92,21 +94,42 @@ extraTrees.default <- function(x, y,
     et$numThreads = numThreads
     et$quantile   = quantile
     et$useWeights = ! is.null(weights)
+    et$useBagging = ! is.null(bagSizes) && sum(bagSizes) != nrow(x)
     et$multitask  = ! is.null(tasks)
     et$probOfTaskCuts = probOfTaskCuts
     et$numRandomTaskCuts = numRandomTaskCuts
     class(et) = "extraTrees"
 
     if (nrow(x) != length(y)) {
-        stop(sprintf("Length of y (%d) is not equal to the number of inputs in x (%d).", length(y), nrow(x) ) )
+        stop(sprintf("Length of y (%d) is not equal to the number of samples in x (%d).", length(y), nrow(x) ) )
     }
     
     if ( ! is.null(weights) ) {
       if (nrow(x) != length(weights)) {
-        stop(sprintf("Length of weights (%d) is not equal to the number of inputs in x (%d).", length(weights), nrow(x) ) )
+        stop(sprintf("Length of weights (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
       }
       if (any(weights <= 0)) {
         stop("Weights have to be positive.")
+      }
+    }
+    
+    if ( et$useBagging ) {
+      if (sum(bagSizes) > nrow(x)) {
+        stop(sprintf("Total of bagSizes (%d) should not be bigger than the number of samples in x (%d).", sum(bagSizes), nrow(x) ))
+      }
+      ## if only one bag size then bagLabels are not used
+      if (length(bagSizes) >= 2) {
+        if (nrow(x) != length(bagLabels)) {
+          stop(sprintf("Length of bagLabels (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
+        }
+        if ( ! is.factor(bagLabels) ) {
+          bagLabels = as.factor( bagLabels )
+        }
+        
+        numUnique = length(levels(bagLabels))
+        if (numUnique != length(bagSizes)) {
+          stop(sprintf("Number of unique bagLabels (%d) has to be the same as length of number of bagSizes (%d).", numUnique, length(bagSizes)  ))
+        }
       }
     }
     
@@ -169,6 +192,18 @@ extraTrees.default <- function(x, y,
     ## if present set weights:
     if (et$useWeights) {
       .jcall( et$jobject, "V", "setWeights", .jarray(as.double(weights)) )
+    }
+    
+    ## if given set bagging:
+    if (et$useBagging) {
+      if (length(bagSizes) == 1) {
+        .jcall( et$jobject, "V", "setBagging", as.integer(bagSizes[1]) )
+      } else {
+        .jcall( et$jobject, "V", "setBagging", 
+                .jarray(as.integer( bagSizes )), 
+                .jarray(as.integer( as.integer(bagLabels)-1 )) 
+              )
+      }
     }
     
     ## multitask variables:
