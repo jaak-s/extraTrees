@@ -39,7 +39,7 @@ public class QuickSelect {
      * @param high the right-most index of the subarray.
      * @param k the desired rank (1 is minimum) in the entire array.
      */
-    private static <T> void quickSelect( ArrayList<Double> a, int low, int high, int k ) {
+    private static void quickSelect( ArrayList<Double> a, int low, int high, int k ) {
         if( low + CUTOFF > high )
             insertionSort( a, low, high );
         else {
