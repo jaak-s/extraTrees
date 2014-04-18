@@ -16,6 +16,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	Random random = new Random();
 	double[] weights;
 	boolean useWeights;
+	boolean hasNaN = false;
 	int[] bagSizes = null;
 	int[][] bagElems = null;
 	protected final static double zero=1e-7;
@@ -494,6 +495,9 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		return bag; 
 	}
 
+	/** @return penalty for NaN values for the given ids */
+	protected abstract double get1NaNScore(int[] ids);
+	
 	protected abstract void calculateCutScore(int[] ids, int col, double t, CutResult result);
 	//protected abstract double[] getTaskScores(int[] ids);
 	/**
@@ -644,6 +648,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		// whichever is smaller:
 		int k = 0, col_best=-1;
 		double t_best=Double.NaN;
+		double nanPenalty = hasNaN ?get1NaNScore(ids) :0;
 		CutResult bestResult = new CutResult();
 		bestResult.score = Double.POSITIVE_INFINITY;
 		

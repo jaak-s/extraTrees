@@ -383,6 +383,19 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	}
 	
 	/**
+	 * @return Gini index value given ids.
+	 */
+	@Override
+	protected double get1NaNScore(int[] ids) {
+		double[] factorCounts = new double[nFactors];
+		for (int n=0; n<ids.length; n++) {
+			int id = ids[n];
+			factorCounts[ output[id] ] += (useWeights ?weights[id] :1.0);
+		}
+		return getGiniIndex(factorCounts);
+	}
+	
+	/**
 	 * Calculates the score for the cut. The smaller the better.
 	 * @param ids
 	 * @param col

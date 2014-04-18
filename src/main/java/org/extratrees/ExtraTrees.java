@@ -188,18 +188,43 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		bt.value /= bt.nSuccessors;
 		return bt;
 	}
+	
+	@Override
+	protected double get1NaNScore(int[] ids) {
+		double sum=0, sumSq=0, weight=0;
+		
+		for (int n=0; n < ids.length; n++) {
+			int id = ids[n];
+			double w = useWeights ?weights[id] :1.0;
+			weight += w;
+			sum    += output[  id] * w;
+			sumSq  += outputSq[id] * w;
+		}
+
+		double var = sumSq/weight - (sum/weight)*(sum/weight);
+		return var;
+	}
 
 	@Override
 	protected void calculateCutScore(int[] ids, int col, double t,
 			CutResult result) {
 		// calculating score:
-		double sumLeft=0, sumRight=0;
-		double sumSqLeft=0, sumSqRight=0;
-		double weightLeft=0, weightRight=0;
+		double sumLeft=0, sumRight=0, sumNaN=0;
+		double sumSqLeft=0, sumSqRight=0, sumSqNaN=0;
+		double weightLeft=0, weightRight=0, weightNaN=0;
 		for (int n=0; n<ids.length; n++) {
 			int id = ids[n];
 			double w = useWeights ?weights[id] :1.0;
-			if (input.get(id, col) < t) {
+			double value = input.get(id, col);
+			if (hasNaN) {
+				if (Double.isNaN(value)) {
+					weightNaN += w;
+					sumNaN    += output[  id] * w;
+					sumSqNaN  += outputSq[id] * w;
+					continue;
+				}
+			}
+			if (value < t) {
 				result.countLeft++;
 				weightLeft += w;
 				sumLeft    += output[  id] * w;
