@@ -5,7 +5,7 @@ Installation:
      -> Key: JAVA6_BOOT_CLASSPATH
      -> Val: /usr/lib/jvm/java-6-openjdk/jre/lib/rt.jar
 
-2a) install the files:
+2a) install the files: (assumes rJava is installed)
 cd ~/Documents/temp
 R CMD INSTALL extraTrees
 
