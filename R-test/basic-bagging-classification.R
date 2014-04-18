@@ -37,6 +37,7 @@ results = data.frame(
   precision = sapply(yhat, function(yh) mean(ytest[yh==1] == 1) ),
   recall    = sapply(yhat, function(yh) mean(ytest[pind]==yh[pind]) )
 )
+results$F1 = results$precision * results$recall
 print(results)
 
 
