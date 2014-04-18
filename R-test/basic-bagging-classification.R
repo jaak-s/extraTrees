@@ -33,8 +33,9 @@ yhat = lapply( methods, predict, xtest)
 pind = which(ytest==1)
 
 results = data.frame(
-  accuracy = sapply(yhat, function(yh) mean(ytest==yh) ),
-  recall   = sapply(yhat, function(yh) mean(ytest[pind]==yh[pind]) )
+  accuracy  = sapply(yhat, function(yh) mean(ytest==yh) ),
+  precision = sapply(yhat, function(yh) mean(ytest[yh==1] == 1) ),
+  recall    = sapply(yhat, function(yh) mean(ytest[pind]==yh[pind]) )
 )
 print(results)
 
