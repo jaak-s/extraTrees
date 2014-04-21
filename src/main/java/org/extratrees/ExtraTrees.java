@@ -29,19 +29,13 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		if (tasks!=null && input.nrows!=tasks.length) {
 			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
 		}
-		this.input = input;
+		setInput(input);
 		this.output = output;
 		this.outputSq = new double[output.length];
 		for (int i=0; i<output.length; i++) {
 			this.outputSq[i] = this.output[i]*this.output[i];
 		}
 		setTasks(tasks);
-		
-		// making cols list for later use:
-		this.cols = new ArrayList<Integer>(input.ncols);
-		for (int i=0; i<input.ncols; i++) {
-			cols.add(i);
-		}
 	}
 	
 	/**
@@ -74,17 +68,30 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	/** Average of several trees: */
 	public static double getValue(ArrayList<BinaryTree> trees, double[] input) {
 		double output = 0;
+		int voteCount = 0;
 		for(BinaryTree t : trees) {
-			output += t.getValue(input);
+			// skipping all NaN predictions
+			double value = t.getValue(input);
+			if ( ! Double.isNaN(value)) {
+				output += value;
+				voteCount++;
+			}
 		}
-		return output/trees.size();
+		if (voteCount == 0) {
+			return NA;
+		}
+		return output/voteCount;
 	}
 
 	/** Average of several trees, using nmin as depth */
 	public static double getValue(ArrayList<BinaryTree> trees, double[] input, int nmin) {
 		double output = 0;
 		for(BinaryTree t : trees) {
-			output += t.getValue(input, nmin);
+			// skipping all NaN predictions
+			double value = t.getValue(input, nmin);
+			if ( ! Double.isNaN(value)) {
+				output += value;
+			}
 		}
 		return output/trees.size();
 	}
@@ -205,22 +212,24 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		return var;
 	}
 
+	/**
+	 * result.score = weight(left) * var(left) + 
+	 *                weight(right) * var(right)
+	 */
 	@Override
 	protected void calculateCutScore(int[] ids, int col, double t,
 			CutResult result) {
 		// calculating score:
-		double sumLeft=0, sumRight=0, sumNaN=0;
-		double sumSqLeft=0, sumSqRight=0, sumSqNaN=0;
-		double weightLeft=0, weightRight=0, weightNaN=0;
+		double sumLeft=0, sumRight=0;
+		double sumSqLeft=0, sumSqRight=0;
+		double weightLeft=0, weightRight=0;
 		for (int n=0; n<ids.length; n++) {
 			int id = ids[n];
 			double w = useWeights ?weights[id] :1.0;
 			double value = input.get(id, col);
 			if (hasNaN) {
 				if (Double.isNaN(value)) {
-					weightNaN += w;
-					sumNaN    += output[  id] * w;
-					sumSqNaN  += outputSq[id] * w;
+					result.nanWeigth += w;
 					continue;
 				}
 			}
@@ -237,7 +246,9 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			}
 		}
 		// calculating score:
-		cutResultFromSums(result, sumLeft, sumRight, sumSqLeft, sumSqRight, weightLeft, weightRight);
+		cutResultFromSums(result, sumLeft, sumRight, 
+				sumSqLeft, sumSqRight, 
+				weightLeft, weightRight);
 		// value in intermediate nodes (used for CV):
 	}
 
@@ -250,6 +261,8 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * @param sumSqRight
 	 * @param countLeft   separate left  count (regularized in the case of task cut)
 	 * @param countRight  separate right count (regularized in the case of task cut)
+	 * @param countNaN    NaN count
+	 * @param nanPenalty  penalty per NaN
 	 */
 	private void cutResultFromSums(CutResult result, double sumLeft,
 			double sumRight, double sumSqLeft, double sumSqRight, 
@@ -258,9 +271,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 				(sumLeft/countLeft)*(sumLeft/countLeft);
 		double varRight = sumSqRight/countRight- 
 				(sumRight/countRight)*(sumRight/countRight);
-		// TODO: move var and var<zero*zero outside this loop:
-		//double var = (sumSqLeft+sumSqRight)/ids.length - Math.pow((sumLeft+sumRight)/ids.length, 2.0);
-		// the smaller the score the better:
 		result.score = (countLeft*varLeft + countRight*varRight);// / ids.length / var;
 		result.leftConst  = (varLeft<zero*zero);
 		result.rightConst = (varRight<zero*zero);

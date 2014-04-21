@@ -28,7 +28,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		if (tasks!=null && input.nrows!=tasks.length) {
 			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
 		}
-		this.input  = input;
+		setInput(input);
 		this.output = output;
 		
 		this.nFactors = 1;
@@ -41,12 +41,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			}
 		}
 		setTasks(tasks);
-		
-		// making cols list for later use:
-		this.cols = new ArrayList<Integer>(input.ncols);
-		for (int i=0; i<input.ncols; i++) {
-			cols.add(i);
-		}
 	}
 	
 	public int getnFactors() {
@@ -86,11 +80,20 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return trees;		
 	}*/
 
-	/** Average of several trees: */
+	/**
+	 * @param trees
+	 * @param input
+	 * @param nFactors
+	 * @return majority voted class from several trees or -1 if all trees have no answer.
+	 */
 	public static int getValue(ArrayList<FactorBinaryTree> trees, double[] input, int nFactors) {
 		int[] counts = new int[nFactors];
 		for(FactorBinaryTree t : trees) {
-			counts[ t.getValue(input) ]++;
+			// avoiding NA answers (when value is -1)
+			int value = t.getValue(input);
+			if (value >= 0) {
+				counts[ value ]++;
+			}
 		}
 		return getMaxIndex(counts);
 	}
@@ -107,14 +110,15 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 
 	/**
 	 * @param values
-	 * @return index of the max value (first one if there are many)
+	 * @return index of the max positive value (first one if there are many) 
+	 * or -1 if all values are non-positive.
 	 */
 	public static int getMaxIndex(int[] values) {
 		int maxIndex = -1;
-		int maxValue = Integer.MIN_VALUE;
+		int maxValue = 0;
 		// adding counts:
 		for (int i=0; i<values.length; i++) {
-			if (values[i]>maxValue) {
+			if (values[i] > maxValue) {
 				maxValue = values[i];
 				maxIndex = i;
 			}
@@ -152,7 +156,8 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		for (int row=0; row<input.nrows; row++) {
 			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
-				out.set( row, j, trees.get(j).getValue(temp) );
+				int value = trees.get(j).getValue(temp);
+				out.set( row, j, value >= 0 ? value : NA );
 			}
 		}
 		return out;
@@ -162,7 +167,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * @param input
 	 * @return matrix of predictions where
 	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
-	 * All values are integers. 
+	 * All values are integers. (or NaN)
 	 */
 	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
 		if (input.nrows!=tasks.length) {
@@ -174,7 +179,8 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		for (int row=0; row<input.nrows; row++) {
 			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
-				out.set( row, j, trees.get(j).getValueMT(temp, tasks[row]) );
+				int value = trees.get(j).getValueMT(temp, tasks[row]);
+				out.set( row, j, value >= 0 ? value : Double.NaN );
 			}
 		}
 		return out;
@@ -189,7 +195,13 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return getValues(this.trees, input, this.nFactors);
 	}
 	
-	/** Average of several trees for many samples */
+	/**
+	 * @param trees
+	 * @param input
+	 * @param nFactors
+	 * @return Average of several trees for many samples. 
+	 * Or -1 for samples that didn't get any prediction.
+	 */
 	public static int[] getValues(ArrayList<FactorBinaryTree> trees, Matrix input, int nFactors) {
 		int[]  values = new int[input.nrows];
 		double[] temp = new double[input.ncols];
@@ -219,7 +231,10 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	public int getValueMT(double[] x, int task) {
 		int[] counts = new int[nFactors];
 		for(FactorBinaryTree t : trees) {
-			counts[ t.getValueMT(x, task) ]++;
+			int value = t.getValueMT(x, task);
+			if (value >= 0) {
+				counts[ value ]++;
+			}
 		}
 		return getMaxIndex(counts);
 	}
@@ -405,7 +420,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	@Override
 	protected void calculateCutScore(int[] ids, int col, double t,
 			CutResult result) {
-		if ( ! useWeights) {
+		if ( ! useWeights && ! hasNaN ) {
 			int[][] factorCounts = new int[2][nFactors];
 			for (int n=0; n<ids.length; n++) {
 				factorCounts[input.get(ids[n], col) < t ?0 :1][ output[ids[n]] ]++;
@@ -423,8 +438,16 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 			int[] branchCounts = new int[2];
 			for (int n=0; n<ids.length; n++) {
 				int id = ids[n];
-				int branch = input.get(id, col) < t ?0 :1;
-				factorWeights[ branch ][ output[id] ] += weights[id];
+				double value = input.get(id, col);
+				double w = useWeights ?weights[id] :1.0;
+				if (hasNaN) {
+					if (Double.isNaN(value)) {
+						result.nanWeigth += w;
+						continue;
+					}
+				}
+				int branch = value < t ?0 :1;
+				factorWeights[ branch ][ output[id] ] += w;
 				branchCounts[  branch ] ++;
 			}
 			result.countLeft  = branchCounts[0];

@@ -20,6 +20,9 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	int[] bagSizes = null;
 	int[][] bagElems = null;
 	protected final static double zero=1e-7;
+	/** value to be returned when there is no answer, i.e., not available */
+	protected final static double NA = Double.NaN;
+
 
 	/** for multi-task learning, stores task indeces (null if not present) */
 	int[] tasks;
@@ -71,6 +74,14 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 //	public double getWeightOfUSL() {
 //		return weightOfUSL;
 //	}
+	
+	public boolean isHasNaN() {
+		return hasNaN;
+	}
+	
+	public void setHasNaN(boolean hasNaN) {
+		this.hasNaN = hasNaN;
+	}
 
 	public int getNumThreads() {
 		return numThreads;
@@ -127,6 +138,15 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	
 	public void setNumRandomCuts(int numRandomCuts) {
 		this.numRandomCuts = numRandomCuts;
+	}
+	
+	public void setInput(Matrix input) {
+		this.input = input;
+		// making cols list for later use:
+		this.cols = new ArrayList<Integer>(input.ncols);
+		for (int i=0; i<input.ncols; i++) {
+			cols.add(i);
+		}
 	}
 	
 	public void setTasks(int[] tasks) {
@@ -275,7 +295,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		boolean rightConst;
 		int countLeft;
 		int countRight;
-		Object value;
+		double nanWeigth;
 		
 		public CutResult() {}
 		
@@ -499,7 +519,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	protected abstract double get1NaNScore(int[] ids);
 	
 	protected abstract void calculateCutScore(int[] ids, int col, double t, CutResult result);
-	//protected abstract double[] getTaskScores(int[] ids);
+	
 	/**
 	 * @param ids
 	 * @param bestScore
@@ -669,6 +689,9 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 				
 				CutResult result = new CutResult();
 				calculateCutScore(ids, col, t, result);
+				if (hasNaN) {
+					result.score += result.nanWeigth * nanPenalty;
+				}
 				
 				if (result.score < bestResult.score) {
 					// found a better scoring cut
@@ -680,7 +703,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 					bestResult.rightConst = result.rightConst;
 					bestResult.countLeft  = result.countLeft;
 					bestResult.countRight = result.countRight;
-					if (bestResult.leftConst && bestResult.rightConst) {
+					if (bestResult.leftConst && bestResult.rightConst && ! hasNaN) {
 						// the result cannot be improved:
 						break loopThroughColumns;
 					}

@@ -43,6 +43,28 @@ public class Matrix {
 		}
 	}
 
+	/**
+	 * Copies values from given row to the vector. 
+	 * @param col
+	 * @param vector
+	 */
+	public void copyCol(int col, double[] vector) {
+		for (int row=0; row<this.nrows; row++) {
+			vector[row] = this.get(row, col);
+		}
+	}
+
+	/**
+	 * Copies values from given row to the vector. 
+	 * @param row
+	 * @param vector
+	 */
+	public double[] getCol(int col) {
+		double[] colValues = new double[ nrows ];
+		copyCol( col, colValues );
+		return colValues;
+	}
+
 	public void square() {
 		for (int i=0; i<v.length; i++) {
 			v[i] *= v[i];
@@ -59,6 +81,15 @@ public class Matrix {
 			out.append("\n");
 		}
 		return out.toString();
+	}
+	
+	public boolean hasNaN() {
+		for (int i = 0; i < v.length; i++) {
+			if ( Double.isNaN(v[i]) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static void main(String[] args) {

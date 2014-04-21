@@ -71,7 +71,6 @@ extraTrees.default <- function(x, y,
     
     ## making sure no NAs:
     if ( any(is.na(y)) ) stop("Output vector y contains NAs.")
-    if ( any(is.na(x)) ) stop("Input matrix x contains NAs.")
     if ( !is.null(tasks) && any(is.na(tasks)) ) stop("Task vector contains NAs.")
     
     ## uncomment when xtest/ytest are used:
@@ -93,6 +92,7 @@ extraTrees.default <- function(x, y,
     et$evenCuts = evenCuts
     et$numThreads = numThreads
     et$quantile   = quantile
+    et$xHasNA     = any(is.na(x))
     et$useWeights = ! is.null(weights)
     et$useBagging = ! is.null(bagSizes) && sum(bagSizes) != nrow(x)
     et$multitask  = ! is.null(tasks)
@@ -184,10 +184,16 @@ extraTrees.default <- function(x, y,
             .jarray(y)
         )
     }
+    
+    #if (et$xHasNA) {
+    #  print("Note: Input matrix has NA. See ?extraTrees how ET builds trees with NAs.")
+    #}
+    
     ## setting variables:
     .jcall( et$jobject, "V", "setNumRandomCuts", as.integer(et$numRandomCuts) )
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
     .jcall( et$jobject, "V", "setNumThreads", as.integer(et$numThreads) )
+    .jcall( et$jobject, "V", "setHasNaN", et$xHasNA)
     
     ## if present set weights:
     if (et$useWeights) {

@@ -39,7 +39,9 @@ public class QuantileExtraTrees extends ExtraTrees {
 		values.clear();
 		for(BinaryTree t : trees) {
 			QuantileBinaryTree leaf = (QuantileBinaryTree)t.getLeaf(input);
-			values.addAll( leaf.values );
+			if (leaf != null) {
+				values.addAll( leaf.values );
+			}
 		}
 	}
 	

@@ -25,6 +25,9 @@ public class BinaryTree extends AbstractBinaryTree {
 		if (left==null) {
 			return this;
 		}
+		if (Double.isNaN(input[column])) {
+			return null;
+		}
 		if (input[column]<threshold) {
 			return left.getLeaf(input);
 		}
@@ -32,13 +35,16 @@ public class BinaryTree extends AbstractBinaryTree {
 	}
 
 	/**
-	 * Returns the value from the whole tree.
+	 * 
 	 * @param input
-	 * @return
+	 * @return the value from the whole tree or NA if input had NaN for needed inputs. 
 	 */
 	public double getValue(double[] input) {
 		if (left==null) {
 			return value; // leaf node
+		}
+		if (Double.isNaN(input[column])) {
+			return AbstractTrees.NA;
 		}
 		if (input[column]<threshold) {
 			return left.getValue(input);
@@ -64,6 +70,9 @@ public class BinaryTree extends AbstractBinaryTree {
 			return right.getValueMT(input, task);
 		}
 		// feature cut
+		if (Double.isNaN(input[column])) {
+			return AbstractTrees.NA;
+		}
 		if (input[column]<threshold) {
 			return left.getValueMT(input, task);
 		}
@@ -92,11 +101,15 @@ public class BinaryTree extends AbstractBinaryTree {
 	/**  uses nmin to choose the depth:
 	 * @param input - input vector
 	 * @param nmin  - number of elements in the final node (used for value).
-	 * @return value in the tree for <b>input</b>.
+	 * @return The value from the whole tree. 
+	 * If {@code input} has a NaN in a used column, to NA is returned.
 	 */
 	public double getValue(double[] input, int nmin) {
 		if (this.nSuccessors<nmin || this.left==null) {
 			return value; // leaf node OR below nmin
+		}
+		if (Double.isNaN(input[column])) {
+			return AbstractTrees.NA;
 		}
 		if (input[column]<threshold) {
 			return left.getValue(input, nmin);

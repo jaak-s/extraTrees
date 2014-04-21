@@ -19,13 +19,16 @@ public class FactorBinaryTree extends AbstractBinaryTree {
 	}
 
 	/**
-	 * Returns the value from the whole tree.
 	 * @param input
-	 * @return
+	 * @return The value from the whole tree. 
+	 * If {@code input} has a NaN in a used column, to -1 is returned.
 	 */
 	public int getValue(double[] input) {
 		if (left==null) {
 			return value; // leaf node
+		}
+		if (Double.isNaN(input[column])) {
+			return -1;
 		}
 		if (input[column]<threshold) {
 			return left.getValue(input);
@@ -49,6 +52,9 @@ public class FactorBinaryTree extends AbstractBinaryTree {
 				return left.getValueMT(input, task);
 			}
 			return right.getValueMT(input, task);
+		}
+		if (Double.isNaN(input[column])) {
+			return -1;
 		}
 		// feature cut
 		if (input[column]<threshold) {
@@ -86,7 +92,10 @@ public class FactorBinaryTree extends AbstractBinaryTree {
 		if (this.nSuccessors<nmin || this.left==null) {
 			return value; // leaf node OR below nmin
 		}
-		if (input[column]<threshold) {
+		if (Double.isNaN(input[column])) {
+			return -1;
+		}
+		if (input[column] < threshold) {
 			return left.getValue(input, nmin);
 		}
 		return right.getValue(input, nmin);

@@ -26,6 +26,9 @@ public class QuickSelect {
      * @param k the desired rank (1 is minimum) in the entire ArrayList.
      */
     public static double quickSelect( ArrayList<Double> a, int k ) {
+    	if (k <= 0) {
+    		return Double.NaN;
+    	}
         quickSelect( a, 0, a.size() - 1, k );
         return a.get(k-1);
     }

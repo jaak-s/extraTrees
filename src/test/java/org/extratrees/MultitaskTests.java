@@ -1,8 +1,8 @@
 package org.extratrees;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -89,11 +89,11 @@ public class MultitaskTests {
 		int ndim   = 10;
 		FactorExtraTrees et  = getData2(ndata, ndim, ntasks);
 		FactorExtraTrees et0 = new FactorExtraTrees(et.input, et.output);
-		FactorExtraTrees testing = getData2(1000, ndim, ntasks);
+		FactorExtraTrees testing = getData2(500, ndim, ntasks);
 		assertEquals(ntasks, et.nTasks);
 		int nmin = 7;
 		int K    = 5;
-		int nTrees = 10;
+		int nTrees = 5;
 		et.setProbOfTaskCuts(0.700);
 		et.learnTrees(nmin, K, nTrees);
 		et0.learnTrees(nmin, K, nTrees);
@@ -128,7 +128,7 @@ public class MultitaskTests {
 		double[] e1k  = new double[2];
 		double[] e2k  = new double[2];
 		double[] temp;
-		int rep = 10;
+		int rep = 2;
 		for (int i=0; i<rep; i++) {
 			temp = testMT(500);
 			e500[0] += temp[0];
@@ -191,12 +191,12 @@ public class MultitaskTests {
 		assertEquals( et.nTasks, ntasks );
 		
 		ExtraTrees et0 = new ExtraTrees(et.input, et.output);
-		ExtraTrees testing = getDataET(1000, ndim, ntasks);
+		ExtraTrees testing = getDataET(500, ndim, ntasks);
 		
 		// training:
 		int nmin = 7;
 		int K    = 5;
-		int nTrees = 100;
+		int nTrees = 10;
 		et.setProbOfTaskCuts(0.700);
 		et.learnTrees(nmin, K, nTrees);
 		et0.learnTrees(nmin, K, nTrees);

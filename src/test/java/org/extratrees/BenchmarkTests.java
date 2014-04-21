@@ -45,6 +45,8 @@ public class BenchmarkTests {
 		int nTrees = 100;
 		int inputDim = 800;
 		FactorExtraTrees et = getSampleData(ndata, inputDim);
+		assertEquals( false, et.isHasNaN() );
+		
 		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
 		Timer.toc("FactorExtraTrees.learnTrees");
@@ -71,6 +73,8 @@ public class BenchmarkTests {
 		int nTrees = 100;
 		int inputDim = 800;
 		ExtraTrees et = getSampleDataRegression(ndata, inputDim);
+		assertEquals( false, et.isHasNaN() );
+		
 		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
 		Timer.toc("ExtraTrees.learnTrees");
@@ -79,7 +83,9 @@ public class BenchmarkTests {
 		Matrix all = et.getAllValues(et.input);
 		assertEquals(et.input.nrows, all.nrows);
 		assertEquals(nTrees, all.ncols);
+		Timer.tic();
 		double[] yhat = et.getValues(et.input);
+		Timer.toc("ExtraTrees.getValues()");
 		// check if their mean is equal to extraTree predictions:
 		//System.out.println(all);
 		double error = 0;
