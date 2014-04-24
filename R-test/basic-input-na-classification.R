@@ -16,7 +16,7 @@ f = function(x) (x[,1]>0.7 & x[,2]>0.75) + 0
 y = as.factor( c(rep(1, nPos), rep(0, nUnlabelled) ) )
 ## 10% NAs in column 1
 na.ind = sample.int(nrow(x), size=round(nrow(x)/10), replace=F)
-x[na.ind, 1] = NA
+x[na.ind, 4] = NA
 w = c(rep(1, nPos), rep(0.1, nUnlabelled) )
 bagLabels = c(rep(1, nPos), rep(2, nUnlabelled))
 bagSizes  = c(nPos, nPos)
@@ -45,4 +45,7 @@ results = data.frame(
 results$F1 = results$precision * results$recall
 print(results)
 
+## testing prediction with NAs
+y0hat = predict( methods$et, x )
+y0all = predict( methods$et, x, allValues=T )
 
