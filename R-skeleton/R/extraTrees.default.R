@@ -104,6 +104,10 @@ extraTrees.default <- function(x, y,
         stop(sprintf("Length of y (%d) is not equal to the number of samples in x (%d).", length(y), nrow(x) ) )
     }
     
+    if ( ! et$factor && ! is.numeric(y) ) {
+      stop("y values have to be either factor (classification) or numeric (regression).")
+    }
+    
     if ( ! is.null(weights) ) {
       if (nrow(x) != length(weights)) {
         stop(sprintf("Length of weights (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
@@ -173,7 +177,7 @@ extraTrees.default <- function(x, y,
         et$jobject = .jnew(
             "org.extratrees.QuantileExtraTrees",
             toJavaMatrix(x),
-            .jarray(y)
+            .jarray( as.double(y) )
         )
     } else {
         ## regression:
@@ -181,7 +185,7 @@ extraTrees.default <- function(x, y,
         et$jobject = .jnew(
             "org.extratrees.ExtraTrees",
             toJavaMatrix(x),
-            .jarray(y)
+            .jarray( as.double(y) )
         )
     }
     
