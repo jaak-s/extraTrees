@@ -60,7 +60,7 @@ extraTrees.default <- function(x, y,
              bagSizes = NULL,
              bagLabels = NULL,
              tasks = NULL,
-             probOfTaskCuts = 1.0,
+             probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
              ...) {
     n <- nrow(x)
