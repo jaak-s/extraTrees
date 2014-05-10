@@ -86,7 +86,7 @@ public class FactorTests {
 		et.learnTrees(5, 4, nTrees);
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
-		assertEquals(et.input.nrows, all.nrows);
+		assertEquals(et.input.nrows(), all.nrows());
 		assertEquals(nTrees, all.ncols);
 		int[] yhat = et.getValues(et.input);
 		// check if their mean is equal to extraTree predictions:
@@ -187,7 +187,7 @@ public class FactorTests {
 		assertTrue( ! et.useWeights );
 		assertTrue( etw.useWeights );
 		
-		int[] all = AbstractTrees.seq(etw.input.nrows);
+		int[] all = AbstractTrees.seq(etw.input.nrows());
 		CutResult resultw = new CutResult();
 		CutResult result  = new CutResult();
 		etw.calculateCutScore(all, 0, 5.5, resultw);

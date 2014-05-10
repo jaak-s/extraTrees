@@ -53,8 +53,8 @@ public class BenchmarkTests {
 		
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
-		assertEquals(et.input.nrows, all.nrows);
-		assertEquals(nTrees, all.ncols);
+		assertEquals(et.input.nrows(), all.nrows());
+		assertEquals(nTrees, all.ncols());
 		int[] yhat = et.getValues(et.input);
 		// check if their mean is equal to extraTree predictions:
 		//System.out.println(all);
@@ -81,8 +81,8 @@ public class BenchmarkTests {
 		
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
-		assertEquals(et.input.nrows, all.nrows);
-		assertEquals(nTrees, all.ncols);
+		assertEquals(et.input.nrows(), all.nrows());
+		assertEquals(nTrees, all.ncols());
 		Timer.tic();
 		double[] yhat = et.getValues(et.input);
 		Timer.toc("ExtraTrees.getValues()");

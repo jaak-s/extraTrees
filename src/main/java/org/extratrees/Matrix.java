@@ -32,6 +32,14 @@ public class Matrix {
 		return this.v[row + col*nrows];
 	}
 	
+	public int ncols() {
+		return ncols;
+	}
+	
+	public int nrows() {
+		return nrows;
+	}
+	
 	/**
 	 * Copies values from given row to the vector. 
 	 * @param row

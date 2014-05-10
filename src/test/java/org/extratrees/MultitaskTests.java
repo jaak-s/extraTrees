@@ -116,8 +116,8 @@ public class MultitaskTests {
 
 		// testing allValuesMT
 		Matrix all = et.getAllValuesMT(testing.input, testing.tasks);
-		assertEquals( testing.input.nrows, all.nrows );
-		assertEquals( et.getNumTrees(),    all.ncols );
+		assertEquals( testing.input.nrows(), all.nrows() );
+		assertEquals( et.getNumTrees(),      all.ncols() );
 		
 		return new double[]{ errors, errors0 };
 	}

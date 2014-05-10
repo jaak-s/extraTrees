@@ -152,7 +152,7 @@ public class ExtraTreeTests {
 		assertTrue( ! et.useWeights );
 		assertTrue( etw.useWeights );
 		
-		int[] all = AbstractTrees.seq(etw.input.nrows);
+		int[] all = AbstractTrees.seq(etw.input.nrows());
 		CutResult resultw = new CutResult();
 		CutResult result  = new CutResult();
 		etw.calculateCutScore(all, 0, 5.5, resultw);

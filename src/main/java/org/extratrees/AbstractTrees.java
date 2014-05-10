@@ -138,7 +138,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	}
 	
 	public void setWeights(double[] weights) {
-		if (weights != null && input.nrows != weights.length) {
+		if (weights != null && input.nrows() != weights.length) {
 			throw(new IllegalArgumentException("Input and weights do not have the same number of data points."));
 		}
 		this.weights = weights;
@@ -150,7 +150,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	 * @param bagSize
 	 */
 	public void setBagging(int bagSize) {
-		if (bagSize > input.nrows) {
+		if (bagSize > input.nrows()) {
 			throw( new IllegalArgumentException("Supplied bagSize exceeds the number of samples.") );
 		}
 		this.bagSizes = new int[]{ bagSize };
@@ -162,12 +162,12 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	 * @param bagLabels  int[] bag label for each sample, all from 0 to (Nbags - 1)
 	 */
 	public void setBagging(int[] bagSizes, int[] bagLabels) {
-		if (bagLabels.length != input.nrows) {
+		if (bagLabels.length != input.nrows()) {
 			throw( new IllegalArgumentException("size of bagLabels has to equal to the number of input rows.") );
 		}
 		this.bagSizes = bagSizes;
 		int[] counts = new int[bagSizes.length];
-		for (int i=0; i<input.nrows; i++) {
+		for (int i=0; i<input.nrows(); i++) {
 			counts[ bagLabels[i] ]++;
 		}
 		// making sure all bags have enough elements:
@@ -182,7 +182,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 			this.bagElems[bag] = new int[ counts[bag] ];
 		}
 		// adding elements to the appropriate bags:
-		for (int i=0; i < input.nrows; i++) {
+		for (int i=0; i < input.nrows(); i++) {
 			int bag = bagLabels[i];
 			int j = this.bagElems[bag].length - counts[bag];
 			counts[bag]--;
@@ -439,10 +439,10 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 
 	protected int[] getInitialSamples() {
 		if (bagSizes == null) {
-			return seq( input.nrows );
+			return seq( input.nrows() );
 		}
 		if (bagSizes.length == 1) {
-			ArrayList<Integer> allIds = arrayToList( seq( input.nrows ) );
+			ArrayList<Integer> allIds = arrayToList( seq( input.nrows() ) );
 			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds);
 			
 			int[] bag = new int[ bagSizes[0] ];
