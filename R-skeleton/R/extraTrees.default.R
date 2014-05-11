@@ -100,6 +100,9 @@ extraTrees.default <- function(x, y,
     et$multitask  = ! is.null(tasks)
     et$probOfTaskCuts = probOfTaskCuts
     et$numRandomTaskCuts = numRandomTaskCuts
+    et$call <- match.call()
+    et$call[[1]] <- as.name("extraTrees")
+    
     class(et) = "extraTrees"
 
     if (nrow(x) != length(y)) {
