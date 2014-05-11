@@ -54,3 +54,24 @@ test.regressionint <- function() {
   checkEquals( length(yhat), length(test$y) )
   checkEquals( TRUE,  is.double(yhat) )
 }
+
+test.regression.mthreads <- function() {
+  train = get.data(100)
+  test  = get.data(100)
+  
+  et = extraTrees(train$x, as.numeric(train$y), numRandomCuts=2, ntree=50, numThreads=2)
+  yhat = predict(et, test$x)
+  checkEquals( length(yhat), length(test$y) )
+  checkEquals( 50,    et$ntree )
+  checkEquals( TRUE,  is.numeric(yhat) )
+  checkEquals( TRUE,  is.double(yhat) )
+  checkEquals( FALSE, et$factor )
+  
+  yall = predict(et, test$x, allValues=T)
+  checkEquals( nrow(yall), nrow(test$x) )
+  checkEquals( ncol(yall), 50 )
+  checkEquals( TRUE, is.double(yall) )
+  
+  checkException(extraTrees(train$x, as.numeric(train$y), numThreads=0), 
+                 msg="numThreads should be at least 1.")
+}

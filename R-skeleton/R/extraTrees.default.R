@@ -73,6 +73,8 @@ extraTrees.default <- function(x, y,
     if ( any(is.na(y)) ) stop("Output vector y contains NAs.")
     if ( !is.null(tasks) && any(is.na(tasks)) ) stop("Task vector contains NAs.")
     
+    if ( numThreads < 1 ) stop("numThreads has to be 1 or bigger.")
+    
     ## uncomment when xtest/ytest are used:
     #testdat <- !is.null(xtest)
     #if (testdat) {
