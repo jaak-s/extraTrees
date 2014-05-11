@@ -95,4 +95,32 @@ public class BenchmarkTests {
 		System.out.println( String.format("Regression MSE: %1.5f", error / (double) yhat.length) );
 	}
 
+	@Test
+	public void testFactorMultiThreaded() {
+		int ndata = 1000;
+		int nTrees = 100;
+		int inputDim = 800;
+		FactorExtraTrees et = getSampleData(ndata, inputDim);
+		et.setNumThreads(2);
+		
+		Timer.tic();
+		et.learnTrees(5, 200, nTrees);
+		Timer.toc("FactorExtraTrees.learnTrees(threads=2)");
+		
+		// get all predictions by trees:
+		Matrix all = et.getAllValues(et.input);
+		assertEquals(et.input.nrows(), all.nrows());
+		assertEquals(nTrees, all.ncols());
+		int[] yhat = et.getValues(et.input);
+		// check if their mean is equal to extraTree predictions:
+		//System.out.println(all);
+		int errors = 0;
+		for (int row=0; row<yhat.length; row++) {
+			if (yhat[row] != et.output[row]) {
+				errors++;
+			}
+		}
+		System.out.println( String.format("Error rate: %1.3f", errors / (double) yhat.length) );
+	}
+
 }
