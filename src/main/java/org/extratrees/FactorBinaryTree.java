@@ -71,11 +71,11 @@ public class FactorBinaryTree extends AbstractBinaryTree {
 	 * @return
 	 */
 	public int[] getValues(Matrix input) {
-		int[] values = new int[input.nrows];
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		int[] values = new int[input.nrows()];
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<input.ncols; col++) {
+			for (int col=0; col < input.ncols(); col++) {
 				temp[col] = input.get(row, col);
 			}
 			values[row] = getValue(temp);
@@ -110,11 +110,11 @@ public class FactorBinaryTree extends AbstractBinaryTree {
 	 * @return value in the tree for all <b>inputs</b> (each row in the matrix is an input).
 	 */
 	public int[] getValues(Matrix input, int nmin) {
-		int[] values = new int[input.nrows];
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		int[] values = new int[input.nrows()];
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<input.ncols; col++) {
+			for (int col=0; col<input.ncols(); col++) {
 				temp[col] = input.get(row, col);
 			}
 			values[row] = getValue(temp, nmin);

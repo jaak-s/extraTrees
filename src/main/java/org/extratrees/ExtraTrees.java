@@ -23,10 +23,10 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * @param tasks    - array of task indices from 0 nTasks-1, null if no multi-task learning
 	 */
 	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
-		if (input.nrows!=output.length) {
+		if (input.nrows() != output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
-		if (tasks!=null && input.nrows!=tasks.length) {
+		if (tasks!=null && input.nrows() != tasks.length) {
 			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
 		}
 		setInput(input);
@@ -102,10 +102,10 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * output[i, j] gives prediction made for i-th row of input by j-th tree. 
 	 */
 	public Matrix getAllValues(Matrix input) {
-		Matrix out = new Matrix( input.nrows, trees.size() );
+		Matrix out = new Matrix( input.nrows(), trees.size() );
 		// temporary vector:
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
 			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
 				out.set( row, j, trees.get(j).getValue(temp) );
@@ -126,9 +126,9 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 
 	/** Average of several trees for many samples */
 	public static double[] getValues(ArrayList<BinaryTree> trees, Matrix input) {
-		double[] values = new double[input.nrows];
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		double[] values = new double[input.nrows()];
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
 			// copying matrix row to temp:
 			input.copyRow(row, temp);
 			values[row] = getValue(trees, temp);
@@ -137,11 +137,11 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	}
 	
 	public double[] getValuesMT(Matrix newInput, int[] tasks) {
-		double[] values = new double[newInput.nrows];
-		double[] temp = new double[newInput.ncols];
-		for (int row=0; row<newInput.nrows; row++) {
+		double[] values = new double[newInput.nrows()];
+		double[] temp = new double[newInput.ncols()];
+		for (int row=0; row<newInput.nrows(); row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<newInput.ncols; col++) {
+			for (int col=0; col<newInput.ncols(); col++) {
 				temp[col] = newInput.get(row, col);
 			}
 			values[row] = this.getValueMT(temp, tasks[row]);
@@ -164,13 +164,13 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
 	 */
 	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
-		if (input.nrows!=tasks.length) {
+		if (input.nrows() != tasks.length) {
 			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
 		}
-		Matrix out = new Matrix( input.nrows, trees.size() );
+		Matrix out = new Matrix( input.nrows(), trees.size() );
 		// temporary vector:
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
 			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
 				out.set( row, j, trees.get(j).getValueMT(temp, tasks[row]) );
@@ -474,10 +474,10 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	public static double getMeanSqError(ArrayList<BinaryTree> trees, Matrix testInput, double[] testOutput) {
 		double error = 0;
 		//double[] output_hat = getValues(trees, testInput);
-		double[] temp = new double[testInput.ncols];
-		for (int row=0; row<testInput.nrows; row++) {
+		double[] temp = new double[testInput.ncols()];
+		for (int row=0; row < testInput.nrows(); row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<testInput.ncols; col++) {
+			for (int col=0; col < testInput.ncols(); col++) {
 				temp[col] = testInput.get(row, col);
 			}
 			error += Math.pow(getValue(trees, temp) - testOutput[row], 2);
@@ -497,11 +497,11 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	{
 		double error = 0;
 		//double[] output_hat = getValues(trees, testInput);
-		double[] temp = new double[testInput.ncols];
+		double[] temp = new double[testInput.ncols()];
 		for (int n=0; n<testIds.length; n++) {
 			int row = testIds[n];
 			// copying matrix row to temp:
-			for (int col=0; col<testInput.ncols; col++) {
+			for (int col=0; col<testInput.ncols(); col++) {
 				temp[col] = testInput.get(row, col);
 			}
 			error += Math.pow(getValue(trees, temp, nmin) - testOutput[row], 2);

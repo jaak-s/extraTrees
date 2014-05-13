@@ -117,8 +117,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	public void setInput(Matrix input) {
 		this.input = input;
 		// making cols list for later use:
-		this.cols = new ArrayList<Integer>(input.ncols);
-		for (int i=0; i<input.ncols; i++) {
+		this.cols = new ArrayList<Integer>(input.ncols());
+		for (int i=0; i<input.ncols(); i++) {
 			cols.add(i);
 		}
 	}

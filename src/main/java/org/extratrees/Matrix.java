@@ -11,7 +11,7 @@ public class Matrix {
 	
 	/** Matrix filled with v. */
 	public Matrix(double[] v, int nrows, int ncols) {
-		if (v.length!=nrows*ncols) {
+		if (v.length != nrows*ncols) {
 			throw( new IllegalArgumentException(
 				"Length of v ("+v.length+") is not equal to nrows*ncols ("+
 				nrows+"*"+ncols+")"));
@@ -46,7 +46,7 @@ public class Matrix {
 	 * @param vector
 	 */
 	public void copyRow(int row, double[] vector) {
-		for (int col=0; col<this.ncols; col++) {
+		for (int col=0; col < this.ncols; col++) {
 			vector[col] = this.get(row, col);
 		}
 	}
@@ -57,7 +57,7 @@ public class Matrix {
 	 * @param vector
 	 */
 	public void copyCol(int col, double[] vector) {
-		for (int row=0; row<this.nrows; row++) {
+		for (int row=0; row < this.nrows; row++) {
 			vector[row] = this.get(row, col);
 		}
 	}
@@ -81,8 +81,8 @@ public class Matrix {
 
 	public String toString() {
 		StringBuilder out = new StringBuilder();
-		for (int row=0; row<nrows; row++) {
-			for (int col=0; col<ncols; col++) {
+		for (int row=0; row < nrows; row++) {
+			for (int col=0; col < ncols; col++) {
 				out.append( String.format("%1.4f", get(row,col) ) );
 				out.append( " " );
 			}
@@ -102,7 +102,7 @@ public class Matrix {
 	
 	public static void main(String[] args) {
 		double[] v = new double[40];
-		for (int i=0; i<v.length; i++) {
+		for (int i=0; i < v.length; i++) {
 			v[i] = i+1;
 		}
 		Matrix m = new Matrix(v, 10, 4);

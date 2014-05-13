@@ -16,10 +16,10 @@ public class QuantileExtraTrees extends ExtraTrees {
 	 * @return return quantiles for each input row. 
 	 */
 	public double[] getQuantiles(Matrix input, double k) {
-		double[] quantileValues = new double[input.nrows];
+		double[] quantileValues = new double[input.nrows()];
 		ArrayList<Double> leafValues = new ArrayList<Double>(this.trees.size());
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
 			// copy row to temp:
 			input.copyRow(row, temp);
 			// get all leaf values for temp:

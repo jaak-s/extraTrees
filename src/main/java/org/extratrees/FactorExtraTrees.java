@@ -22,10 +22,10 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
 	 */
 	public FactorExtraTrees(Matrix input, int[] output, int[] tasks) {
-		if (input.nrows!=output.length) {
+		if (input.nrows() != output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
-		if (tasks!=null && input.nrows!=tasks.length) {
+		if (tasks!=null && input.nrows() != tasks.length) {
 			throw(new IllegalArgumentException("Input and tasks do not have the same number of data points."));
 		}
 		setInput(input);
@@ -150,10 +150,10 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * All values are integers. 
 	 */
 	public Matrix getAllValues(Matrix input) {
-		Matrix out = new Matrix( input.nrows, trees.size() );
+		Matrix out = new Matrix( input.nrows(), trees.size() );
 		// temporary vector:
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
 			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
 				int value = trees.get(j).getValue(temp);
@@ -170,13 +170,13 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * All values are integers. (or NaN)
 	 */
 	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
-		if (input.nrows!=tasks.length) {
+		if (input.nrows() != tasks.length) {
 			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
 		}
-		Matrix out = new Matrix( input.nrows, trees.size() );
+		Matrix out = new Matrix( input.nrows(), trees.size() );
 		// temporary vector:
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
 			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
 				int value = trees.get(j).getValueMT(temp, tasks[row]);
@@ -203,11 +203,11 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	 * Or -1 for samples that didn't get any prediction.
 	 */
 	public static int[] getValues(ArrayList<FactorBinaryTree> trees, Matrix input, int nFactors) {
-		int[]  values = new int[input.nrows];
-		double[] temp = new double[input.ncols];
-		for (int row=0; row<input.nrows; row++) {
+		int[]  values = new int[input.nrows()];
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<input.ncols; col++) {
+			for (int col=0; col < input.ncols(); col++) {
 				temp[col] = input.get(row, col);
 			}
 			values[row] = getValue(trees, temp, nFactors);
@@ -216,11 +216,11 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 	}
 	
 	public int[] getValuesMT(Matrix newInput, int[] tasks) {
-		int[] values = new int[newInput.nrows];
-		double[] temp = new double[newInput.ncols];
-		for (int row=0; row<newInput.nrows; row++) {
+		int[] values = new int[newInput.nrows()];
+		double[] temp = new double[newInput.ncols()];
+		for (int row=0; row < newInput.nrows(); row++) {
 			// copying matrix row to temp:
-			for (int col=0; col<newInput.ncols; col++) {
+			for (int col=0; col < newInput.ncols(); col++) {
 				temp[col] = newInput.get(row, col);
 			}
 			values[row] = this.getValueMT(temp, tasks[row]);
