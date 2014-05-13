@@ -20,7 +20,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 	/**
 	 * @param input    - matrix of inputs, each row is an input vector
 	 * @param output   - array of output values (doubles)
-	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
+	 * @param tasks    - array of task indices from 0 nTasks-1, null if no multi-task learning
 	 */
 	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
 		if (input.nrows!=output.length) {
