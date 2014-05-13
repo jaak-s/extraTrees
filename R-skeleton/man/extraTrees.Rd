@@ -21,6 +21,7 @@
              tasks = NULL,
              probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
+             na.action = "stop",
              ...)
 }
 \arguments{
@@ -40,6 +41,7 @@
   \item{tasks}{ list of tasks, integers from 1 and up. NULL if no multi-task learning }
   \item{probOfTaskCuts}{ probability of performing task cut at a node (default mtry / ncol(x)). Used only if tasks is specified. } 
   \item{numRandomTaskCuts}{ number of times task cut is performed at a node (default 1). Used only if tasks is specified. }
+  \item{na.action}{ specifies how to handle NA in x: "stop" (default) will give error is any NA present, "zero" will set all NA to zero and "fuse" will build trees by skipping samples when the chosen feature is NA for them.} 
   \item{...}{ not used currently. }
 }
 \details{

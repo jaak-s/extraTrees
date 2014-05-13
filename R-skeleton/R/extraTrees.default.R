@@ -62,6 +62,7 @@ extraTrees.default <- function(x, y,
              tasks = NULL,
              probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
+             na.action = "stop",
              ...) {
     n <- nrow(x)
     p <- ncol(x)
@@ -74,7 +75,7 @@ extraTrees.default <- function(x, y,
     if ( !is.null(tasks) && any(is.na(tasks)) ) stop("Task vector contains NAs.")
     
     if ( numThreads < 1 ) stop("numThreads has to be 1 or bigger.")
-    
+
     ## uncomment when xtest/ytest are used:
     #testdat <- !is.null(xtest)
     #if (testdat) {
@@ -94,7 +95,6 @@ extraTrees.default <- function(x, y,
     et$evenCuts = evenCuts
     et$numThreads = numThreads
     et$quantile   = quantile
-    et$xHasNA     = any(is.na(x))
     et$useWeights = ! is.null(weights)
     et$useBagging = ! is.null(bagSizes) && sum(bagSizes) != nrow(x)
     et$multitask  = ! is.null(tasks)
@@ -111,6 +111,17 @@ extraTrees.default <- function(x, y,
     
     if ( ! et$factor && ! is.numeric(y) ) {
       stop("y values have to be either factor (classification) or numeric (regression).")
+    }
+
+    et$xHasNA = FALSE
+    if (na.action == "stop") {
+      if ( any(is.na(x)) ) stop("Input matrix x contains NAs. Change na.action to 'zero' or 'fuse' to allow NA to be used or remove samples with NA.")
+    } else if (na.action == "zero") {
+      x[ is.na(x) ] = 0
+    } else if (na.action == "fuse") {
+      et$xHasNA = any(is.na(x))
+    } else {
+      stop("na.action should be either 'stop', 'zero' or 'fuse'. See manual for details.")
     }
     
     if ( ! is.null(weights) ) {
