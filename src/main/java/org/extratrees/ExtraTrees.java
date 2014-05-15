@@ -65,6 +65,22 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		return trees;
 	}
 	
+	public class ArithmeticMean implements Aggregator<BinaryTree> {
+		double sum = 0;
+		int count;
+		
+		@Override
+		public void processLeaf(BinaryTree leaf) {
+			sum += leaf.value;
+			count++;
+		}
+	}
+	
+	@Override
+	Aggregator<BinaryTree> getNewAggregator() {
+		return new ArithmeticMean();
+	}
+	
 	/** Average of several trees: */
 	public static double getValue(ArrayList<BinaryTree> trees, double[] input) {
 		double output = 0;

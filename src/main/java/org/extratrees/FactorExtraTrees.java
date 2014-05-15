@@ -67,19 +67,22 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		}
 		return newET;
 	}
-
 	
-	/** Builds trees with ids */
-	/*
-	public ArrayList<FactorBinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
-		ArrayList<FactorBinaryTree> trees = new ArrayList<FactorBinaryTree>(nTrees);
-		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		for (int t=0; t<nTrees; t++) {
-			trees.add( this.buildTree(nmin, K, ids, null, cols) );
+	public class MajorityVote implements Aggregator<FactorBinaryTree> {
+		int[] counts = new int[nFactors];
+		
+		@Override
+		public void processLeaf(FactorBinaryTree leaf) {
+			counts[ leaf.value ]++;
 		}
-		return trees;		
-	}*/
+	}
+	
 
+	@Override
+	Aggregator<FactorBinaryTree> getNewAggregator() {
+		return new MajorityVote();
+	}
+	
 	/**
 	 * @param trees
 	 * @param input

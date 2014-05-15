@@ -289,6 +289,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	}
 	
 	abstract public E makeLeaf(int[] ids, Set<Integer> leftTaskSet);
+	abstract Aggregator<E> getNewAggregator();
 	
 	/**
 	 * Same as buildTrees() except computes in parallel.
@@ -379,6 +380,16 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		} else {
 			this.trees = buildTreesParallel(nmin, K, nTrees);
 		}
+	}
+	
+	public Aggregator<E> getValue(ArrayList<E> trees, Row input) {
+		Aggregator<E> aggr = getNewAggregator();
+		
+		for (E tree : trees) {
+			// TODO
+		}
+		
+		return aggr;
 	}
 	
 	/**
