@@ -1,13 +1,6 @@
 package org.extratrees;
 
-public class BinaryTree extends AbstractBinaryTree {
-	/** tree for elements below threshold.
-	 * if left==null, it is a leaf node
-     * if left!=null, not a leaf
-	 *  */
-	public BinaryTree left;
-	/** tree for elements equal or above threshold. */
-	public BinaryTree right;
+public class BinaryTree extends AbstractBinaryTree<BinaryTree> {
 	/** value of the node (estimated by its nodes), value of the node.
 	 *  Non-leaf nodes also store value, allowing to change size of final nodes on-the-fly. */
 	public double value=Double.NEGATIVE_INFINITY;  

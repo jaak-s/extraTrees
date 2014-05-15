@@ -1,13 +1,6 @@
 package org.extratrees;
 
-public class FactorBinaryTree extends AbstractBinaryTree {
-	/** tree for elements below threshold.
-	 * if left==null, it is a leaf node
-     * if left!=null, not a leaf
-	 *  */
-	public FactorBinaryTree left;
-	/** tree for elements equal or above threshold. */
-	public FactorBinaryTree right;
+public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree> {
 	/** Value of the node (estimated by its nodes), value of the node: 
 	 *  from 0 to (#numFactors-1).
 	 *  Non-leaf nodes also store value, allowing to change size of final nodes on-the-fly. */
