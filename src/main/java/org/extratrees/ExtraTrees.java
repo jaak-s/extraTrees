@@ -77,8 +77,10 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 
 		@Override
 		public Double getResult() {
-			// TODO
-			return null;
+			if (count == 0) {
+				return NA;
+			}
+			return sum/count;
 		}
 	}
 	
@@ -87,24 +89,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return new ArithmeticMean();
 	}
 	
-	/** Average of several trees: */
-	public static double getValue(ArrayList<BinaryTree> trees, double[] input) {
-		double output = 0;
-		int voteCount = 0;
-		for(BinaryTree t : trees) {
-			// skipping all NaN predictions
-			double value = t.getValue(input);
-			if ( ! Double.isNaN(value)) {
-				output += value;
-				voteCount++;
-			}
-		}
-		if (voteCount == 0) {
-			return NA;
-		}
-		return output/voteCount;
-	}
-
 	/** Average of several trees, using nmin as depth */
 	public static double getValue(ArrayList<BinaryTree> trees, double[] input, int nmin) {
 		double output = 0;
@@ -143,10 +127,18 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @return
 	 */
 	public double[] getValues(Matrix input) {
-		return getValues(this.trees, input);
+		double[] values = new double[input.nrows()];
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
+			// copying matrix row to temp:
+			input.copyRow(row, temp);
+			values[row] = getValue(temp);
+		}
+		return values;
 	}
 
 	/** Average of several trees for many samples */
+	/*
 	public static double[] getValues(ArrayList<BinaryTree> trees, Matrix input) {
 		double[] values = new double[input.nrows()];
 		double[] temp = new double[input.ncols()];
@@ -156,7 +148,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 			values[row] = getValue(trees, temp);
 		}
 		return values;
-	}
+	}*/
 	
 	public double[] getValuesMT(Matrix newInput, int[] tasks) {
 		double[] values = new double[newInput.nrows()];
@@ -493,7 +485,8 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @param testOutput
 	 * @return mean squared error on the test input and output.
 	 */
-	public static double getMeanSqError(ArrayList<BinaryTree> trees, Matrix testInput, double[] testOutput) {
+	/*
+	public static double getMeanSqError(Matrix testInput, double[] testOutput) {
 		double error = 0;
 		//double[] output_hat = getValues(trees, testInput);
 		double[] temp = new double[testInput.ncols()];
@@ -507,6 +500,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 
 		return error/testOutput.length;
 	}
+	*/
 
 	/** 
 	 * mean squared error for CV
@@ -532,6 +526,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return error/testIds.length;
 	}
 
+	/*
 	public static double getMeanAbsError(ArrayList<BinaryTree> trees, Matrix testInput, double[] testOutput) {
 		double error = 0;
 		double[] output_hat = getValues(trees, testInput);
@@ -539,7 +534,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 			error += Math.abs(output_hat[n] - testOutput[n]);
 		}
 		return error/testOutput.length;
-	}
+	}*/
 	
 	public ArrayList<BinaryTree> buildTreeCV(int K, int nTrees) {
 		int[] nmins = {2, 3, 5, 9, 14};
@@ -596,26 +591,25 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		//if (x==1) return;
 		Date t1 = new Date();
 		et.learnTrees(2, 6, nTrees);
-		ArrayList<BinaryTree> trees = et.trees;
 		Date t2 = new Date();
 		
 		ExtraTrees et2 = getSampleData(1000, ndim);
-		double[] output_hat = getValues(trees, et2.input);
+		double[] output_hat = et.getValues(et2.input);
 		for (int row=0; row<et2.output.length; row++) {
 			System.out.print( String.format("%d\t%1.3f %1.3f", row, et2.output[row], output_hat[row]) );
 			System.out.println();
 		}
 		System.out.println( "Took: " + (t2.getTime()-t1.getTime())/1000.0 + "s");
 
-		int[] ids = new int[et2.output.length];
-		for (int n=0; n<ids.length; n++) { ids[n]=n; }
-		double e1 = getMeanSqError(trees, et2.input, et2.output);
-		double e2 = getMeanSqError(trees, et2.input, et2.output, 5, ids );
-		System.out.println( "Error: " + e1 );
-		System.out.println( "Error: " + e2 );
+//		int[] ids = new int[et2.output.length];
+//		for (int n=0; n<ids.length; n++) { ids[n]=n; }
+//		ArrayList<BinaryTree> trees = et.trees;
+//		double e1 = getMeanSqError(trees, et2.input, et2.output);
+//		double e2 = getMeanSqError(trees, et2.input, et2.output, 5, ids );
+//		System.out.println( "Error: " + e1 );
+//		System.out.println( "Error: " + e2 );
 		
 
-//		System.out.println( Arrays.toString( bt.countColumns(m.ncols)) );
 	}
 
 

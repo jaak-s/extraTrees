@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public abstract class AbstractTrees<E extends AbstractBinaryTree<E>, D> {
+public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	Matrix input;
 	Random random = new Random();
 	double[] weights;
@@ -375,7 +375,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E>, D> {
 	 * @param nTrees
 	 */
 	public void learnTrees(int nmin, int K, int nTrees) {
-		if (numThreads<=1) {	//if (numThreads<=1) {
+		if (numThreads <= 1) {
 			this.trees = buildTrees(nmin, K, nTrees);
 		} else {
 			this.trees = buildTreesParallel(nmin, K, nTrees);

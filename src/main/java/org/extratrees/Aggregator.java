@@ -1,6 +1,15 @@
 package org.extratrees;
 
-public interface Aggregator<T extends AbstractBinaryTree<T>, D> {
+/**
+ * 
+ * @author jaak
+ *
+ * @param <T> Tree type
+ * @param <D>
+ * @param <D> Value type
+ */
+
+public interface Aggregator<T extends AbstractBinaryTree<T, D>, D> {
 	D getResult();
 	void processLeaf(T leaf);
 }
