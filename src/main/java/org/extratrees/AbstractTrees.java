@@ -382,7 +382,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E>, D> {
 		}
 	}
 	
-	public Aggregator<E, D> getValue(double[] input) {
+	public D getValue(double[] input) {
 		Aggregator<E, D> aggr = getNewAggregator();
 		
 		for (E tree : trees) {
@@ -393,7 +393,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E>, D> {
 			}
 		}
 		
-		return aggr;
+		return aggr.getResult();
 	}
 	
 	/**
