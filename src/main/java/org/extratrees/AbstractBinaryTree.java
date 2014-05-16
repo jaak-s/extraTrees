@@ -59,9 +59,7 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	}
 	
 	public D getValue(double[] input) {
-		T leaf = getLeaf(input);
-		if (leaf == null) return getNA();
-		return leaf.getValue();
+		return valueFromLeaf( getLeaf(input) );
 	}
 	
 	/**
@@ -92,7 +90,15 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	}
 
 	public D getValueMT(double[] input, int task) {
-		T leaf = getLeafMT(input, task);
+		return valueFromLeaf( getLeafMT(input, task) );
+	}
+	
+	/**
+	 * 
+	 * @param leaf
+	 * @return leaf.value if leaf is not null or getNA() if leaf is null.
+	 */
+	private D valueFromLeaf(T leaf) {
 		if (leaf == null) return getNA();
 		return leaf.getValue();
 	}
