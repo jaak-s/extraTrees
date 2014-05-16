@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
+public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	int[] output;
 	/** number of factors: */
 	int nFactors;
@@ -68,18 +68,24 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree> {
 		return newET;
 	}
 	
-	public class MajorityVote implements Aggregator<FactorBinaryTree> {
+	public class MajorityVote implements Aggregator<FactorBinaryTree, Integer> {
 		int[] counts = new int[nFactors];
 		
 		@Override
 		public void processLeaf(FactorBinaryTree leaf) {
 			counts[ leaf.value ]++;
 		}
+
+		@Override
+		public Integer getResult() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 	
 
 	@Override
-	Aggregator<FactorBinaryTree> getNewAggregator() {
+	Aggregator<FactorBinaryTree, Integer> getNewAggregator() {
 		return new MajorityVote();
 	}
 	

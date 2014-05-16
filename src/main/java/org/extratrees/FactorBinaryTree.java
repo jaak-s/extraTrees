@@ -8,7 +8,6 @@ public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree> {
 	public int value;
 	
 	public FactorBinaryTree() {
-		
 	}
 
 	/**

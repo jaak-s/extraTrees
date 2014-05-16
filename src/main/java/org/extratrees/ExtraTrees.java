@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ExtraTrees extends AbstractTrees<BinaryTree> {
+public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	double[] output;
 	double[] outputSq;
 	
@@ -65,7 +65,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 		return trees;
 	}
 	
-	public class ArithmeticMean implements Aggregator<BinaryTree> {
+	public class ArithmeticMean implements Aggregator<BinaryTree, Double> {
 		double sum = 0;
 		int count;
 		
@@ -74,10 +74,16 @@ public class ExtraTrees extends AbstractTrees<BinaryTree> {
 			sum += leaf.value;
 			count++;
 		}
+
+		@Override
+		public Double getResult() {
+			// TODO
+			return null;
+		}
 	}
 	
 	@Override
-	Aggregator<BinaryTree> getNewAggregator() {
+	Aggregator<BinaryTree, Double> getNewAggregator() {
 		return new ArithmeticMean();
 	}
 	

@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public abstract class AbstractTrees<E extends AbstractBinaryTree> {
+public abstract class AbstractTrees<E extends AbstractBinaryTree<E>, D> {
 	Matrix input;
 	Random random = new Random();
 	double[] weights;
@@ -289,7 +289,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 	}
 	
 	abstract public E makeLeaf(int[] ids, Set<Integer> leftTaskSet);
-	abstract Aggregator<E> getNewAggregator();
+	abstract Aggregator<E, D> getNewAggregator();
 	
 	/**
 	 * Same as buildTrees() except computes in parallel.
@@ -382,11 +382,15 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree> {
 		}
 	}
 	
-	public Aggregator<E> getValue(ArrayList<E> trees, Row input) {
-		Aggregator<E> aggr = getNewAggregator();
+	public Aggregator<E, D> getValue(double[] input) {
+		Aggregator<E, D> aggr = getNewAggregator();
 		
 		for (E tree : trees) {
-			// TODO
+			E leaf = tree.getLeaf(input);
+			/** do not process NAs */
+			if (leaf != null) {
+				aggr.processLeaf( leaf );
+			}
 		}
 		
 		return aggr;

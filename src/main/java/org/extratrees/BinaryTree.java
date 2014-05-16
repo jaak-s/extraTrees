@@ -6,26 +6,8 @@ public class BinaryTree extends AbstractBinaryTree<BinaryTree> {
 	public double value=Double.NEGATIVE_INFINITY;  
 	
 	public BinaryTree() {
-		
 	}
 
-
-	/**
-	 * @param input the vector of input values
-	 * @return the leaf node (BinaryTree) for the input
-	 */
-	public BinaryTree getLeaf(double[] input) {
-		if (left==null) {
-			return this;
-		}
-		if (Double.isNaN(input[column])) {
-			return null;
-		}
-		if (input[column]<threshold) {
-			return left.getLeaf(input);
-		}
-		return right.getLeaf(input);
-	}
 
 	/**
 	 * 
