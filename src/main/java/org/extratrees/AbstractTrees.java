@@ -289,7 +289,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	}
 	
 	abstract public E makeLeaf(int[] ids, Set<Integer> leftTaskSet);
-	abstract Aggregator<E, D> getNewAggregator();
+	abstract Aggregator<D> getNewAggregator();
 	
 	/**
 	 * Same as buildTrees() except computes in parallel.
@@ -383,13 +383,13 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	}
 	
 	public D getValue(double[] input) {
-		Aggregator<E, D> aggr = getNewAggregator();
+		Aggregator<D> aggr = getNewAggregator();
 		
 		for (E tree : trees) {
 			E leaf = tree.getLeaf(input);
 			/** do not process NAs */
 			if (leaf != null) {
-				aggr.processLeaf( leaf );
+				aggr.processLeaf( leaf.value );
 			}
 		}
 		

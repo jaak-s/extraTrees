@@ -65,13 +65,13 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return trees;
 	}
 	
-	public class ArithmeticMean implements Aggregator<BinaryTree, Double> {
+	public class ArithmeticMean implements Aggregator<Double> {
 		double sum = 0;
 		int count;
 		
 		@Override
-		public void processLeaf(BinaryTree leaf) {
-			sum += leaf.value;
+		public void processLeaf(Double leafValue) {
+			sum += leafValue;
 			count++;
 		}
 
@@ -85,7 +85,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	}
 	
 	@Override
-	Aggregator<BinaryTree, Double> getNewAggregator() {
+	Aggregator<Double> getNewAggregator() {
 		return new ArithmeticMean();
 	}
 	
@@ -137,19 +137,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return values;
 	}
 
-	/** Average of several trees for many samples */
-	/*
-	public static double[] getValues(ArrayList<BinaryTree> trees, Matrix input) {
-		double[] values = new double[input.nrows()];
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row<input.nrows(); row++) {
-			// copying matrix row to temp:
-			input.copyRow(row, temp);
-			values[row] = getValue(trees, temp);
-		}
-		return values;
-	}*/
-	
 	public double[] getValuesMT(Matrix newInput, int[] tasks) {
 		double[] values = new double[newInput.nrows()];
 		double[] temp = new double[newInput.ncols()];

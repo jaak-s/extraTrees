@@ -9,7 +9,7 @@ package org.extratrees;
  * @param <D> Value type
  */
 
-public interface Aggregator<T extends AbstractBinaryTree<T, D>, D> {
+public interface Aggregator<D> {
 	D getResult();
-	void processLeaf(T leaf);
+	void processLeaf(D leafValue);
 }

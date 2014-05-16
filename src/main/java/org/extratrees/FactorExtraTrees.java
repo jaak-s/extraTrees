@@ -65,24 +65,23 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 		return newET;
 	}
 	
-	public class MajorityVote implements Aggregator<FactorBinaryTree, Integer> {
+	public class MajorityVote implements Aggregator<Integer> {
 		int[] counts = new int[nFactors];
 		
 		@Override
-		public void processLeaf(FactorBinaryTree leaf) {
-			counts[ leaf.value ]++;
+		public void processLeaf(Integer leafValue) {
+			counts[ leafValue ]++;
 		}
 
 		@Override
 		public Integer getResult() {
-			// TODO Auto-generated method stub
-			return null;
+			return getMaxIndex(counts);
 		}
 	}
 	
 
 	@Override
-	Aggregator<FactorBinaryTree, Integer> getNewAggregator() {
+	Aggregator<Integer> getNewAggregator() {
 		return new MajorityVote();
 	}
 	
@@ -198,7 +197,16 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	 * @return
 	 */
 	public int[] getValues(Matrix input) {
-		return getValues(this.trees, input, this.nFactors);
+		int[]  values = new int[input.nrows()];
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
+			// copying matrix row to temp:
+			for (int col=0; col < input.ncols(); col++) {
+				temp[col] = input.get(row, col);
+			}
+			values[row] = getValue(temp);
+		}
+		return values;
 	}
 	
 	/**
