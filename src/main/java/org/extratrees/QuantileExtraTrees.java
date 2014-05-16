@@ -55,7 +55,7 @@ public class QuantileExtraTrees extends ExtraTrees {
 	public BinaryTree makeLeaf(int[] ids, Set<Integer> tasks) {
 		// terminal node:
 		QuantileBinaryTree bt = new QuantileBinaryTree();
-		bt.value = 0;
+		bt.value = 0d;
 		bt.nSuccessors = ids.length;
 		bt.tasks = tasks;
 		bt.values = new ArrayList<Double>(ids.length);

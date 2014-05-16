@@ -440,7 +440,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	public BinaryTree makeLeaf(int[] ids, Set<Integer> tasks) {
 		// terminal node:
 		BinaryTree bt = new BinaryTree();
-		bt.value = 0;
+		bt.value = 0d;
 		bt.nSuccessors = ids.length;
 		bt.tasks = tasks;
 		double sumWeights = 0;

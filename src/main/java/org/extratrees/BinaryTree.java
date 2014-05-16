@@ -1,42 +1,13 @@
 package org.extratrees;
 
 public class BinaryTree extends AbstractBinaryTree<BinaryTree, Double> {
-	/** value of the node (estimated by its nodes), value of the node.
-	 *  Non-leaf nodes also store value, allowing to change size of final nodes on-the-fly. */
-	public double value=Double.NEGATIVE_INFINITY;  
-	
 	public BinaryTree() {
-	}
-	
-	@Override
-	public Double getValue() {
-		return value;
 	}
 	
 	@Override
 	public Double getNA() {
 		return AbstractTrees.NA;
 	}
-
-	/**
-	 * 
-	 * @param input
-	 * @return the value from the whole tree or NA if input had NaN for needed inputs. 
-	 */
-	/*
-	public double getValue(double[] input) {
-		if (left==null) {
-			return value; // leaf node
-		}
-		if (Double.isNaN(input[column])) {
-			return AbstractTrees.NA;
-		}
-		if (input[column]<threshold) {
-			return left.getValue(input);
-		}
-		return right.getValue(input);
-	}*/
-	
 
 	/**
 	 * @param input

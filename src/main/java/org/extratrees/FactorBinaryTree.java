@@ -1,44 +1,13 @@
 package org.extratrees;
 
 public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree, Integer> {
-	/** Value of the node (estimated by its nodes), value of the node: 
-	 *  from 0 to (#numFactors-1).
-	 *  Non-leaf nodes also store value, allowing to change size of final nodes on-the-fly. */
-	//public double value=Double.NEGATIVE_INFINITY;
-	public int value;
-	
 	public FactorBinaryTree() {
-	}
-	
-	@Override
-	public Integer getValue() {
-		return value;
 	}
 	
 	@Override
 	public Integer getNA() {
 		return -1;
 	}
-
-	/**
-	 * @param input
-	 * @return The value from the whole tree. 
-	 * If {@code input} has a NaN in a used column, to -1 is returned.
-	 */
-	/*
-	public int getValue(double[] input) {
-		if (left==null) {
-			return value; // leaf node
-		}
-		if (Double.isNaN(input[column])) {
-			return -1;
-		}
-		if (input[column]<threshold) {
-			return left.getValue(input);
-		}
-		return right.getValue(input);
-	}*/
-	
 
 	/**
 	 * @param x

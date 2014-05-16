@@ -9,7 +9,8 @@ import java.util.Set;
  * 
  * @author jaak
  *
- * @param <T>
+ * @param <T> class that extends ABT
+ * @param <D> class of value
  */
 public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D> {
 	/** tree for elements below threshold.
@@ -25,15 +26,20 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	/** feature ID used for cutting */
 	public int    column=-1;
 	/** threshold of cutting */
-	public double threshold; 
+	public double threshold;
+	/** value of the node (estimated by its samples).
+	 *  Non-leaf nodes (may) also store value, allowing to change size of final nodes on-the-fly. */
+	public D      value;
 
 	/** tasks that are active in this thread */
 	Set<Integer> tasks;
 	
-	/** @return value of current node */
-	public abstract D getValue();
 	public abstract D getNA();
 	
+	/** @return value of current node */
+	public D getValue() {
+		return value;
+	}
 	
 	/**
 	 * @param input the vector of input values
