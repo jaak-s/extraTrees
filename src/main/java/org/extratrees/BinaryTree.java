@@ -8,33 +8,6 @@ public class BinaryTree extends AbstractBinaryTree<BinaryTree, Double> {
 	public Double getNA() {
 		return AbstractTrees.NA;
 	}
-
-	/**
-	 * @param input
-	 * @param task
-	 * @return return multitask value for given input and task
-	 */
-	public double getValueMT(double[] input, int task) {
-		if (left==null) {
-			return value;
-		}
-		if (column<0) {
-			// task cut:
-			if (left.tasks.contains(task)) {
-				return left.getValueMT(input, task);
-			}
-			return right.getValueMT(input, task);
-		}
-		// feature cut
-		if (Double.isNaN(input[column])) {
-			return AbstractTrees.NA;
-		}
-		if (input[column]<threshold) {
-			return left.getValueMT(input, task);
-		}
-		return right.getValueMT(input, task);
-	}
-
 	
 	/**
 	 * Returns values for data points, each data point is a row of the matrix.

@@ -10,34 +10,6 @@ public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree, Integ
 	}
 
 	/**
-	 * @param x
-	 * @param task
-	 * @return return multitask value for given input and task
-	 */
-	public int getValueMT(double[] input, int task) {
-		if (left==null) {
-			return value;
-		}
-		if (column<0) {
-			// task cut:
-			if (left.tasks.contains(task)) {
-				return left.getValueMT(input, task);
-			}
-			return right.getValueMT(input, task);
-		}
-		if (Double.isNaN(input[column])) {
-			return -1;
-		}
-		// feature cut
-		if (input[column]<threshold) {
-			return left.getValueMT(input, task);
-		}
-		return right.getValueMT(input, task);
-
-	}
-
-
-	/**
 	 * Returns values for data points, each data point is a row of the matrix.
 	 * @param input
 	 * @return

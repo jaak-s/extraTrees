@@ -8,9 +8,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	int[] output;
 	/** number of factors: */
 	int nFactors;
-	//String[] factorNames;
-	
-	//ArrayList<FactorBinaryTree> trees;
 
 	public FactorExtraTrees(Matrix input, int[] output) {
 		this(input, output, null);

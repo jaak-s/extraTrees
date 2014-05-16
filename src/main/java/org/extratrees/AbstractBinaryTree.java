@@ -91,6 +91,12 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 
 	}
 
+	public D getValueMT(double[] input, int task) {
+		T leaf = getLeafMT(input, task);
+		if (leaf == null) return getNA();
+		return leaf.getValue();
+	}
+
 
 	@SuppressWarnings("unchecked")
 	public T getItself() {
