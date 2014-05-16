@@ -54,7 +54,7 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	
 	public D getValue(double[] input) {
 		T leaf = getLeaf(input);
-		if (leaf == null) return null;
+		if (leaf == null) return getNA();
 		return leaf.getValue();
 	}
 	
