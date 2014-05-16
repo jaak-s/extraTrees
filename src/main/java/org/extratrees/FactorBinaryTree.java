@@ -27,26 +27,6 @@ public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree, Integ
 		return values;
 	}
 
-	/**  uses nmin to choose the depth:
-	 * @param input - input vector
-	 * @param nmin  - number of elements in the final node (used for value).
-	 * @return value in the tree for <b>input</b>.
-	 */
-	public int getValue(double[] input, int nmin) {
-		if (this.nSuccessors<nmin || this.left==null) {
-			return value; // leaf node OR below nmin
-		}
-		if (Double.isNaN(input[column])) {
-			return -1;
-		}
-		if (input[column] < threshold) {
-			return left.getValue(input, nmin);
-		}
-		return right.getValue(input, nmin);
-	}
-	
-
-
 	/**
 	 * uses nmin to choose the depth:
 	 * @param input

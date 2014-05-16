@@ -27,25 +27,6 @@ public class BinaryTree extends AbstractBinaryTree<BinaryTree, Double> {
 		return values;
 	}
 	
-	/**  uses nmin to choose the depth:
-	 * @param input - input vector
-	 * @param nmin  - number of elements in the final node (used for value).
-	 * @return The value from the whole tree. 
-	 * If {@code input} has a NaN in a used column, to NA is returned.
-	 */
-	public double getValue(double[] input, int nmin) {
-		if (this.nSuccessors<nmin || this.left==null) {
-			return value; // leaf node OR below nmin
-		}
-		if (Double.isNaN(input[column])) {
-			return AbstractTrees.NA;
-		}
-		if (input[column]<threshold) {
-			return left.getValue(input, nmin);
-		}
-		return right.getValue(input, nmin);
-	}
-	
 	/**
 	 * uses nmin to choose the depth:
 	 * @param input

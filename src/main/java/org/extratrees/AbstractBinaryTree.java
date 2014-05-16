@@ -93,6 +93,29 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 		return valueFromLeaf( getLeafMT(input, task) );
 	}
 	
+	/**  uses nmin to choose the depth:
+	 * @param input - input vector
+	 * @param nmin  - number of elements in the final node (used for value).
+	 * @return value in the tree for <b>input</b>.
+	 */
+	public T getLeaf(double[] input, int nmin) {
+		if (this.nSuccessors < nmin || this.left == null) {
+			return getItself(); // leaf node OR below nmin
+		}
+		if (Double.isNaN(input[column])) {
+			return null;
+		}
+		if (input[column] < threshold) {
+			return left.getLeaf(input, nmin);
+		}
+		return right.getLeaf(input, nmin);
+	}
+	
+	public D getValue(double[] input, int nmin) {
+		return valueFromLeaf( getLeaf(input, nmin) );
+	}
+
+	
 	/**
 	 * 
 	 * @param leaf
