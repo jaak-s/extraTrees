@@ -104,6 +104,13 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return out;
 	}
 	
+	private static double[] list2array(ArrayList<Double> list) {
+		double[] out = new double[ list.size() ];
+		for (int i = 0; i < out.length; i++) {
+			out[i] = list.get(i);
+		}
+		return out;
+	}
 
 	/**
 	 * Object method, using the trees stored by learnTrees(...) method.
@@ -111,16 +118,9 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @return
 	 */
 	public double[] getValues(Matrix input) {
-		double[] values = new double[input.nrows()];
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row<input.nrows(); row++) {
-			// copying matrix row to temp:
-			input.copyRow(row, temp);
-			values[row] = getValue(temp);
-		}
-		return values;
+		return list2array( getValuesD(input) );
 	}
-
+	
 	public double[] getValuesMT(Matrix newInput, int[] tasks) {
 		double[] values = new double[newInput.nrows()];
 		double[] temp = new double[newInput.ncols()];

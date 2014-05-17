@@ -408,6 +408,19 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		}
 		return aggr.getResult();
 	}
+	
+	public ArrayList<D> getValuesD(Matrix input) {
+		ArrayList<D> values = new ArrayList<D>( input.nrows() );
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
+			// copying matrix row to temp:
+			for (int col=0; col < input.ncols(); col++) {
+				temp[col] = input.get(row, col);
+			}
+			values.add( getValue(temp) );
+		}
+		return values;
+	}
 
 	
 	/**

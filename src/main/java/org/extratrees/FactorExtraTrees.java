@@ -162,6 +162,14 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 		}
 		return out;
 	}
+	
+	private static int[] list2array(ArrayList<Integer> list) {
+		int[] out = new int[ list.size() ];
+		for (int i = 0; i < out.length; i++) {
+			out[i] = list.get(i);
+		}
+		return out;
+	}
 
 	/**
 	 * Object method, using the trees stored by learnTrees(...) method.
@@ -169,16 +177,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	 * @return
 	 */
 	public int[] getValues(Matrix input) {
-		int[]  values = new int[input.nrows()];
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row < input.nrows(); row++) {
-			// copying matrix row to temp:
-			for (int col=0; col < input.ncols(); col++) {
-				temp[col] = input.get(row, col);
-			}
-			values[row] = getValue(temp);
-		}
-		return values;
+		return list2array( getValuesD(input) );
 	}
 	
 	public int[] getValuesMT(Matrix newInput, int[] tasks) {
