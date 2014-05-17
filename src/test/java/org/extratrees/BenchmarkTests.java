@@ -41,26 +41,31 @@ public class BenchmarkTests {
 
 	@Test
 	public void testFactor() {
+		System.out.println("----Factor----");
 		int ndata = 1000;
 		int nTrees = 100;
 		int inputDim = 800;
 		FactorExtraTrees et = getSampleData(ndata, inputDim);
+		FactorExtraTrees et2 = getSampleData(ndata*10, inputDim);
 		assertEquals( false, et.isHasNaN() );
 		
 		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
-		Timer.toc("FactorExtraTrees.learnTrees");
+		Timer.toc(".learnTrees()");
 		
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
 		assertEquals(et.input.nrows(), all.nrows());
 		assertEquals(nTrees, all.ncols());
-		int[] yhat = et.getValues(et.input);
+		
+		Timer.tic();
+		int[] yhat = et.getValues(et2.input);
+		Timer.toc(".getValues()");
 		// check if their mean is equal to extraTree predictions:
 		//System.out.println(all);
 		int errors = 0;
 		for (int row=0; row<yhat.length; row++) {
-			if (yhat[row] != et.output[row]) {
+			if (yhat[row] != et2.output[row]) {
 				errors++;
 			}
 		}
@@ -69,6 +74,7 @@ public class BenchmarkTests {
 
 	@Test
 	public void testRegression() {
+		System.out.println("----Regression----");
 		int ndata = 1000;
 		int nTrees = 100;
 		int inputDim = 800;
@@ -77,46 +83,51 @@ public class BenchmarkTests {
 		
 		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
-		Timer.toc("ExtraTrees.learnTrees");
+		Timer.toc(".learnTrees()");
 		
 		// get all predictions by trees:
+		ExtraTrees et2 = getSampleDataRegression(ndata*10, inputDim);
 		Matrix all = et.getAllValues(et.input);
 		assertEquals(et.input.nrows(), all.nrows());
 		assertEquals(nTrees, all.ncols());
 		Timer.tic();
-		double[] yhat = et.getValues(et.input);
-		Timer.toc("ExtraTrees.getValues()");
+		double[] yhat = et.getValues(et2.input);
+		Timer.toc(".getValues()");
 		// check if their mean is equal to extraTree predictions:
 		//System.out.println(all);
 		double error = 0;
 		for (int row=0; row<yhat.length; row++) {
-			error += Math.pow(yhat[row] - et.output[row], 2);
+			error += Math.pow(yhat[row] - et2.output[row], 2);
 		}
-		System.out.println( String.format("Regression MSE: %1.5f", error / (double) yhat.length) );
+		System.out.println( String.format("Regression MSE: %1.5f", error / yhat.length) );
 	}
 
 	@Test
 	public void testFactorMultiThreaded() {
+		System.out.println("----Factor Multithreaded----");
 		int ndata = 1000;
 		int nTrees = 100;
 		int inputDim = 800;
 		FactorExtraTrees et = getSampleData(ndata, inputDim);
+		FactorExtraTrees et2 = getSampleData(ndata*10, inputDim);
 		et.setNumThreads(2);
 		
 		Timer.tic();
 		et.learnTrees(5, 200, nTrees);
-		Timer.toc("FactorExtraTrees.learnTrees(threads=2)");
+		Timer.toc(".learnTrees()");
 		
 		// get all predictions by trees:
 		Matrix all = et.getAllValues(et.input);
 		assertEquals(et.input.nrows(), all.nrows());
 		assertEquals(nTrees, all.ncols());
-		int[] yhat = et.getValues(et.input);
+		Timer.tic();
+		int[] yhat = et.getValues(et2.input);
+		Timer.toc(".getValues()");
 		// check if their mean is equal to extraTree predictions:
 		//System.out.println(all);
 		int errors = 0;
 		for (int row=0; row<yhat.length; row++) {
-			if (yhat[row] != et.output[row]) {
+			if (yhat[row] != et2.output[row]) {
 				errors++;
 			}
 		}
