@@ -242,17 +242,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 		return values;
 	}
 
-	public int getValueMT(double[] x, int task) {
-		int[] counts = new int[nFactors];
-		for(FactorBinaryTree t : trees) {
-			int value = t.getValueMT(x, task);
-			if (value >= 0) {
-				counts[ value ]++;
-			}
-		}
-		return getMaxIndex(counts);
-	}
-
 	
 	/**
 	 * @param counts

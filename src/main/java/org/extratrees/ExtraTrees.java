@@ -150,15 +150,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return values;
 	}
 
-	public double getValueMT(double[] x, int task) {
-		double mean = 0;
-		for(BinaryTree t : trees) {
-			mean += t.getValueMT(x, task);
-		}
-		mean /= trees.size();
-		return mean;
-	}
-
 	/**
 	 * @param input
 	 * @return matrix of predictions where

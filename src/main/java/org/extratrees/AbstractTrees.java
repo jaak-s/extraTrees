@@ -396,6 +396,20 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		return aggr.getResult();
 	}
 	
+	public D getValueMT(double[] row, int task) {
+		Aggregator<D> aggr = getNewAggregator();
+		
+		for (E tree : trees) {
+			E leaf = tree.getLeafMT(row, task);
+			/** do not process NAs */
+			if (leaf != null) {
+				aggr.processLeaf( leaf.value );
+			}
+		}
+		return aggr.getResult();
+	}
+
+	
 	/**
 	 * @param n
 	 * @return int array of [0, 1, ..., n-1].
