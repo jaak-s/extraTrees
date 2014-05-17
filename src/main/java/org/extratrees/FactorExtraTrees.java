@@ -86,34 +86,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	}
 	
 	/**
-	 * @param trees
-	 * @param input
-	 * @param nFactors
-	 * @return majority voted class from several trees or -1 if all trees have no answer.
-	 */
-	public static int getValue(ArrayList<FactorBinaryTree> trees, double[] input, int nFactors) {
-		int[] counts = new int[nFactors];
-		for(FactorBinaryTree t : trees) {
-			// avoiding NA answers (when value is -1)
-			int value = t.getValue(input);
-			if (value >= 0) {
-				counts[ value ]++;
-			}
-		}
-		return getMaxIndex(counts);
-	}
-	
-	/** Average of several trees, using nmin as depth */
-	/*
-	public static double getValue(ArrayList<FactorBinaryTree> trees, double[] input, int nmin, int nFactors) {
-		int[] counts = new int[nFactors];
-		for(FactorBinaryTree t : trees) {
-			counts[ t.getValue(input, nmin) ]++;
-		}
-		return getMaxIndex(counts);
-	}*/
-
-	/**
 	 * @param values
 	 * @return index of the max positive value (first one if there are many) 
 	 * or -1 if all values are non-positive.
@@ -205,26 +177,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 				temp[col] = input.get(row, col);
 			}
 			values[row] = getValue(temp);
-		}
-		return values;
-	}
-	
-	/**
-	 * @param trees
-	 * @param input
-	 * @param nFactors
-	 * @return Average of several trees for many samples. 
-	 * Or -1 for samples that didn't get any prediction.
-	 */
-	public static int[] getValues(ArrayList<FactorBinaryTree> trees, Matrix input, int nFactors) {
-		int[]  values = new int[input.nrows()];
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row < input.nrows(); row++) {
-			// copying matrix row to temp:
-			for (int col=0; col < input.ncols(); col++) {
-				temp[col] = input.get(row, col);
-			}
-			values[row] = getValue(trees, temp, nFactors);
 		}
 		return values;
 	}
