@@ -421,6 +421,20 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		}
 		return values;
 	}
+	
+	public ArrayList<D> getValuesMTD(Matrix newInput, int[] tasks) {
+		ArrayList<D> values = new ArrayList<D>(newInput.nrows());
+		double[] temp = new double[newInput.ncols()];
+		for (int row=0; row<newInput.nrows(); row++) {
+			// copying matrix row to temp:
+			for (int col=0; col<newInput.ncols(); col++) {
+				temp[col] = newInput.get(row, col);
+			}
+			values.add( getValueMT(temp, tasks[row]) );
+		}
+		return values;
+	}
+
 
 	
 	/**

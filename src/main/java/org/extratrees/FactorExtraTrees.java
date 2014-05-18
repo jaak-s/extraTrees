@@ -181,18 +181,8 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	}
 	
 	public int[] getValuesMT(Matrix newInput, int[] tasks) {
-		int[] values = new int[newInput.nrows()];
-		double[] temp = new double[newInput.ncols()];
-		for (int row=0; row < newInput.nrows(); row++) {
-			// copying matrix row to temp:
-			for (int col=0; col < newInput.ncols(); col++) {
-				temp[col] = newInput.get(row, col);
-			}
-			values[row] = this.getValueMT(temp, tasks[row]);
-		}
-		return values;
+		return list2array( getValuesMTD(newInput, tasks) );
 	}
-
 	
 	/**
 	 * @param counts
