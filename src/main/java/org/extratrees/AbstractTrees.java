@@ -290,6 +290,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	
 	abstract public E makeLeaf(int[] ids, Set<Integer> leftTaskSet);
 	abstract Aggregator<D> getNewAggregator();
+	abstract double convertToDouble(D value);
 	
 	/**
 	 * Same as buildTrees() except computes in parallel.
@@ -433,6 +434,48 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 			values.add( getValueMT(temp, tasks[row]) );
 		}
 		return values;
+	}
+
+
+	/**
+	 * @param input
+	 * @return matrix of predictions where
+	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
+	 * All values are integers for FactorExtraTrees and ExtraTrees. 
+	 */
+	public Matrix getAllValues(Matrix input) {
+		Matrix out = new Matrix( input.nrows(), trees.size() );
+		// temporary vector:
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row < input.nrows(); row++) {
+			input.copyRow(row, temp);
+			for (int j=0; j < trees.size(); j++) {
+				out.set( row, j, convertToDouble(trees.get(j).getValue(temp)) );
+			}
+		}
+		return out;
+	}
+	
+	/**
+	 * @param input
+	 * @return matrix of predictions where
+	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
+	 * All values are integers. (or NaN)
+	 */
+	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
+		if (input.nrows() != tasks.length) {
+			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
+		}
+		Matrix out = new Matrix( input.nrows(), trees.size() );
+		// temporary vector:
+		double[] temp = new double[input.ncols()];
+		for (int row=0; row<input.nrows(); row++) {
+			input.copyRow(row, temp);
+			for (int j=0; j<trees.size(); j++) {
+				out.set( row, j, convertToDouble(trees.get(j).getValueMT(temp, tasks[row])) );
+			}
+		}
+		return out;
 	}
 
 

@@ -85,6 +85,11 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 		return new MajorityVote();
 	}
 	
+	@Override
+	double convertToDouble(Integer value) {
+		return value >= 0 ? value : NA;
+	}
+	
 	/**
 	 * @param values
 	 * @return index of the max positive value (first one if there are many) 
@@ -118,49 +123,6 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 			}
 		}
 		return maxIndex;
-	}
-
-	/**
-	 * @param input
-	 * @return matrix of predictions where
-	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
-	 * All values are integers. 
-	 */
-	public Matrix getAllValues(Matrix input) {
-		Matrix out = new Matrix( input.nrows(), trees.size() );
-		// temporary vector:
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row<input.nrows(); row++) {
-			input.copyRow(row, temp);
-			for (int j=0; j<trees.size(); j++) {
-				int value = trees.get(j).getValue(temp);
-				out.set( row, j, value >= 0 ? value : NA );
-			}
-		}
-		return out;
-	}
-
-	/**
-	 * @param input
-	 * @return matrix of predictions where
-	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
-	 * All values are integers. (or NaN)
-	 */
-	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
-		if (input.nrows() != tasks.length) {
-			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
-		}
-		Matrix out = new Matrix( input.nrows(), trees.size() );
-		// temporary vector:
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row<input.nrows(); row++) {
-			input.copyRow(row, temp);
-			for (int j=0; j<trees.size(); j++) {
-				int value = trees.get(j).getValueMT(temp, tasks[row]);
-				out.set( row, j, value >= 0 ? value : Double.NaN );
-			}
-		}
-		return out;
 	}
 	
 	private static int[] list2array(ArrayList<Integer> list) {

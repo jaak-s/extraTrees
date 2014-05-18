@@ -85,23 +85,10 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	Aggregator<Double> getNewAggregator() {
 		return new ArithmeticMean();
 	}
-	
-	/**
-	 * @param input
-	 * @return matrix of predictions where
-	 * output[i, j] gives prediction made for i-th row of input by j-th tree. 
-	 */
-	public Matrix getAllValues(Matrix input) {
-		Matrix out = new Matrix( input.nrows(), trees.size() );
-		// temporary vector:
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row<input.nrows(); row++) {
-			input.copyRow(row, temp);
-			for (int j=0; j<trees.size(); j++) {
-				out.set( row, j, trees.get(j).getValue(temp) );
-			}
-		}
-		return out;
+
+	@Override
+	double convertToDouble(Double value) {
+		return value;
 	}
 	
 	private static double[] list2array(ArrayList<Double> list) {
@@ -124,29 +111,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	public double[] getValuesMT(Matrix newInput, int[] tasks) {
 		return list2array( getValuesMTD(newInput, tasks) );
 	}
-
-	/**
-	 * @param input
-	 * @return matrix of predictions where
-	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
-	 */
-	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
-		if (input.nrows() != tasks.length) {
-			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
-		}
-		Matrix out = new Matrix( input.nrows(), trees.size() );
-		// temporary vector:
-		double[] temp = new double[input.ncols()];
-		for (int row=0; row < input.nrows(); row++) {
-			input.copyRow(row, temp);
-			for (int j=0; j<trees.size(); j++) {
-				out.set( row, j, trees.get(j).getValueMT(temp, tasks[row]) );
-			}
-		}
-		return out;
-	}
-
-	
 
 	@Override
 	protected BinaryTree makeFilledTree(BinaryTree leftTree, BinaryTree rightTree,
