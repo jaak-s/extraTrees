@@ -52,16 +52,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return newET;
 	}
 	
-	/** Builds trees with ids */
-	public ArrayList<BinaryTree> buildTrees(int nmin, int K, int nTrees, int[] ids) {
-		ArrayList<BinaryTree> trees = new ArrayList<BinaryTree>(nTrees);
-		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
-		for (int t=0; t<nTrees; t++) {
-			trees.add( this.buildTree(nmin, K, ids, cols, getSequenceSet(nTasks)) );
-		}
-		return trees;
-	}
-	
 	public class ArithmeticMean implements Aggregator<Double> {
 		double sum = 0;
 		int count;
