@@ -82,7 +82,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return value;
 	}
 	
-	private static double[] list2array(ArrayList<Double> list) {
+	protected static double[] listToArray(ArrayList<Double> list) {
 		double[] out = new double[ list.size() ];
 		for (int i = 0; i < out.length; i++) {
 			out[i] = list.get(i);
@@ -96,11 +96,11 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @return
 	 */
 	public double[] getValues(Array2D input) {
-		return list2array( getValuesD(input) );
+		return listToArray( getValuesD(input) );
 	}
 	
 	public double[] getValuesMT(Array2D newInput, int[] tasks) {
-		return list2array( getValuesMTD(newInput, tasks) );
+		return listToArray( getValuesMTD(newInput, tasks) );
 	}
 
 	@Override

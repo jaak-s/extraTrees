@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ BagTests.class, ExtraTreeTests.class, FactorTests.class,
 		MultitaskTests.class, NATests.class,
-		QuantileTests.class, QuickSelectTests.class, ShuffleTests.class })
+		QuantileTests.class, QuickSelectTests.class, ShuffleTests.class,
+		SparseMartixTest.class})
 public class AllFeatureTests {
 
 }
