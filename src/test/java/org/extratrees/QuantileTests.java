@@ -3,7 +3,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
-import org.extratrees.Matrix;
+import org.extratrees.data.Matrix;
 import org.junit.Test;
 
 public class QuantileTests {

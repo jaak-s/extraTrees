@@ -3,6 +3,9 @@ package org.extratrees;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.extratrees.data.Matrix;
+import org.extratrees.data.Row;
+
 public class QuantileExtraTrees extends ExtraTrees {
 
 	public QuantileExtraTrees(Matrix input, double[] output) {
@@ -18,12 +21,8 @@ public class QuantileExtraTrees extends ExtraTrees {
 	public double[] getQuantiles(Matrix input, double k) {
 		double[] quantileValues = new double[input.nrows()];
 		ArrayList<Double> leafValues = new ArrayList<Double>(this.trees.size());
-		double[] temp = new double[input.ncols()];
 		for (int row=0; row<input.nrows(); row++) {
-			// copy row to temp:
-			input.copyRow(row, temp);
-			// get all leaf values for temp:
-			getLeafValues(temp, leafValues);
+			getLeafValues(input.getRow(row), leafValues);
 			// doing quickselect:
 			quantileValues[row] = QuickSelect.quickSelect(leafValues, k);
 		}
@@ -35,7 +34,7 @@ public class QuantileExtraTrees extends ExtraTrees {
 	 * @param input
 	 * @param values 
 	 */
-	public void getLeafValues(double[] input, ArrayList<Double> values) {
+	public void getLeafValues(Row input, ArrayList<Double> values) {
 		values.clear();
 		for(BinaryTree t : trees) {
 			QuantileBinaryTree leaf = (QuantileBinaryTree)t.getLeaf(input);

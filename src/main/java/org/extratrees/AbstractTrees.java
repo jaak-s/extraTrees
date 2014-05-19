@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.extratrees.data.Matrix;
+import org.extratrees.data.Row;
+
 public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	Matrix input;
 	Random random = new Random();
@@ -383,7 +386,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		}
 	}
 	
-	public D getValue(double[] input) {
+	public D getValue(Row input) {
 		Aggregator<D> aggr = getNewAggregator();
 		
 		for (E tree : trees) {
@@ -397,11 +400,11 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		return aggr.getResult();
 	}
 	
-	public D getValueMT(double[] row, int task) {
+	public D getValueMT(Row input, int task) {
 		Aggregator<D> aggr = getNewAggregator();
 		
 		for (E tree : trees) {
-			E leaf = tree.getLeafMT(row, task);
+			E leaf = tree.getLeafMT(input, task);
 			/** do not process NAs */
 			if (leaf != null) {
 				aggr.processLeaf( leaf.value );
@@ -412,26 +415,16 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	
 	public ArrayList<D> getValuesD(Matrix input) {
 		ArrayList<D> values = new ArrayList<D>( input.nrows() );
-		double[] temp = new double[input.ncols()];
 		for (int row=0; row < input.nrows(); row++) {
-			// copying matrix row to temp:
-			for (int col=0; col < input.ncols(); col++) {
-				temp[col] = input.get(row, col);
-			}
-			values.add( getValue(temp) );
+			values.add( getValue(input.getRow(row)) );
 		}
 		return values;
 	}
 	
 	public ArrayList<D> getValuesMTD(Matrix newInput, int[] tasks) {
 		ArrayList<D> values = new ArrayList<D>(newInput.nrows());
-		double[] temp = new double[newInput.ncols()];
 		for (int row=0; row<newInput.nrows(); row++) {
-			// copying matrix row to temp:
-			for (int col=0; col<newInput.ncols(); col++) {
-				temp[col] = newInput.get(row, col);
-			}
-			values.add( getValueMT(temp, tasks[row]) );
+			values.add( getValueMT(newInput.getRow(row), tasks[row]) );
 		}
 		return values;
 	}
@@ -445,12 +438,11 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	 */
 	public Matrix getAllValues(Matrix input) {
 		Matrix out = new Matrix( input.nrows(), trees.size() );
-		// temporary vector:
-		double[] temp = new double[input.ncols()];
 		for (int row=0; row < input.nrows(); row++) {
-			input.copyRow(row, temp);
 			for (int j=0; j < trees.size(); j++) {
-				out.set( row, j, convertToDouble(trees.get(j).getValue(temp)) );
+				out.set( row, j, convertToDouble(trees.get(j).getValue(
+							input.getRow(row)
+				)) );
 			}
 		}
 		return out;
@@ -467,12 +459,12 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
 		}
 		Matrix out = new Matrix( input.nrows(), trees.size() );
-		// temporary vector:
-		double[] temp = new double[input.ncols()];
 		for (int row=0; row<input.nrows(); row++) {
-			input.copyRow(row, temp);
 			for (int j=0; j<trees.size(); j++) {
-				out.set( row, j, convertToDouble(trees.get(j).getValueMT(temp, tasks[row])) );
+				out.set( row, j, convertToDouble(trees.get(j).getValueMT(
+						input.getRow(row), 
+						tasks[row]
+				)) );
 			}
 		}
 		return out;

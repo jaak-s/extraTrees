@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.extratrees.data.Matrix;
 import org.junit.Test;
 
 public class MultitaskTests {

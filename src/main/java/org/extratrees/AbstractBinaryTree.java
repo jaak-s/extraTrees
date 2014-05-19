@@ -2,6 +2,8 @@ package org.extratrees;
 
 import java.util.Set;
 
+import org.extratrees.data.Row;
+
 /**
  * All subclasses should have their generic argument equal to itself, 
  * i.e. X extends AbstractBinaryTree<X>.
@@ -45,20 +47,20 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	 * @param input the vector of input values
 	 * @return the leaf node (BinaryTree) for the input
 	 */
-	public T getLeaf(double[] input) {
+	public T getLeaf(Row input) {
 		if (left==null) {
 			return getItself();
 		}
-		if (Double.isNaN(input[column])) {
+		if (Double.isNaN(input.get(column))) {
 			return null;
 		}
-		if (input[column]<threshold) {
+		if (input.get(column)<threshold) {
 			return left.getLeaf(input);
 		}
 		return right.getLeaf(input);
 	}
 	
-	public D getValue(double[] input) {
+	public D getValue(Row input) {
 		return valueFromLeaf( getLeaf(input) );
 	}
 	
@@ -67,7 +69,7 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	 * @param task
 	 * @return return multitask value for given input and task
 	 */
-	public T getLeafMT(double[] input, int task) {
+	public T getLeafMT(Row input, int task) {
 		if (left==null) {
 			return getItself();
 		}
@@ -78,18 +80,18 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 			}
 			return right.getLeafMT(input, task);
 		}
-		if (Double.isNaN(input[column])) {
+		if (Double.isNaN( input.get(column)) ) {
 			return null;
 		}
 		// feature cut
-		if (input[column]<threshold) {
+		if (input.get(column) < threshold) {
 			return left.getLeafMT(input, task);
 		}
 		return right.getLeafMT(input, task);
 
 	}
 
-	public D getValueMT(double[] input, int task) {
+	public D getValueMT(Row input, int task) {
 		return valueFromLeaf( getLeafMT(input, task) );
 	}
 	

@@ -2,6 +2,7 @@ package org.extratrees;
 
 import static org.junit.Assert.assertEquals;
 
+import org.extratrees.data.Matrix;
 import org.junit.Test;
 
 public class BenchmarkTests {

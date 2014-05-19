@@ -1,5 +1,6 @@
 package org.extratrees;
 
+import org.extratrees.data.Matrix;
 import org.junit.Test;
 
 public class BenchmarkRange {

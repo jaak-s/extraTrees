@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.extratrees.data.Matrix;
+
 
 public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	int[] output;

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Random;
 
 import org.extratrees.AbstractTrees.CutResult;
+import org.extratrees.data.Matrix;
 import org.junit.Test;
 
 

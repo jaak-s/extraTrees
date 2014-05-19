@@ -3,6 +3,7 @@ package org.extratrees;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.extratrees.data.Matrix;
 import org.junit.Test;
 
 public class BagTests {

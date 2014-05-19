@@ -1,6 +1,6 @@
-package org.extratrees;
+package org.extratrees.data;
 
-public class Matrix {
+public class Matrix implements Array2D {
 	public double[] v;
 	public int ncols, nrows;
 	
@@ -28,16 +28,38 @@ public class Matrix {
 		this.v[row + col*nrows] = value;
 	}
 	
+	@Override
 	public double get(int row, int col) {
 		return this.v[row + col*nrows];
 	}
 	
+	@Override
 	public int ncols() {
 		return ncols;
 	}
 	
+	@Override
 	public int nrows() {
 		return nrows;
+	}
+	
+	@Override
+	public Row getRow(int row) {
+		return new MRow(row);
+	}
+	
+	/**
+	 *  Provide access to rows of the matrix without copy-pasting
+	 */
+	public class MRow implements Row {
+		int row;
+		public MRow(int row) {
+			this.row = row;
+		}
+		@Override
+		public double get(int col) {
+			return Matrix.this.get(row, col);
+		}
 	}
 	
 	/**
