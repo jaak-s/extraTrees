@@ -3,12 +3,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.extratrees.data.Matrix;
+
 public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	double[] output;
 	double[] outputSq;
 	
-	// defined in AbstractTrees:
-	//ArrayList<BinaryTree> trees;
 	public ExtraTrees(Matrix input, double[] output) {
 		this(input, output, null);
 	}
