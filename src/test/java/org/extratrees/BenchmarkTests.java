@@ -50,7 +50,7 @@ public class BenchmarkTests {
 		assertEquals( false, et.isHasNaN() );
 		
 		Timer.tic();
-		et.learnTrees(5, 200, nTrees);
+		et.learnTrees(3, 200, nTrees);
 		Timer.toc(".learnTrees()");
 		
 		// get all predictions by trees:
@@ -113,7 +113,7 @@ public class BenchmarkTests {
 		et.setNumThreads(2);
 		
 		Timer.tic();
-		et.learnTrees(5, 200, nTrees);
+		et.learnTrees(3, 200, nTrees);
 		Timer.toc(".learnTrees()");
 		
 		// get all predictions by trees:

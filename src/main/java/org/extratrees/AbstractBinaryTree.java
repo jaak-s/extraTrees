@@ -7,7 +7,7 @@ import java.util.Set;
  * i.e. X extends AbstractBinaryTree<X>.
  * Otherwise getItself() will break. 
  * 
- * @author jaak
+ * @author Jaak Simm
  *
  * @param <T> class that extends ABT
  * @param <D> class of value
@@ -99,7 +99,7 @@ public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D>
 	 * @return value in the tree for <b>input</b>.
 	 */
 	public T getLeaf(double[] input, int nmin) {
-		if (this.nSuccessors < nmin || this.left == null) {
+		if (this.nSuccessors <= nmin || this.left == null) {
 			return getItself(); // leaf node OR below nmin
 		}
 		if (Double.isNaN(input[column])) {

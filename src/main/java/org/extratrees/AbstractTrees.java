@@ -710,7 +710,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	 */
 	public E buildTree(int nmin, int K, int[] ids, 
 			ShuffledIterator<Integer> randomCols, Set<Integer> taskSet) {
-		if (ids.length<nmin) {
+		if (ids.length < nmin) {
 			return makeLeaf(ids, taskSet);
 		}
 		// doing a shuffle of cols:
