@@ -14,8 +14,12 @@ toJavaMatrix <- function( m ) {
     if ( !is.matrix(m) ) { m = as.matrix(m) }
     if ( !is.double(m) ) { m = m + 0.0 }
     return(.jnew(
-        "org.extratrees.Matrix", .jarray(m), nrow(m), ncol(m)
+        "org.extratrees.data.Matrix", .jarray(m), nrow(m), ncol(m)
     ))
+}
+
+toJavaMatrix2D <- function( m ) {
+  .jcast(toJavaMatrix(m), new.class="org/extratrees/data/Array2D")
 }
 
 ## creates a new extraTrees object based on selection
@@ -184,7 +188,7 @@ extraTrees.default <- function(x, y,
         ## creating FactorExtraTree object with the data
         et$jobject = .jnew(
             "org.extratrees.FactorExtraTrees",
-            toJavaMatrix(x),
+            toJavaMatrix2D(x),
             .jarray( as.integer( as.integer(y)-1 ) )
         )
         .jcall( et$jobject, "V", "setnFactors", as.integer(length(et$levels)) )
@@ -192,7 +196,7 @@ extraTrees.default <- function(x, y,
         ## quantile regression:
         et$jobject = .jnew(
             "org.extratrees.QuantileExtraTrees",
-            toJavaMatrix(x),
+            toJavaMatrix2D(x),
             .jarray( as.double(y) )
         )
     } else {
@@ -200,7 +204,7 @@ extraTrees.default <- function(x, y,
         ## creating ExtraTree object with the data
         et$jobject = .jnew(
             "org.extratrees.ExtraTrees",
-            toJavaMatrix(x),
+            toJavaMatrix2D(x),
             .jarray( as.double(y) )
         )
     }

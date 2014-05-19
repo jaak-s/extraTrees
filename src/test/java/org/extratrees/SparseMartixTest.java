@@ -116,7 +116,7 @@ public class SparseMartixTest {
 		CSparseMatrix sm = new CSparseMatrix(
 				FactorExtraTrees.listToArray(r),
 				FactorExtraTrees.listToArray(c),
-				ExtraTrees.listToArray(v),
+				ExtraTrees.listToDArray(v),
 				ndata,
 				ncol
 		);

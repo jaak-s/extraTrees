@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.extratrees.data.Array2D;
-import org.extratrees.data.Matrix;
 
 public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	double[] output;
@@ -14,7 +13,6 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		this(input, output, null);
 	}
 	
-
 	/**
 	 * @param input    - matrix of inputs, each row is an input vector
 	 * @param output   - array of output values (doubles)
@@ -82,7 +80,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		return value;
 	}
 	
-	protected static double[] listToArray(ArrayList<Double> list) {
+	protected static double[] listToDArray(ArrayList<Double> list) {
 		double[] out = new double[ list.size() ];
 		for (int i = 0; i < out.length; i++) {
 			out[i] = list.get(i);
@@ -96,11 +94,11 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @return
 	 */
 	public double[] getValues(Array2D input) {
-		return listToArray( getValuesD(input) );
+		return listToDArray( getValuesD(input) );
 	}
 	
 	public double[] getValuesMT(Array2D newInput, int[] tasks) {
-		return listToArray( getValuesMTD(newInput, tasks) );
+		return listToDArray( getValuesMTD(newInput, tasks) );
 	}
 
 	@Override

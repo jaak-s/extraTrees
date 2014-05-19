@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.extratrees.data.Array2D;
-import org.extratrees.data.Matrix;
 
 
 public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {

@@ -32,7 +32,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
             stop("Can't use allValues=T with quantile.")
         }
         ## quantile regression:
-        return( .jcall( et$jobject, "[D", "getQuantiles", toJavaMatrix(newdata), quantile[1] ) )
+        return( .jcall( et$jobject, "[D", "getQuantiles", toJavaMatrix2D(newdata), quantile[1] ) )
     }
     if (allValues) {
         ## returning allValues prediction:
@@ -40,13 +40,18 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
             ## multi-task version:
             m = toRMatrix( .jcall( 
                 et$jobject,
-                "Lorg/extratrees/Matrix;", 
+                "Lorg/extratrees/data/Matrix;", 
                 "getAllValuesMT", 
-                toJavaMatrix(newdata),
+                toJavaMatrix2D(newdata),
                 .jarray(as.integer(newtasks-1))
             ))
         } else {
-            m = toRMatrix( .jcall( et$jobject, "Lorg/extratrees/Matrix;", "getAllValues", toJavaMatrix(newdata) ) )
+            m = toRMatrix( .jcall( 
+              et$jobject, 
+              "Lorg/extratrees/data/Matrix;", 
+              "getAllValues", 
+              toJavaMatrix2D(newdata) 
+            ) )
         }
         ## converting NaN to NA
         m[ is.nan(m) ] = NA
@@ -70,17 +75,17 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
     }
     if ( ! et$factor) {
         if (et$multitask) {
-            yhat = .jcall( et$jobject, "[D", "getValuesMT", toJavaMatrix(newdata), .jarray(as.integer(newtasks-1)) )
+            yhat = .jcall( et$jobject, "[D", "getValuesMT", toJavaMatrix2D(newdata), .jarray(as.integer(newtasks-1)) )
         } else {
-            yhat = .jcall( et$jobject, "[D", "getValues", toJavaMatrix(newdata) )
+            yhat = .jcall( et$jobject, "[D", "getValues", toJavaMatrix2D(newdata) )
         }
         yhat[ is.nan(yhat) ] = NA
         return(yhat)
     }
     if (et$multitask) {
-        yhat = .jcall( et$jobject, "[I", "getValuesMT", toJavaMatrix(newdata), .jarray(as.integer(newtasks-1)) )
+        yhat = .jcall( et$jobject, "[I", "getValuesMT", toJavaMatrix2D(newdata), .jarray(as.integer(newtasks-1)) )
     } else {
-        yhat = .jcall( et$jobject, "[I", "getValues", toJavaMatrix(newdata) )
+        yhat = .jcall( et$jobject, "[I", "getValues", toJavaMatrix2D(newdata) )
     }
     yhat[yhat < 0] = NA
     return( factor(yhat, levels=0:(length(et$levels)-1), labels=et$levels ) )
