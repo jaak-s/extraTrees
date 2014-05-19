@@ -3,13 +3,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.extratrees.data.Array2D;
 import org.extratrees.data.Matrix;
 
 public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	double[] output;
 	double[] outputSq;
 	
-	public ExtraTrees(Matrix input, double[] output) {
+	public ExtraTrees(Array2D input, double[] output) {
 		this(input, output, null);
 	}
 	
@@ -19,7 +20,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @param output   - array of output values (doubles)
 	 * @param tasks    - array of task indices from 0 nTasks-1, null if no multi-task learning
 	 */
-	public ExtraTrees(Matrix input, double[] output, int[] tasks) {
+	public ExtraTrees(Array2D input, double[] output, int[] tasks) {
 		if (input.nrows() != output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
@@ -94,11 +95,11 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * @param input
 	 * @return
 	 */
-	public double[] getValues(Matrix input) {
+	public double[] getValues(Array2D input) {
 		return list2array( getValuesD(input) );
 	}
 	
-	public double[] getValuesMT(Matrix newInput, int[] tasks) {
+	public double[] getValuesMT(Array2D newInput, int[] tasks) {
 		return list2array( getValuesMTD(newInput, tasks) );
 	}
 

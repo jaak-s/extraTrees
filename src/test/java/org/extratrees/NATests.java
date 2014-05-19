@@ -164,7 +164,7 @@ public class NATests {
 		assertTrue( Double.isNaN(val[0]) );
 		
 		// checking if getRange works with NaN
-		double[] col2   = et.input.getCol(2);
+		double[] col2   = ((Matrix)et.input).getCol(2);
 		double[] range2 = AbstractTrees.getRange( col2 );
 		assertEquals(0.5, range2[0], 1e-6);
 		assertEquals(0.5, range2[1], 1e-6);

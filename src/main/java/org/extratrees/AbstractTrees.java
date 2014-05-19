@@ -11,11 +11,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.extratrees.data.Array2D;
 import org.extratrees.data.Matrix;
 import org.extratrees.data.Row;
 
 public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
-	Matrix input;
+	Array2D input;
 	Random random = new Random();
 	double[] weights;
 	boolean useWeights;
@@ -27,7 +28,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	protected final static double NA = Double.NaN;
 
 
-	/** for multi-task learning, stores task indeces (null if not present) */
+	/** for multi-task learning, stores task indices (null if not present) */
 	int[] tasks;
 	
 	/** number of tasks: (tasks are indexed from 0 to (nTasks-1) */
@@ -117,7 +118,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		this.numRandomCuts = numRandomCuts;
 	}
 	
-	public void setInput(Matrix input) {
+	public void setInput(Array2D input) {
 		this.input = input;
 		// making cols list for later use:
 		this.cols = new ArrayList<Integer>(input.ncols());
@@ -218,7 +219,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	 * @param input
 	 * @return array of min and max values.
 	 */
-	protected static double[] getRange(int[] ids, int col, Matrix input) {
+	protected static double[] getRange(int[] ids, int col, Array2D input) {
 		double[] range = new double[2];
 		range[0] = Double.POSITIVE_INFINITY;
 		range[1] = Double.NEGATIVE_INFINITY;
@@ -413,7 +414,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		return aggr.getResult();
 	}
 	
-	public ArrayList<D> getValuesD(Matrix input) {
+	public ArrayList<D> getValuesD(Array2D input) {
 		ArrayList<D> values = new ArrayList<D>( input.nrows() );
 		for (int row=0; row < input.nrows(); row++) {
 			values.add( getValue(input.getRow(row)) );
@@ -421,7 +422,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		return values;
 	}
 	
-	public ArrayList<D> getValuesMTD(Matrix newInput, int[] tasks) {
+	public ArrayList<D> getValuesMTD(Array2D newInput, int[] tasks) {
 		ArrayList<D> values = new ArrayList<D>(newInput.nrows());
 		for (int row=0; row<newInput.nrows(); row++) {
 			values.add( getValueMT(newInput.getRow(row), tasks[row]) );
@@ -436,7 +437,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
 	 * All values are integers for FactorExtraTrees and ExtraTrees. 
 	 */
-	public Matrix getAllValues(Matrix input) {
+	public Matrix getAllValues(Array2D input) {
 		Matrix out = new Matrix( input.nrows(), trees.size() );
 		for (int row=0; row < input.nrows(); row++) {
 			for (int j=0; j < trees.size(); j++) {
@@ -454,7 +455,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	 * output[i, j] gives prediction made for i-th row of input by j-th tree.
 	 * All values are integers. (or NaN)
 	 */
-	public Matrix getAllValuesMT(Matrix input, int[] tasks) {
+	public Matrix getAllValuesMT(Array2D input, int[] tasks) {
 		if (input.nrows() != tasks.length) {
 			throw new IllegalArgumentException("Inputs and tasks do not have the same length.");
 		}
@@ -582,7 +583,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	 * @return filters ids <b>ids</b> into two arrays, one whose values in data values
 	 * {@code m[id, dim]} are below cut and others whose values are higher. 
 	 */
-	public static int[][] splitIds(Matrix m, int[] ids, int dim, double cut) {
+	public static int[][] splitIds(Array2D m, int[] ids, int dim, double cut) {
 		int[][] out = new int[2][];
 		int lenLower = 0;
 		for (int i=0; i<ids.length; i++) {

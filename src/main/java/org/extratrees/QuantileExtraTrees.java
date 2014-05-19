@@ -3,6 +3,7 @@ package org.extratrees;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.extratrees.data.Array2D;
 import org.extratrees.data.Matrix;
 import org.extratrees.data.Row;
 
@@ -18,7 +19,7 @@ public class QuantileExtraTrees extends ExtraTrees {
 	 * @param quantile a value between 0.0 and 1.0. For median use 0.5
 	 * @return return quantiles for each input row. 
 	 */
-	public double[] getQuantiles(Matrix input, double k) {
+	public double[] getQuantiles(Array2D input, double k) {
 		double[] quantileValues = new double[input.nrows()];
 		ArrayList<Double> leafValues = new ArrayList<Double>(this.trees.size());
 		for (int row=0; row<input.nrows(); row++) {

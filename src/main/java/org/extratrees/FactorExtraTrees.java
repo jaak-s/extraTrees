@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.extratrees.data.Array2D;
 import org.extratrees.data.Matrix;
 
 
@@ -11,7 +12,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	/** number of factors: */
 	int nFactors;
 
-	public FactorExtraTrees(Matrix input, int[] output) {
+	public FactorExtraTrees(Array2D input, int[] output) {
 		this(input, output, null);
 	}
 	
@@ -20,7 +21,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	 * @param output   - array of ints from 0 to nFactors-1 (class label)
 	 * @param tasks    - array of task indeces from 0 nTasks-1, null if no multi-task learning
 	 */
-	public FactorExtraTrees(Matrix input, int[] output, int[] tasks) {
+	public FactorExtraTrees(Array2D input, int[] output, int[] tasks) {
 		if (input.nrows() != output.length) {
 			throw(new IllegalArgumentException("Input and output do not have same length."));
 		}
@@ -140,11 +141,11 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
 	 * @param input
 	 * @return
 	 */
-	public int[] getValues(Matrix input) {
+	public int[] getValues(Array2D input) {
 		return list2array( getValuesD(input) );
 	}
 	
-	public int[] getValuesMT(Matrix newInput, int[] tasks) {
+	public int[] getValuesMT(Array2D newInput, int[] tasks) {
 		return list2array( getValuesMTD(newInput, tasks) );
 	}
 	
