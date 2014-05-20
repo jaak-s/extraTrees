@@ -9,23 +9,25 @@ get.data.regr <- function(n=800) {
 }
 
 train <- get.data.regr(100)
-test  <- get.data.regr(100)
+test  <- get.data.regr(101)
 
 test_that("basic regression and prediction", {  
   et    <- extraTrees(train$x, train$y, nodesize=1, mTry=2, numRandomCuts=2, ntree=50)
-  yhat  <- predict(et, test$x)
-
   expect_is   ( et, "extraTrees")
-  expect_equal( length(yhat), length(test$y) )
+  expect_false( et$factor )
+  expect_false( et$multitask )
   expect_equal( 50,    et$ntree )
+  
+  yhat  <- predict(et, test$x)
+  expect_equal( length(yhat), length(test$y) )
   expect_true(  is.numeric(yhat) )
   expect_true(  is.double(yhat) )
-  expect_false( et$factor )
   
   yall <- predict(et, test$x, allValues=T)
   expect_equal( nrow(yall), nrow(test$x) )
   expect_equal( ncol(yall), 50 )
   expect_true(  is.double(yall) )
+  expect_equal( yhat, rowMeans(yall), tolerance=1e-5)
 })
 
 test_that("integer y is used as double for regression", {  
@@ -50,6 +52,7 @@ test_that("multi-threaded regression works", {
   expect_equal( nrow(yall), nrow(test$x) )
   expect_equal( ncol(yall), 50 )
   expect_true(  is.double(yall) )
+  expect_equal( yhat, rowMeans(yall), tolerance=1e-5)
   
   expect_error( extraTrees(train$x, train$y, numThreads=0 ) )
 })

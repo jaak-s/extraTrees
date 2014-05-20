@@ -13,7 +13,7 @@ get.data.class <- function(n=800) {
 }
 
 train <- get.data.class(100)
-test  <- get.data.class(100)
+test  <- get.data.class(101)
 
 test_that("na.action='stop' gives error", {  
   expect_error( extraTrees(train$x, train$y, ntree=50, na.action='stop'), regex="NA" )
