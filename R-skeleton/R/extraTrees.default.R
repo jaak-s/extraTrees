@@ -18,6 +18,19 @@ toJavaMatrix <- function( m ) {
     ))
 }
 
+## converts R matrix (or data.frame) into Java CSparseMatrix
+toJavaCSMatrix <- function( m ) {
+  nzi = which(m != 0, arr.ind=TRUE)
+  v   = m[nzi]
+  return(.jnew("org.extratrees.data.CSparseMatrix", 
+               .jarray(nzi[,1] - as.integer(1)),
+               .jarray(nzi[,2] - as.integer(1)),
+               .jarray(as.double(v)),
+               nrow(m),
+               ncol(m)
+  ))
+}
+
 toJavaMatrix2D <- function( m ) {
   .jcast(toJavaMatrix(m), new.class="org/extratrees/data/Array2D")
 }
