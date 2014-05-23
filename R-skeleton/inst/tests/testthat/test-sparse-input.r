@@ -14,7 +14,7 @@ get.sparse.class <- function(n=800) {
   p = 40
   x = matrix(sample(0:1, n*p, prob=c(0.9, 0.1), replace=T), n, p)
   x = as(x, "sparseMatrix")
-  f = function(x) (rowSums(x[,1:20]) >= 3) + (rowSums(x[,21:p]) >= 4)
+  f = function(x) (Matrix::rowSums(x[,1:20]) >= 3) + (Matrix::rowSums(x[,21:p]) >= 4)
   y = factor(f(x), levels=0:2)
   return(list(x=x, y=y))
 }
