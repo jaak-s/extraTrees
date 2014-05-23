@@ -1,6 +1,6 @@
 
 
-## converts Java matrix to R matrix (doubles):
+## converts Java org.extratrees.data.Matrix to R matrix (doubles):
 toRMatrix <- function( javam ) {
     return( matrix( 
         .jfield(javam, "[D", "v" ),
@@ -20,19 +20,25 @@ toJavaMatrix <- function( m ) {
 
 ## converts R matrix (or data.frame) into Java CSparseMatrix
 toJavaCSMatrix <- function( m ) {
-  nzi = which(m != 0, arr.ind=TRUE)
-  v   = m[nzi]
-  return(.jnew("org.extratrees.data.CSparseMatrix", 
-               .jarray(nzi[,1] - as.integer(1)),
-               .jarray(nzi[,2] - as.integer(1)),
-               .jarray(as.double(v)),
-               nrow(m),
-               ncol(m)
-  ))
+    nzi = Matrix::which(m != 0, arr.ind=TRUE)
+    v   = m[nzi]
+    return(.jnew("org.extratrees.data.CSparseMatrix", 
+                 .jarray(nzi[,1] - as.integer(1)),
+                 .jarray(nzi[,2] - as.integer(1)),
+                 .jarray(as.double(v)),
+                 nrow(m),
+                 ncol(m)
+    ))
 }
 
+## converts R matrix, data.frame or sparseMatrix into Java Array2D
 toJavaMatrix2D <- function( m ) {
-  .jcast(toJavaMatrix(m), new.class="org/extratrees/data/Array2D")
+  if ( is(m, "sparseMatrix") ) {
+    jm = .jcast(toJavaCSMatrix(m), new.class="org/extratrees/data/Array2D")
+  } else {
+    jm = .jcast(toJavaMatrix(m), new.class="org/extratrees/data/Array2D")
+  }
+  return( jm )
 }
 
 ## creates a new extraTrees object based on selection
