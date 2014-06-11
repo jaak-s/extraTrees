@@ -1,5 +1,5 @@
 
-predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, newtasks=NULL, ... )
+predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, prob=F, newtasks=NULL, ... )
 {
     if (!inherits(object, "extraTrees")) {
         stop("Object not of class extraTrees")
@@ -12,6 +12,10 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
     
     if (!et$multitask && ! is.null(newtasks)) {
         stop("to predict with newtasks extraTrees must be trained with tasks")
+    }
+    
+    if (prob && ! et$factor) {
+        stop("prob=TRUE can be only used for factor model (classification).")
     }
     
     ## making sure no NAs: !!! we now support NAs in Java
@@ -34,7 +38,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
         ## quantile regression:
         return( .jcall( et$jobject, "[D", "getQuantiles", toJavaMatrix2D(newdata), quantile[1] ) )
     }
-    if (allValues) {
+    if (allValues || prob) {
         ## returning allValues prediction:
         if (et$multitask) {
             ## multi-task version:
@@ -59,6 +63,12 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, new
             ## regression model:
             return(m)
         }
+        if (prob) {
+          counts = t( apply(m+1, 1, tabulate, nbins=length(et$levels)) )
+          counts = counts / rowSums(counts)
+          return(counts)
+        }
+        
         ## factor model: convert double matrix into data.frame of factors
         lvls = 0:(length(et$levels)-1)
         ## converting NaN to NA
