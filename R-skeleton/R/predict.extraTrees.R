@@ -66,6 +66,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, pro
         if (prob) {
           counts = t( apply(m+1, 1, tabulate, nbins=length(et$levels)) )
           counts = counts / rowSums(counts)
+          colnames(counts) = et$levels
           return(counts)
         }
         
