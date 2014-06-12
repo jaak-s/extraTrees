@@ -64,6 +64,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, pro
             return(m)
         }
         if (prob) {
+          ## following code assumes (correctly) we have at least 2 classes
           counts = t( apply(m+1, 1, tabulate, nbins=length(et$levels)) )
           counts = counts / rowSums(counts)
           colnames(counts) = et$levels
