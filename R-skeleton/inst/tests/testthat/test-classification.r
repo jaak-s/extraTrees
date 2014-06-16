@@ -38,4 +38,5 @@ test_that("basic classification and prediction", {
   expect_equal( ncol(yprob), nlevels(train$y) )
   expect_equal( colnames(yprob), levels(train$y) )  
   expect_equal( unname(mean(yall[1,]==0)), unname(yprob[1,1]), tolerance=1e-6 )
+  expect_equal( rowSums(yprob), rep.int(1, nrow(yprob)) )
 })
