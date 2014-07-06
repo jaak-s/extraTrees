@@ -24,6 +24,7 @@ install.packages("C:\\Users\\...\\extraTrees", type="source", repos=NULL)
 ```
 
 ## Running included tests
+After the package is installed you can run the R tests.
 ```R
 library(testthat)
 test_package("extraTrees")
