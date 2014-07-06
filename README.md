@@ -3,8 +3,7 @@ extraTrees
 
 ExtraTrees method for Java and R. ExtraTrees trains an ensemble of binary decision trees for *classification* and *regression*. ExtraTrees is very closely related to RandomForest. 
 
-The software is available in R (2.15.2 and up). For Java please clone the
-repository.
+The software is available in R (2.15.2 and up).
 
 ```R
 ## Installing:
@@ -26,4 +25,7 @@ y <- (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4) +
 et <- extraTrees(x, y)
 yhat <- predict(et, x)
 ```
+
+## Java setup
+For Java or development checkout the git repository and follow [development.md](development.md).
 
