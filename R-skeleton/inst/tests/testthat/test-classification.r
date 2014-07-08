@@ -32,7 +32,7 @@ test_that("basic classification and prediction", {
   expect_false( is.numeric(yall) )
   
   ## probability prediction
-  yprob = predict(et, test$x, prob=T)
+  yprob = predict(et, test$x, probability=T)
   expect_true ( is.numeric(yprob) )
   expect_equal( nrow(yprob), nrow(test$x) )
   expect_equal( ncol(yprob), nlevels(train$y) )
