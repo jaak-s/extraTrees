@@ -1,5 +1,5 @@
 
-predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, prob=F, newtasks=NULL, ... )
+predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, probability=F, newtasks=NULL, ... )
 {
     if (!inherits(object, "extraTrees")) {
         stop("Object not of class extraTrees")
@@ -14,8 +14,8 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, pro
         stop("to predict with newtasks extraTrees must be trained with tasks")
     }
     
-    if (prob && ! et$factor) {
-        stop("prob=TRUE can be only used for factor model (classification).")
+    if (probability && ! et$factor) {
+        stop("probability=TRUE can be only used for factor model (classification).")
     }
     
     ## making sure no NAs: !!! we now support NAs in Java
@@ -38,7 +38,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, pro
         ## quantile regression:
         return( .jcall( et$jobject, "[D", "getQuantiles", toJavaMatrix2D(newdata), quantile[1] ) )
     }
-    if (allValues || prob) {
+    if (allValues || probability) {
         ## returning allValues prediction:
         if (et$multitask) {
             ## multi-task version:
@@ -63,7 +63,7 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, pro
             ## regression model:
             return(m)
         }
-        if (prob) {
+        if (probability) {
           ## following code assumes (correctly) we have at least 2 classes
           counts = t( apply(m+1, 1, tabulate, nbins=length(et$levels)) )
           counts = counts / rowSums(counts)
