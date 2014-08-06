@@ -80,8 +80,8 @@ extraTrees.default <- function(x, y,
              numThreads = 1,
              quantile = F,
              weights = NULL,
-             bagSizes = NULL,
-             bagLabels = NULL,
+             subsetSizes = NULL,
+             subsetLabels = NULL,
              tasks = NULL,
              probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
@@ -119,7 +119,7 @@ extraTrees.default <- function(x, y,
     et$numThreads = numThreads
     et$quantile   = quantile
     et$useWeights = ! is.null(weights)
-    et$useBagging = ! is.null(bagSizes) && sum(bagSizes) != nrow(x)
+    et$usesubsetting = ! is.null(subsetSizes) && sum(subsetSizes) != nrow(x)
     et$multitask  = ! is.null(tasks)
     et$probOfTaskCuts = probOfTaskCuts
     et$numRandomTaskCuts = numRandomTaskCuts
@@ -156,22 +156,22 @@ extraTrees.default <- function(x, y,
       }
     }
     
-    if ( et$useBagging ) {
-      if (sum(bagSizes) > nrow(x)) {
-        stop(sprintf("Total of bagSizes (%d) should not be bigger than the number of samples in x (%d).", sum(bagSizes), nrow(x) ))
+    if ( et$usesubsetting ) {
+      if (sum(subsetSizes) > nrow(x)) {
+        stop(sprintf("Total of subsetSizes (%d) should not be bigger than the number of samples in x (%d).", sum(subsetSizes), nrow(x) ))
       }
-      ## if only one bag size then bagLabels are not used
-      if (length(bagSizes) >= 2) {
-        if (nrow(x) != length(bagLabels)) {
-          stop(sprintf("Length of bagLabels (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
+      ## if only one subset size then subsetLabels are not used
+      if (length(subsetSizes) >= 2) {
+        if (nrow(x) != length(subsetLabels)) {
+          stop(sprintf("Length of subsetLabels (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
         }
-        if ( ! is.factor(bagLabels) ) {
-          bagLabels = as.factor( bagLabels )
+        if ( ! is.factor(subsetLabels) ) {
+          subsetLabels = as.factor( subsetLabels )
         }
         
-        numUnique = length(levels(bagLabels))
-        if (numUnique != length(bagSizes)) {
-          stop(sprintf("Number of unique bagLabels (%d) has to be the same as length of number of bagSizes (%d).", numUnique, length(bagSizes)  ))
+        numUnique = length(levels(subsetLabels))
+        if (numUnique != length(subsetSizes)) {
+          stop(sprintf("Number of unique subsetLabels (%d) has to be the same as length of number of subsetSizes (%d).", numUnique, length(subsetSizes)  ))
         }
       }
     }
@@ -243,14 +243,14 @@ extraTrees.default <- function(x, y,
       .jcall( et$jobject, "V", "setWeights", .jarray(as.double(weights)) )
     }
     
-    ## if given set bagging:
-    if (et$useBagging) {
-      if (length(bagSizes) == 1) {
-        .jcall( et$jobject, "V", "setBagging", as.integer(bagSizes[1]) )
+    ## if given set subsetting:
+    if (et$usesubsetting) {
+      if (length(subsetSizes) == 1) {
+        .jcall( et$jobject, "V", "setSubsetting", as.integer(subsetSizes[1]) )
       } else {
-        .jcall( et$jobject, "V", "setBagging", 
-                .jarray(as.integer( bagSizes )), 
-                .jarray(as.integer( as.integer(bagLabels)-1 )) 
+        .jcall( et$jobject, "V", "setSubsetting", 
+                .jarray(as.integer( subsetSizes )), 
+                .jarray(as.integer( as.integer(subsetLabels)-1 )) 
               )
       }
     }

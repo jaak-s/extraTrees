@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.extratrees.data.Matrix;
 import org.junit.Test;
 
-public class BagTests {
+public class SubsetTests {
 	public static ExtraTrees getSampleData(int ndata, int ndim) {
 		double[] output = new double[ndata];
 		double[] v = new double[ndata*ndim];
@@ -27,28 +27,28 @@ public class BagTests {
 	@Test
 	public void test() {
 		ExtraTrees et = getSampleData(100, 10);
-		assertTrue( et.bagElems == null );
-		assertTrue( et.bagSizes == null );
+		assertTrue( et.subsetElems == null );
+		assertTrue( et.subsetSizes == null );
 		
-		et.setBagging(90);
-		assertArrayEquals(new int[]{90}, et.bagSizes);
+		et.setSubsetting(90);
+		assertArrayEquals(new int[]{90}, et.subsetSizes);
 		
 		int[] ids = et.getInitialSamples();
-		assertTrue("Random bag should contain 90 samples.", ids.length == 90);
+		assertTrue("Random subset should contain 90 samples.", ids.length == 90);
 		
-		int[] bagLabels = new int[100];
-		for (int i = 0; i<bagLabels.length; i++) {
-			bagLabels[i] = (i < 30) ?0 :1;
+		int[] subsetLabels = new int[100];
+		for (int i = 0; i<subsetLabels.length; i++) {
+			subsetLabels[i] = (i < 30) ?0 :1;
 		}
-		int[] bagSizes = new int[]{9, 50};
-		et.setBagging( bagSizes, bagLabels );
+		int[] subsetSizes = new int[]{9, 50};
+		et.setSubsetting( subsetSizes, subsetLabels );
 		
-		assertArrayEquals(bagSizes, et.bagSizes);
-		assertArrayEquals(AbstractTrees.seq(30), et.bagElems[0]);
-		assertArrayEquals(AbstractTrees.seq(30, 100), et.bagElems[1]);
+		assertArrayEquals(subsetSizes, et.subsetSizes);
+		assertArrayEquals(AbstractTrees.seq(30), et.subsetElems[0]);
+		assertArrayEquals(AbstractTrees.seq(30, 100), et.subsetElems[1]);
 
 		ids = et.getInitialSamples();
-		assertTrue("Random bag should contain 59 samples.", ids.length == AbstractTrees.sum(bagSizes) );
+		assertTrue("Random subset should contain 59 samples.", ids.length == AbstractTrees.sum(subsetSizes) );
 
 		et.learnTrees(5, 3, 10);
 	}

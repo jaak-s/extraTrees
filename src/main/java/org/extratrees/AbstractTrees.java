@@ -21,8 +21,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	double[] weights;
 	boolean useWeights;
 	boolean hasNaN = false;
-	int[] bagSizes = null;
-	int[][] bagElems = null;
+	int[] subsetSizes = null;
+	int[][] subsetElems = null;
 	protected final static double zero=1e-7;
 	/** value to be returned when there is no answer, i.e., not available */
 	protected final static double NA = Double.NaN;
@@ -150,47 +150,47 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	}
 	
 	/**
-	 * Sets bag size to bagSize, so each tree is only built with bagSize (randomly selected) samples.
-	 * @param bagSize
+	 * Sets subset size to subsetSize, so each tree is only built with subsetSize (randomly selected) samples.
+	 * @param subsetSize
 	 */
-	public void setBagging(int bagSize) {
-		if (bagSize > input.nrows()) {
-			throw( new IllegalArgumentException("Supplied bagSize exceeds the number of samples.") );
+	public void setSubsetting(int subsetSize) {
+		if (subsetSize > input.nrows()) {
+			throw( new IllegalArgumentException("Supplied subsetSize exceeds the number of samples.") );
 		}
-		this.bagSizes = new int[]{ bagSize };
+		this.subsetSizes = new int[]{ subsetSize };
 	}
 
 	/**
-	 * Sets bag sizes for each bag label group. 
-	 * @param bagSizes   int[] size of the bag for each label
-	 * @param bagLabels  int[] bag label for each sample, all from 0 to (Nbags - 1)
+	 * Sets subset sizes for each subset label group. 
+	 * @param subsetSizes   int[] size of the subset for each label
+	 * @param subsetLabels  int[] subset label for each sample, all from 0 to (Nsubsets - 1)
 	 */
-	public void setBagging(int[] bagSizes, int[] bagLabels) {
-		if (bagLabels.length != input.nrows()) {
-			throw( new IllegalArgumentException("size of bagLabels has to equal to the number of input rows.") );
+	public void setSubsetting(int[] subsetSizes, int[] subsetLabels) {
+		if (subsetLabels.length != input.nrows()) {
+			throw( new IllegalArgumentException("size of subsetLabels has to equal to the number of input rows.") );
 		}
-		this.bagSizes = bagSizes;
-		int[] counts = new int[bagSizes.length];
+		this.subsetSizes = subsetSizes;
+		int[] counts = new int[subsetSizes.length];
 		for (int i=0; i<input.nrows(); i++) {
-			counts[ bagLabels[i] ]++;
+			counts[ subsetLabels[i] ]++;
 		}
-		// making sure all bags have enough elements:
-		this.bagElems = new int[counts.length][];
-		for (int bag=0; bag < counts.length; bag++) {
-			if (counts[bag] < bagSizes[bag]) {
+		// making sure all subsets have enough elements:
+		this.subsetElems = new int[counts.length][];
+		for (int subset=0; subset < counts.length; subset++) {
+			if (counts[subset] < subsetSizes[subset]) {
 				throw( new IllegalArgumentException( 
-						String.format("Bag %d has less elements (%d) than requested by bag size (%d).",
-								bag, counts[bag], bagSizes[bag]
+						String.format("subset %d has less elements (%d) than requested by subset size (%d).",
+								subset, counts[subset], subsetSizes[subset]
 						)));
 			}
-			this.bagElems[bag] = new int[ counts[bag] ];
+			this.subsetElems[subset] = new int[ counts[subset] ];
 		}
-		// adding elements to the appropriate bags:
+		// adding elements to the appropriate subsets:
 		for (int i=0; i < input.nrows(); i++) {
-			int bag = bagLabels[i];
-			int j = this.bagElems[bag].length - counts[bag];
-			counts[bag]--;
-			this.bagElems[bag][j] = i;
+			int subset = subsetLabels[i];
+			int j = this.subsetElems[subset].length - counts[subset];
+			counts[subset]--;
+			this.subsetElems[subset][j] = i;
 		}
 
 	}
@@ -530,34 +530,34 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	}
 
 	protected int[] getInitialSamples() {
-		if (bagSizes == null) {
+		if (subsetSizes == null) {
 			return seq( input.nrows() );
 		}
-		if (bagSizes.length == 1) {
+		if (subsetSizes.length == 1) {
 			ArrayList<Integer> allIds = arrayToList( seq( input.nrows() ) );
 			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds);
 			
-			int[] bag = new int[ bagSizes[0] ];
-			for (int i=0; i < bag.length; i++) {
-				bag[i] = shuffle.next();
+			int[] subset = new int[ subsetSizes[0] ];
+			for (int i=0; i < subset.length; i++) {
+				subset[i] = shuffle.next();
 			}
-			return bag;
+			return subset;
 		}
-		// selecting random samples from each bag:
-		int[] bag = new int[ sum(bagSizes) ];
+		// selecting random samples from each subset:
+		int[] subset = new int[ sum(subsetSizes) ];
 		int i = 0;
-		for (int b=0; b < bagSizes.length; b++) {
-			ArrayList<Integer> ids = arrayToList( bagElems[b] );
+		for (int b=0; b < subsetSizes.length; b++) {
+			ArrayList<Integer> ids = arrayToList( subsetElems[b] );
 			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(ids);
 
-			// filling with elements from bag[b]:
-			for (int n = i + bagSizes[b]; i < n; i++) {
-				bag[i] = shuffle.next();
+			// filling with elements from subset[b]:
+			for (int n = i + subsetSizes[b]; i < n; i++) {
+				subset[i] = shuffle.next();
 			}
 			
 		}
 		
-		return bag; 
+		return subset; 
 	}
 
 	/** @return penalty for NaN values for the given ids */
