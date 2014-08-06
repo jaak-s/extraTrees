@@ -28,11 +28,6 @@
   
   <target name="dist" depends="compile"
         description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <!-- not needed for R:
-    <mkdir dir="${dist}/lib"/>
-     -->
-    
     <!-- Copy skeletong to the new directory -->
     <copy todir="${dist}">
     	<fileset dir="${skeleton}"/>
@@ -44,8 +39,10 @@
     	<fileset dir="${src}"/>
   	</copy>
   	 -->
+  	<!--
   	<copy file="LICENSE" todir="${dist}" />
   	<copy file="NOTICE" todir="${dist}" />
+  	 -->
     
     <!-- Put everything in ${build} into the ExtraTrees.jar file -->
     <jar jarfile="${dist}/inst/java/ExtraTrees.jar" basedir="${build}"/>
