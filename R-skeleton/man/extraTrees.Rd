@@ -17,7 +17,7 @@
              quantile = F,
              weights = NULL,
              subsetSizes = NULL,
-             subsetLabels = NULL,
+             subsetGroups = NULL,
              tasks = NULL,
              probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
@@ -36,8 +36,8 @@
   \item{quantile}{ if TRUE then quantile regression is performed (default is FALSE), only for regression data.
                    Then use predict(et, newdata, quantile=k) to make predictions for k quantile. }
   \item{weights}{ list of weights, positive real values. NULL means standard learning, i.e. equal weights. }
-  \item{subsetSizes}{ subset size (one integer) or subset sizes (vector of integers, requires subsetLabels), if supplied every tree is built from a random subset of size subsetSizes. NULL means no subsetting, i.e. all samples are used. }
-  \item{subsetLabels}{ list specifying subset label for every sample: from samples with label g, each tree will randomly select subsetSizes[g] samples. }
+  \item{subsetSizes}{ subset size (one integer) or subset sizes (vector of integers, requires subsetGroups), if supplied every tree is built from a random subset of size subsetSizes. NULL means no subsetting, i.e. all samples are used. }
+  \item{subsetGroups}{ list specifying subset group for each sample: from samples in group g, each tree will randomly select subsetSizes[g] samples. }
   \item{tasks}{ list of tasks, integers from 1 and up. NULL if no multi-task learning }
   \item{probOfTaskCuts}{ probability of performing task cut at a node (default mtry / ncol(x)). Used only if tasks is specified. } 
   \item{numRandomTaskCuts}{ number of times task cut is performed at a node (default 1). Used only if tasks is specified. }

@@ -18,7 +18,7 @@ y = as.factor( c(rep(1, nPos), rep(0, nUnlabelled) ) )
 na.ind = sample.int(nrow(x), size=round(nrow(x)/10), replace=F)
 x[na.ind, 4] = NA
 w = c(rep(1, nPos), rep(0.1, nUnlabelled) )
-subsetLabels = c(rep(1, nPos), rep(2, nUnlabelled))
+subsetGroups = c(rep(1, nPos), rep(2, nUnlabelled))
 subsetSizes  = c(nPos, nPos)
 
 xtest = fx.all( 10000 )
@@ -29,8 +29,8 @@ methods = list()
 methods$et = extraTrees(x, y, nodesize=2, mTry=p-1, numRandomCuts=2)
 methods$et2 = extraTrees(x[1:(2*nPos),], y[1:(2*nPos)], nodesize=2, mTry=p-1, numRandomCuts=2)
 methods$etw = extraTrees(x, y, nodesize=8, mTry=p-1, numRandomCuts=2, weights=w )
-methods$etb = extraTrees(x, y, nodesize=2, mTry=p-1, numRandomCuts=2, subsetLabels=subsetLabels, subsetSizes=subsetSizes )
-methods$etwb = extraTrees(x, y, nodesize=8, mTry=p-1, numRandomCuts=2, subsetLabels=subsetLabels, subsetSizes=c(nPos, 4*nPos), 
+methods$etb = extraTrees(x, y, nodesize=2, mTry=p-1, numRandomCuts=2, subsetGroups=subsetGroups, subsetSizes=subsetSizes )
+methods$etwb = extraTrees(x, y, nodesize=8, mTry=p-1, numRandomCuts=2, subsetGroups=subsetGroups, subsetSizes=c(nPos, 4*nPos), 
                           weights=c(rep(1, nPos), rep(0.25, nUnlabelled)) )
 
 yhat = lapply( methods, predict, xtest)

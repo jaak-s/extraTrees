@@ -163,16 +163,16 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	/**
 	 * Sets subset sizes for each subset label group. 
 	 * @param subsetSizes   int[] size of the subset for each label
-	 * @param subsetLabels  int[] subset label for each sample, all from 0 to (Nsubsets - 1)
+	 * @param subsetGroups  int[] subset label for each sample, all from 0 to (Nsubsets - 1)
 	 */
-	public void setSubsetting(int[] subsetSizes, int[] subsetLabels) {
-		if (subsetLabels.length != input.nrows()) {
-			throw( new IllegalArgumentException("size of subsetLabels has to equal to the number of input rows.") );
+	public void setSubsetting(int[] subsetSizes, int[] subsetGroups) {
+		if (subsetGroups.length != input.nrows()) {
+			throw( new IllegalArgumentException("size of subsetGroups has to equal to the number of input rows.") );
 		}
 		this.subsetSizes = subsetSizes;
 		int[] counts = new int[subsetSizes.length];
 		for (int i=0; i<input.nrows(); i++) {
-			counts[ subsetLabels[i] ]++;
+			counts[ subsetGroups[i] ]++;
 		}
 		// making sure all subsets have enough elements:
 		this.subsetElems = new int[counts.length][];
@@ -187,7 +187,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 		}
 		// adding elements to the appropriate subsets:
 		for (int i=0; i < input.nrows(); i++) {
-			int subset = subsetLabels[i];
+			int subset = subsetGroups[i];
 			int j = this.subsetElems[subset].length - counts[subset];
 			counts[subset]--;
 			this.subsetElems[subset][j] = i;

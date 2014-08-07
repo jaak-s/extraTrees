@@ -81,7 +81,7 @@ extraTrees.default <- function(x, y,
              quantile = F,
              weights = NULL,
              subsetSizes = NULL,
-             subsetLabels = NULL,
+             subsetGroups = NULL,
              tasks = NULL,
              probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
@@ -160,18 +160,18 @@ extraTrees.default <- function(x, y,
       if (sum(subsetSizes) > nrow(x)) {
         stop(sprintf("Total of subsetSizes (%d) should not be bigger than the number of samples in x (%d).", sum(subsetSizes), nrow(x) ))
       }
-      ## if only one subset size then subsetLabels are not used
+      ## if only one subset size then subsetGroups are not used
       if (length(subsetSizes) >= 2) {
-        if (nrow(x) != length(subsetLabels)) {
-          stop(sprintf("Length of subsetLabels (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
+        if (nrow(x) != length(subsetGroups)) {
+          stop(sprintf("Length of subsetGroups (%d) is not equal to the number of samples in x (%d).", length(weights), nrow(x) ) )
         }
-        if ( ! is.factor(subsetLabels) ) {
-          subsetLabels = as.factor( subsetLabels )
+        if ( ! is.factor(subsetGroups) ) {
+          subsetGroups = as.factor( subsetGroups )
         }
         
-        numUnique = length(levels(subsetLabels))
+        numUnique = length(levels(subsetGroups))
         if (numUnique != length(subsetSizes)) {
-          stop(sprintf("Number of unique subsetLabels (%d) has to be the same as length of number of subsetSizes (%d).", numUnique, length(subsetSizes)  ))
+          stop(sprintf("Number of unique subsetGroups (%d) has to be the same as length of number of subsetSizes (%d).", numUnique, length(subsetSizes)  ))
         }
       }
     }
@@ -250,7 +250,7 @@ extraTrees.default <- function(x, y,
       } else {
         .jcall( et$jobject, "V", "setSubsetting", 
                 .jarray(as.integer( subsetSizes )), 
-                .jarray(as.integer( as.integer(subsetLabels)-1 )) 
+                .jarray(as.integer( as.integer(subsetGroups)-1 )) 
               )
       }
     }

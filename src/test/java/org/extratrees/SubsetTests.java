@@ -36,12 +36,12 @@ public class SubsetTests {
 		int[] ids = et.getInitialSamples();
 		assertTrue("Random subset should contain 90 samples.", ids.length == 90);
 		
-		int[] subsetLabels = new int[100];
-		for (int i = 0; i<subsetLabels.length; i++) {
-			subsetLabels[i] = (i < 30) ?0 :1;
+		int[] subsetGroups = new int[100];
+		for (int i = 0; i<subsetGroups.length; i++) {
+			subsetGroups[i] = (i < 30) ?0 :1;
 		}
 		int[] subsetSizes = new int[]{9, 50};
-		et.setSubsetting( subsetSizes, subsetLabels );
+		et.setSubsetting( subsetSizes, subsetGroups );
 		
 		assertArrayEquals(subsetSizes, et.subsetSizes);
 		assertArrayEquals(AbstractTrees.seq(30), et.subsetElems[0]);
