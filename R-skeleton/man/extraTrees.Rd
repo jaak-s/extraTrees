@@ -73,9 +73,9 @@
   n <- 1000  ## number of samples
   p <- 5     ## number of dimensions
   x <- matrix(runif(n*p), n, p)
-  task <- sample(1:10, size=n, replace=T)
+  task <- sample(1:10, size=n, replace=TRUE)
   ## y depends on the task: 
-  y <- 0.5*(x[,1]>0.5) + 0.6*(x[,2]>0.6) + 0.8*(x[cbind(1:n,(task %% 2) + 3)]>0.4)
+  y <- 0.5*(x[,1]>0.5) + 0.6*(x[,2]>0.6) + 0.8*(x[cbind(1:n,(task \%\% 2) + 3)]>0.4)
   et <- extraTrees(x, y, nodesize=3, mtry=p-1, numRandomCuts=2, tasks=task)
   yhat <- predict(et, x, newtasks=task)
 }
