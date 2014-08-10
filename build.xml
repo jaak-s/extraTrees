@@ -39,7 +39,7 @@
   	</copy>
   	
 <!--   	<copy file="LICENSE" todir="${dist}" /> -->
-  	<copy file="NOTICE" todir="${dist}" />
+<!--   	<copy file="NOTICE" todir="${dist}" /> -->
     
     <!-- Put everything in ${build} into the ExtraTrees.jar file -->
     <jar jarfile="${dist}/inst/java/ExtraTrees.jar" basedir="${build}"/>
