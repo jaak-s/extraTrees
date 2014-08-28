@@ -85,8 +85,7 @@ extraTrees.default <- function(x, y,
              tasks = NULL,
              probOfTaskCuts = mtry / ncol(x),
              numRandomTaskCuts = 1,
-             na.action = "stop",
-             ...) {
+             na.action = "stop") {
     n <- nrow(x)
     p <- ncol(x)
     if (n == 0) stop("data (x) has 0 rows")

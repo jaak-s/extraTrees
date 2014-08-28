@@ -1,5 +1,5 @@
 
-predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, probability=F, newtasks=NULL, ... )
+predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, probability=F, newtasks=NULL)
 {
     if (!inherits(object, "extraTrees")) {
         stop("Object not of class extraTrees")
