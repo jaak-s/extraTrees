@@ -1,6 +1,6 @@
 Package: extraTrees
-Version: 1.0.1
-Date: 2014-08-09
+Version: 1.0.2
+Date: 2014-08-29
 Title: ExtraTrees method
 Author: Jaak Simm, Ildefons Magrans de Abril
 Maintainer: Jaak Simm <jaak.simm@gmail.com>
@@ -12,6 +12,6 @@ SystemRequirements: Java (>= 1.6)
 NeedsCompilation: no
 License: Apache License 2.0
 URL: http://github.com/jaak-s/extraTrees
-Packaged: 2014-08-09 00:00:00 UTC; jaak
+Packaged: 2014-08-29 00:00:00 UTC; jaak
 Repository: CRAN
-Date/Publication: 2014-08-09 00:00:00
+Date/Publication: 2014-08-29 00:00:00
