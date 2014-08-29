@@ -5,7 +5,7 @@
   This function makes predictions for regression/classification using the given trained ExtraTree object and provided input matrix (newdata).
 }
 \usage{
-  \method{predict}{extraTrees}(object, newdata, quantile=NULL, allValues=F, probability=F, newtasks=NULL)
+  \method{predict}{extraTrees}(object, newdata, quantile=NULL, allValues=F, probability=F, newtasks=NULL, ...)
 }
 \arguments{
   \item{object}{ extraTree (S3) object, created by extraTrees(). }
@@ -14,6 +14,7 @@
   \item{allValues}{ whether or not to return outputs of all trees (default FALSE). }
   \item{probability}{ whether to return a matrix of class (factor) probabilities, default FALSE. Can only be used in the case of classification. Calculated as the proportion of trees voting for particular class. }
   \item{newtasks}{ list of tasks, for each input in newdata (default NULL). Must be NULL if no multi-task learning was used at training. }
+  \item{...}{ not used currently. }
 }
 \value{
   The vector of predictions from the ExtraTree et.
