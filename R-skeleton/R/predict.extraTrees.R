@@ -6,6 +6,9 @@ predict.extraTrees <- function( object, newdata, quantile=NULL, allValues=F, pro
     }
     et = object
     
+    args <- list(...)
+    if (length(args) > 0) stop(sprintf("Illegal argument '%s' to predict.extraTrees.", names(args)[1]))
+    
     if (et$multitask && is.null(newtasks)) {
         stop("Prediction requires list of newtasks.")
     }

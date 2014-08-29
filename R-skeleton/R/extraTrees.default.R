@@ -87,6 +87,9 @@ extraTrees.default <- function(x, y,
              numRandomTaskCuts = 1,
              na.action = "stop",
              ...) {
+    args <- list(...)
+    if (length(args) > 0) stop(sprintf("Illegal argument '%s' to extraTrees.", names(args)[1]))
+  
     n <- nrow(x)
     p <- ncol(x)
     if (n == 0) stop("data (x) has 0 rows")
