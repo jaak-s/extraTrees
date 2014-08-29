@@ -80,6 +80,24 @@
   y <- 0.5*(x[,1]>0.5) + 0.6*(x[,2]>0.6) + 0.8*(x[cbind(1:n,(task \%\% 2) + 3)]>0.4)
   et <- extraTrees(x, y, nodesize=3, mtry=p-1, numRandomCuts=2, tasks=task)
   yhat <- predict(et, x, newtasks=task)
+  
+  ## Classification with ExtraTrees (with test data)
+  make.data <- function(n) {
+    p <- 4
+    f <- function(x) (x[,1]>0.5) + (x[,2]>0.6) + (x[,3]>0.4)
+    x <- matrix(runif(n*p), n, p)
+    y <- as.factor(f(x))
+    return(list(x=x, y=y))
+  }
+  train <- make.data(800)
+  test  <- make.data(500)
+  et    <- extraTrees(train$x, train$y)
+  yhat  <- predict(et, test$x)
+  ## accuracy
+  mean(test$y == yhat)
+  ## class probabilities
+  yprob = predict(et, test$x, probability=TRUE)
+  head(yprob)
 }
 \keyword{regression,classification,trees}
 
