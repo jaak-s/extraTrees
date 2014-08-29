@@ -1,0 +1,17 @@
+2014-08-09  Jaak Simm  <jaak.simm@gmail.com>
+  * Version: 1.0.1
+  * ADDED: Java source (now under java directory)
+
+2014-08-08  Jaak Simm  <jaak.simm@gmail.com>
+  * Version: 1.0
+  * ADDED: support for subset sampling for training
+  * ADDED: support for weighted training
+  * ADDED: support for sparse input matrix
+  * ADDED: an approach for handling NA values in input matrix
+  * Bug fixes and speed improvements
+  * REMOVED: Java sources (binary is sufficient)
+  * MOVED: git repository to github https://github.com/jaak-s/extraTrees
+
+2014-03-22  Jaak Simm  <jaak.simm@gmail.com>
+  * Version: 0.4
+	* ADDED: support for multi-task learning
