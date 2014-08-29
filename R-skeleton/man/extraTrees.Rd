@@ -57,6 +57,9 @@
 \value{
   The trained model from input x and output values y, stored in ExtraTree object.
 }
+\seealso{
+   \code{\link{predict.extraTrees}}
+}
 \author{Jaak Simm}
 \examples{
   ## Regression with ExtraTrees:
