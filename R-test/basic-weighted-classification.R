@@ -18,9 +18,9 @@ xtest = fx.all( 10000 )
 ytest = as.factor( f(xtest) )
 
 ## learning extra trees:
-et = extraTrees(x, y, nodesize=2, mTry=p-1, numRandomCuts=2)
-et2 = extraTrees(x[1:200,], y[1:200], nodesize=2, mTry=p-1, numRandomCuts=2)
-etw = extraTrees(x, y, nodesize=8, mTry=p-1, numRandomCuts=2, weights=w )
+et = extraTrees(x, y, nodesize=2, mtry=p-1, numRandomCuts=2)
+et2 = extraTrees(x[1:200,], y[1:200], nodesize=2, mtry=p-1, numRandomCuts=2)
+etw = extraTrees(x, y, nodesize=8, mtry=p-1, numRandomCuts=2, weights=w )
 yhat.et = predict(et, xtest)
 yhat.et2 = predict(et2, xtest)
 yhat.etw = predict(etw, xtest)

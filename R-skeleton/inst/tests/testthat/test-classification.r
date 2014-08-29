@@ -13,7 +13,7 @@ train <- get.data.class(100)
 test  <- get.data.class(101)
 
 test_that("basic classification and prediction", {  
-  et   <- extraTrees(train$x, train$y, nodesize=1, mTry=2, numRandomCuts=2, ntree=50)
+  et   <- extraTrees(train$x, train$y, nodesize=1, mtry=2, numRandomCuts=2, ntree=50)
   expect_equal( 50, et$ntree )
   expect_true(  et$factor )  
   expect_false( et$multitask )

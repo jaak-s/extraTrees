@@ -13,7 +13,7 @@ xtest = matrix(runif(n*p), n, p)
 ytest = as.factor( f(xtest) )
 
 ## learning extra trees:
-et = extraTrees(x, y, nodesize=1, mTry=p, numRandomCuts=4)
+et = extraTrees(x, y, nodesize=1, mtry=p, numRandomCuts=4)
 yhat = predict(et, xtest)
 print( sprintf( "accuracy(extraTrees): %f", mean(ytest==yhat) ) )
 

@@ -28,8 +28,8 @@ Dtrain = makeDataRegr()
 Dtest  = makeDataRegr()
 
 ## learning extra trees with multi-task learning:
-et = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mTry=p, numRandomCuts=1, tasks=Dtrain$tasks)
-et0 = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mTry=p, numRandomCuts=1)
+et = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mtry=p, numRandomCuts=1, tasks=Dtrain$tasks)
+et0 = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mtry=p, numRandomCuts=1)
 yhat = predict(et, Dtest$x, newtasks=Dtest$tasks)
 ## testing allValues
 yhatAll = predict(et, Dtest$x[1:10,], newtasks=Dtest$tasks[1:10], allValues=T)

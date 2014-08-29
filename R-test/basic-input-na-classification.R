@@ -26,11 +26,11 @@ ytest = as.factor( f(xtest) )
 
 ## learning extra trees:
 methods = list()
-methods$et = extraTrees(x, y, nodesize=2, mTry=p-1, numRandomCuts=2)
-methods$et2 = extraTrees(x[1:(2*nPos),], y[1:(2*nPos)], nodesize=2, mTry=p-1, numRandomCuts=2)
-methods$etw = extraTrees(x, y, nodesize=8, mTry=p-1, numRandomCuts=2, weights=w )
-methods$etb = extraTrees(x, y, nodesize=2, mTry=p-1, numRandomCuts=2, subsetGroups=subsetGroups, subsetSizes=subsetSizes )
-methods$etwb = extraTrees(x, y, nodesize=8, mTry=p-1, numRandomCuts=2, subsetGroups=subsetGroups, subsetSizes=c(nPos, 4*nPos), 
+methods$et = extraTrees(x, y, nodesize=2, mtry=p-1, numRandomCuts=2)
+methods$et2 = extraTrees(x[1:(2*nPos),], y[1:(2*nPos)], nodesize=2, mtry=p-1, numRandomCuts=2)
+methods$etw = extraTrees(x, y, nodesize=8, mtry=p-1, numRandomCuts=2, weights=w )
+methods$etb = extraTrees(x, y, nodesize=2, mtry=p-1, numRandomCuts=2, subsetGroups=subsetGroups, subsetSizes=subsetSizes )
+methods$etwb = extraTrees(x, y, nodesize=8, mtry=p-1, numRandomCuts=2, subsetGroups=subsetGroups, subsetSizes=c(nPos, 4*nPos), 
                           weights=c(rep(1, nPos), rep(0.25, nUnlabelled)) )
 
 yhat = lapply( methods, predict, xtest)

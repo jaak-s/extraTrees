@@ -28,7 +28,7 @@ Dtest  = makeData()
 train.sep <- function(X, y, tasks) {
     x = tapply( 1:nrow(X), tasks, function(i) {
         ## training separate extraTrees
-        et = extraTrees( X[i,,drop=FALSE], y[i], nodesize=1, mTry=p, numRandomCuts=1 )
+        et = extraTrees( X[i,,drop=FALSE], y[i], nodesize=1, mtry=p, numRandomCuts=1 )
         return(et)
     })
     return(x)
@@ -51,8 +51,8 @@ predict.sep <- function(etsep, newdata, newtasks) {
 
 
 ## learning extra trees with multi-task learning:
-et = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mTry=p, numRandomCuts=1, tasks=Dtrain$tasks)
-et0 = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mTry=p, numRandomCuts=1)
+et = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mtry=p, numRandomCuts=1, tasks=Dtrain$tasks)
+et0 = extraTrees(Dtrain$x, Dtrain$y, nodesize=1, mtry=p, numRandomCuts=1)
 ets = train.sep(Dtrain$x, Dtrain$y, Dtrain$tasks)
 
 yhat = predict(et, Dtest$x, newtasks=Dtest$tasks)

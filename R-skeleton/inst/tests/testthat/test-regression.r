@@ -12,7 +12,7 @@ train <- get.data.regr(100)
 test  <- get.data.regr(101)
 
 test_that("basic regression and prediction", {  
-  et    <- extraTrees(train$x, train$y, nodesize=1, mTry=2, numRandomCuts=2, ntree=50)
+  et    <- extraTrees(train$x, train$y, nodesize=1, mtry=2, numRandomCuts=2, ntree=50)
   expect_is   ( et, "extraTrees")
   expect_false( et$factor )
   expect_false( et$multitask )
