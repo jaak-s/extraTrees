@@ -1,3 +1,8 @@
+2014-08-29  Jaak Simm  <jaak.simm@gmail.com>
+  * Version: 1.0.2
+  * ADDED: classification example to the manual page
+  * FIXED: check ... for illegal arguments
+
 2014-08-09  Jaak Simm  <jaak.simm@gmail.com>
   * Version: 1.0.1
   * ADDED: Java source (now under java directory)
