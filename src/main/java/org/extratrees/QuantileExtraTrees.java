@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.extratrees.data.Array2D;
-import org.extratrees.data.Matrix;
 import org.extratrees.data.Row;
 
 public class QuantileExtraTrees extends ExtraTrees {
 
-	public QuantileExtraTrees(Matrix input, double[] output) {
+	public QuantileExtraTrees(Array2D input, double[] output) {
 		super(input, output);
 	}
 	
