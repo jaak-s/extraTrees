@@ -99,6 +99,24 @@
   ## class probabilities
   yprob = predict(et, test$x, probability=TRUE)
   head(yprob)
+  
+  ## Quantile regression with ExtraTrees (with test data)
+  make.qdata <- function(n) {
+    p <- 4
+    f <- function(x) (x[,1]>0.5) + 0.8*(x[,2]>0.6) + 0.5*(x[,3]>0.4)
+    x <- matrix(runif(n*p), n, p)
+    y <- as.numeric(f(x))
+    return(list(x=x, y=y))
+  }
+  train <- make.qdata(400)
+  test  <- make.qdata(200)
+  
+  ## learning extra trees:
+  et <- extraTrees(train$x, train$y, quantile=TRUE)
+  ## estimate median (0.5 quantile)
+  yhat0.5 <- predict(et, test$x, quantile = 0.5)
+  ## estimate 0.8 quantile (80\%)
+  yhat0.8 <- predict(et, test$x, quantile = 0.8)
 }
 \keyword{regression,classification,trees}
 
