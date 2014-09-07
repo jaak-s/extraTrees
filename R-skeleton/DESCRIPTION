@@ -1,17 +1,16 @@
 Package: extraTrees
-Version: 1.0.2
-Date: 2014-08-29
-Title: ExtraTrees method
+Version: 1.0.3
+Date: 2014-09-07
+Title: Extremely Randomized Trees (ExtraTrees) method for classification and regression
 Author: Jaak Simm, Ildefons Magrans de Abril
 Maintainer: Jaak Simm <jaak.simm@gmail.com>
-Description: A package implementing ExtraTrees method for classification and
-        regression. Uses Java implementation of the method. 
+Description: Classification and regression based on an ensemble of decision trees. The package also provides extensions of ExtraTrees to multi-task learning and quantile regression. Uses Java implementation of the method.
 Depends: R (>= 2.7.0), rJava (>= 0.5-0)
 Suggests: testthat, Matrix
 SystemRequirements: Java (>= 1.6)
 NeedsCompilation: no
 License: Apache License 2.0
 URL: http://github.com/jaak-s/extraTrees
-Packaged: 2014-08-29 00:00:00 UTC; jaak
+Packaged: 2014-09-07 00:00:00 UTC; jaak
 Repository: CRAN
-Date/Publication: 2014-08-29 00:00:00
+Date/Publication: 2014-09-07 00:00:00
