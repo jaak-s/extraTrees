@@ -1,0 +1,15 @@
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "Tree-Based Ensemble Multi-Task Learning Method for Classification and Regression",
+         author = c(person("Jaak", "Simm"),
+                    person("Ildefons Magrans", "de Abril"),
+                    person("Masashi", "Sugiyama")),
+         volume = "97",
+         number = "6",
+         pages  = "1677--1681",
+         year = 2014,
+         journal = "IEICE TRANSACTIONS on Information and Systems",
+         publisher = "The Institute of Electronics, Information and Communication Engineers",
+         url = "http://CRAN.R-project.org/package=extraTrees")
+
