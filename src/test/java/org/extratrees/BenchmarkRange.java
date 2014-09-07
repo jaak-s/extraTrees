@@ -48,7 +48,7 @@ public class BenchmarkRange {
 		double[] range;
 		Timer.tic();
 		range = AbstractTrees.getRange(ids, col, m);
-		Timer.toc("AbstractTrees.getRange(1M random-ids)");
+		Timer.toc("AbstractTrees.getRange(500k random-ids)");
 	}
 
 }
