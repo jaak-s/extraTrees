@@ -26,6 +26,6 @@ et <- extraTrees(x, y)
 yhat <- predict(et, x)
 ```
 
-## Java setup
-For Java or development checkout the git repository and follow [development.md](development.md).
+## Development setup
+For Java development checkout the git repository and follow [development.md](development.md).
 
