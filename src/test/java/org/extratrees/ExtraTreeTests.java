@@ -65,7 +65,7 @@ public class ExtraTreeTests {
 		ExtraTrees et2 = et.selectTrees(selection);
 		
 		Matrix m  = et.getAllValues(et.input);
-		Matrix m2 = et2.getAllValues(et2.input);
+		Matrix m2 = et2.getAllValues(et.input);
 		
 		// checking that the chosen trees are the same:
 		assertEquals( treeIds.length, et2.trees.size() );
@@ -77,7 +77,7 @@ public class ExtraTreeTests {
 		}
 		
 	}
-
+	
 	public static Matrix getSampleData(int ndata) {
 		int ndim = 3;
 		Matrix m = new Matrix(ndata, ndim);

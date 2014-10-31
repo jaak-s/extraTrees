@@ -9,6 +9,9 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	double[] output;
 	double[] outputSq;
 	
+	public ExtraTrees() {
+	}
+	
 	public ExtraTrees(Array2D input, double[] output) {
 		this(input, output, null);
 	}
@@ -40,7 +43,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 	 * only the selected trees specified by {@code selection}.
 	 */
 	public ExtraTrees selectTrees(boolean[] selection) {
-		ExtraTrees newET = new ExtraTrees(input, output);
+		ExtraTrees newET = new ExtraTrees();
 		newET.trees = new ArrayList<BinaryTree>();
 		for (int i=0; i<selection.length; i++) {
 			if (!selection[i]) {

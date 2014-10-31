@@ -40,3 +40,13 @@ test_that("basic classification and prediction", {
   expect_equal( unname(mean(yall[1,]==0)), unname(yprob[1,1]), tolerance=1e-6 )
   expect_equal( rowSums(yprob), rep.int(1, nrow(yprob)) )
 })
+
+test_that("selectTree works with classification", {  
+  et    <- extraTrees(train$x, train$y, nodesize=1, mtry=2, numRandomCuts=2, ntree=20)
+  trees <- rep(c(T, F), 10)
+  et10 <- selectTrees(et, trees )
+  expect_equal( et10$ntree, 10 )
+  yall   <- predict(et,   test$x, allValues=T)
+  yall10 <- predict(et10, test$x, allValues=T)
+  expect_true( all(yall[,trees] == yall10) )
+})

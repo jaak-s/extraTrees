@@ -120,7 +120,7 @@ public class FactorTests {
 		FactorExtraTrees et2 = et.selectTrees(selection);
 		
 		Matrix m  = et.getAllValues(et.input);
-		Matrix m2 = et2.getAllValues(et2.input);
+		Matrix m2 = et2.getAllValues(et.input);
 		
 		// checking that the chosen trees are the same:
 		assertEquals( treeIds.length, et2.trees.size() );
