@@ -1,5 +1,6 @@
 package org.extratrees;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.extratrees.data.Row;
@@ -14,7 +15,9 @@ import org.extratrees.data.Row;
  * @param <T> class that extends ABT
  * @param <D> class of value
  */
-public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D> {
+public abstract class AbstractBinaryTree <T extends AbstractBinaryTree<T, D>, D> implements Serializable {
+	private static final long serialVersionUID = 5530548509407016040L;
+	
 	/** tree for elements below threshold.
 	 * if left==null, it is a leaf node
      * if left!=null, not a leaf

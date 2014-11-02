@@ -1,6 +1,10 @@
 package org.extratrees;
 
-public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree, Integer> {
+import java.io.Serializable;
+
+public class FactorBinaryTree extends AbstractBinaryTree<FactorBinaryTree, Integer> implements Serializable {
+	private static final long serialVersionUID = 6177152082032351501L;
+
 	public FactorBinaryTree() {
 	}
 	

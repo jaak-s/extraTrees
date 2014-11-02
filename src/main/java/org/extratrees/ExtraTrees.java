@@ -1,13 +1,16 @@
 package org.extratrees;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.extratrees.data.Array2D;
 
-public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
-	double[] output;
-	double[] outputSq;
+public class ExtraTrees extends AbstractTrees<BinaryTree, Double> implements Serializable {
+	private static final long serialVersionUID = -8164290318411068380L;
+	
+	transient double[] output;
+	transient double[] outputSq;
 	
 	public ExtraTrees() {
 	}
@@ -361,5 +364,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> {
 		bt.value /= sumWeights;
 		return(bt);
 	}
+	
+	
 
 }

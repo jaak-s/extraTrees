@@ -1,4 +1,5 @@
 package org.extratrees;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -6,8 +7,10 @@ import java.util.Set;
 import org.extratrees.data.Array2D;
 
 
-public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> {
-	int[] output;
+public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> implements Serializable {
+	private static final long serialVersionUID = 3625952360819832098L;
+	
+	transient int[] output;
 	/** number of factors: */
 	int nFactors;
 	

@@ -1,5 +1,6 @@
 package org.extratrees;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,21 +16,23 @@ import org.extratrees.data.Array2D;
 import org.extratrees.data.Matrix;
 import org.extratrees.data.Row;
 
-public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
-	Array2D input;
-	Random random = new Random();
-	double[] weights;
+public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implements Serializable {
+	private static final long serialVersionUID = -7981888649599586067L;
+	
+	transient Array2D input;
+	transient Random random = new Random();
+	transient double[] weights;
 	boolean useWeights;
 	boolean hasNaN = false;
-	int[] subsetSizes = null;
-	int[][] subsetElems = null;
+	transient int[] subsetSizes = null;
+	transient int[][] subsetElems = null;
 	protected final static double zero=1e-7;
 	/** value to be returned when there is no answer, i.e., not available */
 	protected final static double NA = Double.NaN;
 
 
 	/** for multi-task learning, stores task indices (null if not present) */
-	int[] tasks;
+	transient int[] tasks;
 	
 	/** number of tasks: (tasks are indexed from 0 to (nTasks-1) */
 	int nTasks;
@@ -51,7 +54,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> {
 	boolean evenCuts = false;
 
 	/** later shuffled and used for choosing random columns at each node: */
-	ArrayList<Integer> cols;
+	transient ArrayList<Integer> cols;
 	
 	public boolean isHasNaN() {
 		return hasNaN;

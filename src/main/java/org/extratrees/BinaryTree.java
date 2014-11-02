@@ -1,6 +1,10 @@
 package org.extratrees;
 
-public class BinaryTree extends AbstractBinaryTree<BinaryTree, Double> {
+import java.io.Serializable;
+
+public class BinaryTree extends AbstractBinaryTree<BinaryTree, Double> implements Serializable {
+	private static final long serialVersionUID = 1616743600450700483L;
+
 	public BinaryTree() {
 	}
 	
