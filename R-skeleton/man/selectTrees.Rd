@@ -1,18 +1,18 @@
 \name{selectTrees}
 \alias{selectTrees}
-\title{Makes a sub-ExtraTree object by keeping only selected trees.}
+\title{Makes a sub-ExtraTrees object by keeping only selected trees.}
 \description{
-  This function creates a sub-ExtraTree object by keeping only selected trees specified by selection.
+  This function creates a sub-ExtraTrees object by keeping only selected trees specified by selection.
 }
 \usage{
   selectTrees(object, selection)
 }
 \arguments{
-  \item{object}{ extraTree (S3) object, created by extraTrees(). }
+  \item{object}{ extraTrees (S3) object, created by extraTrees(). }
   \item{selection}{ a list of logicals (T/F) of length object$ntree. }
 }
 \value{
-  A new ExtraTree (S3) object based on the existing object by keeping only the trees
+  A new ExtraTrees (S3) object based on the existing object by keeping only the trees
   present in the selection.
 }
 \author{Jaak Simm}
