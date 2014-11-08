@@ -1,3 +1,7 @@
+2014-11-08  Jaak Simm  <jaak.simm@gmail.com>
+  * Version: 1.0.4
+  * ADDED: save support and prepareForSave function
+
 2014-09-07  Jaak Simm  <jaak.simm@gmail.com>
   * Version: 1.0.3
   * FIXED: quantile regression now works
