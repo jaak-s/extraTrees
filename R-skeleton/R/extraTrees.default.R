@@ -68,6 +68,13 @@ selectTrees <- function( object, selection ) {
     return(etNew)
 }
 
+prepareForSave <- function( object ) {
+    if (!inherits(object, "extraTrees")) {
+        stop("object not of class extraTrees")
+    }
+    .jcache(object$jobject)
+}
+
 ## main extraTree training function
 extraTrees.default <- function(x, y, 
              #xtest=NULL, ytest=NULL, 

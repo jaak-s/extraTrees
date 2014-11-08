@@ -59,7 +59,7 @@
   The trained model from input x and output values y, stored in ExtraTree object.
 }
 \seealso{
-   \code{\link{predict.extraTrees}}
+   \code{\link{predict.extraTrees}} for predicting and \code{\link{prepareForSave}} for saving ExtraTrees models to disk.
 }
 \author{Jaak Simm}
 \examples{
