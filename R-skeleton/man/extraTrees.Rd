@@ -35,7 +35,7 @@
   \item{numThreads}{ the number of CPU threads to use (default is 1). }
   \item{quantile}{ if TRUE then quantile regression is performed (default is FALSE), only for regression data.
                    Then use predict(et, newdata, quantile=k) to make predictions for k quantile. }
-  \item{weights}{ list of weights, positive real values. NULL means standard learning, i.e. equal weights. }
+  \item{weights}{ a list of sample weights, one positive real value for each sample. NULL means standard learning, i.e. equal weights. }
   \item{subsetSizes}{ subset size (one integer) or subset sizes (vector of integers, requires subsetGroups), if supplied every tree is built from a random subset of size subsetSizes. NULL means no subsetting, i.e. all samples are used. }
   \item{subsetGroups}{ list specifying subset group for each sample: from samples in group g, each tree will randomly select subsetSizes[g] samples. }
   \item{tasks}{ list of tasks, integers from 1 and up. NULL if no multi-task learning }
