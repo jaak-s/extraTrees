@@ -1,10 +1,13 @@
 package org.extratrees;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -17,7 +20,7 @@ public class ShuffleTests {
 		for (int i=0; i<n; i++) {
 			data.add(i);
 		}
-		ShuffledIterator<Integer> si = new ShuffledIterator<Integer>(data);
+		ShuffledIterator<Integer> si = new ShuffledIterator<Integer>(data, new Random());
 		HashSet<Integer> result = new HashSet<Integer>();
 		while (si.hasNext()) {
 			int x = si.next();

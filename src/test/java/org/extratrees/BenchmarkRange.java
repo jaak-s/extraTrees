@@ -1,6 +1,7 @@
 package org.extratrees;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.extratrees.data.Matrix;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class BenchmarkRange {
 	public static int[] randIds(int size, int max) {
 		ArrayList<Integer> allIds = AbstractTrees.arrayToList( AbstractTrees.seq( max ) );
 		Timer.tic();
-		ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds);
+		ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds, new Random());
 		
 		int[] subset = new int[ size ];
 		for (int i=0; i < subset.length; i++) {

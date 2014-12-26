@@ -74,3 +74,14 @@ test_that("training creates a usable call object", {
   expect_is(et2, "extraTrees")
 })
 
+test_that("using same set.seed gives same results", {
+  set.seed(1000)
+  et1   <- extraTrees(train$x, train$y, ntree=10)
+  yhat1 <- predict(et1, test$x)
+  
+  set.seed(1000)
+  et2   <- extraTrees(train$x, train$y, ntree=10)
+  yhat2 <- predict(et2, test$x)
+  
+  expect_equal( yhat1, yhat2, tolerance=1e-6)
+})

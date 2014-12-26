@@ -41,6 +41,14 @@ toJavaMatrix2D <- function( m ) {
   return( jm )
 }
 
+## computes two integers, passed to Java for a long
+get64BitSeed <- function() {
+  as.integer(
+    sample.int(n=2^31-1, size=2, replace=TRUE) * 
+      c(-1, 1)[sample.int(n=2, size=2, replace=TRUE)]
+  )
+}
+
 ## creates a new extraTrees object based on selection
 selectTrees <- function( object, selection ) {
     ## checking if right object:
@@ -247,6 +255,8 @@ extraTrees.default <- function(x, y,
     .jcall( et$jobject, "V", "setEvenCuts", et$evenCuts )
     .jcall( et$jobject, "V", "setNumThreads", as.integer(et$numThreads) )
     .jcall( et$jobject, "V", "setHasNaN", et$xHasNA)
+    seeds = get64BitSeed()
+    .jcall( et$jobject, "V", "setSeed", seeds[1], seeds[2])
     
     ## if present set weights:
     if (et$useWeights) {

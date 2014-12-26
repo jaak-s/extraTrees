@@ -1,12 +1,12 @@
 package org.extratrees;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.extratrees.data.Matrix;
 import org.extratrees.data.CSparseMatrix;
+import org.extratrees.data.Matrix;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -93,7 +93,7 @@ public class SparseMartixTest {
 		ArrayList<Double>  v = new ArrayList<Double> ();
 		ArrayList<Integer> y = new ArrayList<Integer>();
 		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(
-				AbstractTrees.getSequenceSet(ncol));
+				AbstractTrees.getSequenceSet(ncol), new Random());
 		Random rnd = new Random();
 		
 		for (int row = 0; row < ndata; row++) {

@@ -15,9 +15,9 @@ public class ShuffledIterator<E> implements Iterator<E> {
 	 * @param c - creates iterator for Collection {@code c}, 
 	 * elements are returned in random order. 
 	 */
-	public ShuffledIterator(Collection<E> c) {
+	public ShuffledIterator(Collection<E> c, Random r) {
 		data = new ArrayList<E>(c);
-		random = new Random();
+		random = r;
 	}
 
 	@Override

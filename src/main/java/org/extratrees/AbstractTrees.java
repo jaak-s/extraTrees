@@ -509,7 +509,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 */
 	public E buildTree(int nmin, int K) {
 		int[] ids = getInitialSamples();
-		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols);
+		Random rand = new Random(this.random.nextLong());
+		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols, rand);
 		
 		// finding task set:
 		HashSet<Integer> taskSet = getSequenceSet(nTasks);
@@ -538,7 +539,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 		}
 		if (subsetSizes.length == 1) {
 			ArrayList<Integer> allIds = arrayToList( seq( input.nrows() ) );
-			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds);
+			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(allIds, random);
 			
 			int[] subset = new int[ subsetSizes[0] ];
 			for (int i=0; i < subset.length; i++) {
@@ -551,7 +552,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 		int i = 0;
 		for (int b=0; b < subsetSizes.length; b++) {
 			ArrayList<Integer> ids = arrayToList( subsetElems[b] );
-			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(ids);
+			ShuffledIterator<Integer> shuffle = new ShuffledIterator<Integer>(ids, random);
 
 			// filling with elements from subset[b]:
 			for (int n = i + subsetSizes[b]; i < n; i++) {
@@ -677,6 +678,15 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 */
 	protected double getRandom() {
 		return random.nextDouble();
+	}
+	
+	/**
+	 * Used from R to set seed
+	 * @param seed1
+	 * @param seed2
+	 */
+	public void setSeed(int seed1, int seed2) {
+		setSeed( (long)seed1 << 32 | seed2 & 0xFFFFFFFFL );
 	}
 	
 	public void setSeed(long seed) {

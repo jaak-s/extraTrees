@@ -1,3 +1,7 @@
+2014-12-28  Jaak Simm  <jaak.simm@gmail.com>
+  * Version: 1.0.5
+  * ADDED: using seed from R, currently only for single thread case
+
 2014-11-08  Jaak Simm  <jaak.simm@gmail.com>
   * Version: 1.0.4
   * ADDED: save support and prepareForSave function
