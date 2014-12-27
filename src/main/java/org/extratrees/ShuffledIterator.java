@@ -15,9 +15,9 @@ public class ShuffledIterator<E> implements Iterator<E> {
 	 * @param c - creates iterator for Collection {@code c}, 
 	 * elements are returned in random order. 
 	 */
-	public ShuffledIterator(Collection<E> c, Random r) {
+	public ShuffledIterator(Collection<E> c, Random random) {
 		data = new ArrayList<E>(c);
-		random = r;
+		this.reset(random);
 	}
 
 	@Override
@@ -48,8 +48,12 @@ public class ShuffledIterator<E> implements Iterator<E> {
 	/**
 	 * Resets the iterator so we can start from a new shuffle again. 
 	 */
-	public void reset() {
+	public void reset(Random random) {
 		nextIndex = 0;
+		this.random = random;
 	}
 
+	public void reset() {
+		reset(random);
+	}
 }

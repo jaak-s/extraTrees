@@ -218,7 +218,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> i
 	}
 	
 	@Override
-	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> nodeTasks, double bestScore) {
+	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> nodeTasks, double bestScore, int tree) {
 		if (nFactors>2) {
 			throw new RuntimeException("Multitask learning is not implemented 3 or more factors (classes).");
 		}
@@ -239,7 +239,7 @@ public class FactorExtraTrees extends AbstractTrees<FactorBinaryTree, Integer> i
 
 		for (int repeat=0; repeat<this.numRandomTaskCuts; repeat++) {
 			// get random cut:
-			double t = getRandom(range[0], range[1]);
+			double t = getRandom(range[0], range[1], tree);
 			TaskCutResult result = new TaskCutResult();
 			calculateTaskCutScore(p, factorTaskTable, t, result);
 			if (result.score < bestScore) {

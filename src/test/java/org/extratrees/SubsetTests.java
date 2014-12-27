@@ -3,6 +3,8 @@ package org.extratrees;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Random;
+
 import org.extratrees.data.Matrix;
 import org.junit.Test;
 
@@ -33,7 +35,7 @@ public class SubsetTests {
 		et.setSubsetting(90);
 		assertArrayEquals(new int[]{90}, et.subsetSizes);
 		
-		int[] ids = et.getInitialSamples();
+		int[] ids = et.getInitialSamples(new Random());
 		assertTrue("Random subset should contain 90 samples.", ids.length == 90);
 		
 		int[] subsetGroups = new int[100];
@@ -47,7 +49,7 @@ public class SubsetTests {
 		assertArrayEquals(AbstractTrees.seq(30), et.subsetElems[0]);
 		assertArrayEquals(AbstractTrees.seq(30, 100), et.subsetElems[1]);
 
-		ids = et.getInitialSamples();
+		ids = et.getInitialSamples(new Random());
 		assertTrue("Random subset should contain 59 samples.", ids.length == AbstractTrees.sum(subsetSizes) );
 
 		et.learnTrees(5, 3, 10);

@@ -21,6 +21,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	
 	transient Array2D input;
 	transient Random random = new Random();
+	transient Random[] treeRandoms = null;
 	transient double[] weights;
 	boolean useWeights;
 	boolean hasNaN = false;
@@ -204,14 +205,14 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 * @param repeat  only used when evenCuts==true.
 	 * @return random cut from col_min to col_min+diff.
 	 */
-	protected double getRandomCut(double col_min, double diff, int repeat) {
+	protected double getRandomCut(double col_min, double diff, int repeat, int tree) {
 		double t;
 		if (evenCuts) {
 			double iStart = col_min + repeat*diff/numRandomCuts;
 			double iStop  = col_min + (repeat+1)*diff/numRandomCuts;
-			t = getRandom()*(iStop-iStart) + iStart;
+			t = getRandom(tree)*(iStop-iStart) + iStart;
 		} else {
-			t = getRandom()*diff + col_min;
+			t = getRandom(tree)*diff + col_min;
 		}
 		return t;
 	}
@@ -312,9 +313,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 		List<TreeCallable> callables = new ArrayList<TreeCallable>();
 		
 		// adding tasks: using the same task for each tree
-		TreeCallable task = new TreeCallable(nmin, K);
 		for (int i=0; i<nTrees; i++) {
-			callables.add( task );
+			callables.add( new TreeCallable(nmin, K, i) );
 		}
 		// computing and fetching results:
 		List<Future<E>> results;
@@ -342,14 +342,15 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	
 	/** Nested class for making BinaryTrees */
 	public class TreeCallable implements Callable<E> {
-		int nmin, K;
-		public TreeCallable(int nmin, int K) {
+		int nmin, K, tree;
+		public TreeCallable(int nmin, int K, int tree) {
 			this.nmin = nmin;
 			this.K    = K;
+			this.tree = tree;
 		}
 		@Override
 		public E call() throws Exception {
-			return AbstractTrees.this.buildTree(nmin, K);
+			return AbstractTrees.this.buildTree(nmin, K, tree);
 		}
 	}
 
@@ -370,9 +371,16 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 		ArrayList<E> trees = new ArrayList<E>(nTrees);
 		// single-threading:
 		for (int t=0; t<nTrees; t++) {
-			trees.add( this.buildTree(nmin, K) );
+			trees.add( this.buildTree(nmin, K, t) );
 		}
 		return trees;
+	}
+	
+	public void setupRandoms(int nTrees) {
+		this.treeRandoms = new Random[nTrees];
+		for (int i = 0; i < nTrees; i++) {
+			treeRandoms[i] = new Random( this.random.nextLong() );
+		}
 	}
 
 	/**
@@ -383,6 +391,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 * @param nTrees
 	 */
 	public void learnTrees(int nmin, int K, int nTrees) {
+		setupRandoms(nTrees);
 		if (numThreads <= 1) {
 			this.trees = buildTrees(nmin, K, nTrees);
 		} else {
@@ -507,14 +516,14 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 * @param K
 	 * @return
 	 */
-	public E buildTree(int nmin, int K) {
-		int[] ids = getInitialSamples();
-		Random rand = new Random(this.random.nextLong());
-		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols, rand);
+	public E buildTree(int nmin, int K, int tree) {
+		int[] ids = getInitialSamples(tree);
+		//Random rand = new Random(this.random.nextLong());
+		ShuffledIterator<Integer> cols = new ShuffledIterator<Integer>(this.cols, treeRandoms[tree]);
 		
 		// finding task set:
 		HashSet<Integer> taskSet = getSequenceSet(nTasks);
-		return buildTree(nmin, K, ids, cols, taskSet );
+		return buildTree(nmin, K, ids, cols, taskSet, tree);
 	}
 	
 	protected static ArrayList<Integer> arrayToList(int[] array) {
@@ -532,8 +541,12 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 		}
 		return a;
 	}
+	
+	protected int[] getInitialSamples(int tree) {
+		return getInitialSamples(treeRandoms[tree]);
+	}
 
-	protected int[] getInitialSamples() {
+	protected int[] getInitialSamples(Random random) {
 		if (subsetSizes == null) {
 			return seq( input.nrows() );
 		}
@@ -576,7 +589,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 *         Returns null if no cut better (smaller score) than bestScore was found.
 	 */
 	protected abstract TaskCutResult getTaskCut(int[] ids, 
-			Set<Integer> tasks, double bestScore);
+			Set<Integer> tasks, double bestScore, int tree);
 
 
 	/**
@@ -676,8 +689,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	/**
 	 * @return random between 0.0 and 1.0.
 	 */
-	protected double getRandom() {
-		return random.nextDouble();
+	protected double getRandom(int tree) {
+		return treeRandoms[tree].nextDouble();
 	}
 	
 	/**
@@ -698,8 +711,8 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 * @param xmax
 	 * @return uniformly random value between xmin and xmax.
 	 */
-	protected double getRandom(double xmin, double xmax) {
-		return xmin + getRandom()*(xmax - xmin);
+	protected double getRandom(double xmin, double xmax, int tree) {
+		return xmin + getRandom(tree)*(xmax - xmin);
 	}
 
 	abstract protected E makeFilledTree(E leftTree, E rightTree, 
@@ -715,20 +728,20 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 	 * @return
 	 */
 	public E buildTree(int nmin, int K, int[] ids, 
-			ShuffledIterator<Integer> randomCols, Set<Integer> taskSet) {
+			ShuffledIterator<Integer> randomCols, Set<Integer> taskSet, int tree) {
 		if (ids.length < nmin) {
 			return makeLeaf(ids, taskSet);
 		}
 		// doing a shuffle of cols:
-		randomCols.reset();
+		randomCols.reset( treeRandoms[tree] );
 		
 		// trying K trees or the number of non-constant columns,
 		// whichever is smaller:
 		int k = 0, col_best=-1;
-		double t_best=Double.NaN;
-		double nanPenalty = hasNaN ?get1NaNScore(ids) :0;
+		double t_best        = Double.NaN;
+		double nanPenalty    = hasNaN ?get1NaNScore(ids) :0;
 		CutResult bestResult = new CutResult();
-		bestResult.score = Double.POSITIVE_INFINITY;
+		bestResult.score     = Double.POSITIVE_INFINITY;
 		
 		loopThroughColumns:
 		while( randomCols.hasNext() ) {
@@ -743,7 +756,7 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 			double diff = (range[1]-range[0]);
 			for (int repeat=0; repeat<this.numRandomCuts; repeat++) {
 				double t;
-				t = getRandomCut(range[0], diff, repeat);
+				t = getRandomCut(range[0], diff, repeat, tree);
 				
 				CutResult result = new CutResult();
 				calculateCutScore(ids, col, t, result);
@@ -780,9 +793,9 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 		TaskCutResult taskCutResult = null;
 		if (taskSet.size() > 1) {
 			// checking whether to perform task splitting
-			if ( probOfTaskCuts > getRandom() ) {
+			if ( probOfTaskCuts > getRandom(tree) ) {
 				// calculating task order:
-				taskCutResult = getTaskCut(ids, taskSet, bestResult.score);
+				taskCutResult = getTaskCut(ids, taskSet, bestResult.score, tree);
 			}
 		}
 		
@@ -818,13 +831,13 @@ public abstract class AbstractTrees<E extends AbstractBinaryTree<E,D>, D> implem
 			 // left child's output is constant
 			leftTree = makeLeaf(idsLeft, leftTaskSet); 
 		} else {
-			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols, leftTaskSet); 
+			leftTree  = this.buildTree(nmin, K, idsLeft, randomCols, leftTaskSet, tree); 
 		}
 		if (bestResult.rightConst) {
 			// right child's output is constant
 			rightTree = makeLeaf(idsRight, rightTaskSet);
 		} else {
-			rightTree = this.buildTree(nmin, K, idsRight, randomCols, rightTaskSet);
+			rightTree = this.buildTree(nmin, K, idsRight, randomCols, rightTaskSet, tree);
 		}
 		
 		E bt = makeFilledTree(leftTree, rightTree, 

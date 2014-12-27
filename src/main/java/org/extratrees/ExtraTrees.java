@@ -204,7 +204,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> implements Ser
 
 	@Override
 	protected TaskCutResult getTaskCut(int[] ids, Set<Integer> nodeTasks,
-			double bestScore) {
+			double bestScore, int tree) {
 		// return null if not at least 2 tasks
 		if (nodeTasks.size() <= 1) {
 			return null;
@@ -227,7 +227,7 @@ public class ExtraTrees extends AbstractTrees<BinaryTree, Double> implements Ser
 		
 		for (int repeat=0; repeat<this.numRandomTaskCuts; repeat++) {
 			// get random cut:
-			double t = getRandom(range[0], range[1]);
+			double t = getRandom(range[0], range[1], tree);
 			TaskCutResult result = new TaskCutResult();
 			calculateTaskCutScore(p, counts, regcounts, sums, sumSq, mean, t, result, nodeTasks);
 			if (result.score < bestScore) {

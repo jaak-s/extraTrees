@@ -70,7 +70,7 @@ public class BenchmarkTests {
 				errors++;
 			}
 		}
-		System.out.println( String.format("Error rate: %1.3f", errors / (double) yhat.length) );
+		System.out.println( String.format("Error rate: %1.3f   (should be 0.08-0.13)", errors / (double) yhat.length) );
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class BenchmarkTests {
 		for (int row=0; row<yhat.length; row++) {
 			error += Math.pow(yhat[row] - et2.output[row], 2);
 		}
-		System.out.println( String.format("Regression MSE: %1.5f", error / yhat.length) );
+		System.out.println( String.format("Regression MSE: %1.5f   (should be 0.05-0.06)", error / yhat.length) );
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class BenchmarkTests {
 				errors++;
 			}
 		}
-		System.out.println( String.format("Error rate: %1.3f", errors / (double) yhat.length) );
+		System.out.println( String.format("Error rate: %1.3f   (should be 0.08-0.13)", errors / (double) yhat.length) );
 	}
 
 }

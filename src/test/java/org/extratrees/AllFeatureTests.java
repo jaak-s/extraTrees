@@ -5,10 +5,13 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ SubsetTests.class, ExtraTreeTests.class, FactorTests.class,
+@SuiteClasses({ ExtraTreeTests.class, FactorTests.class,
 		MultitaskTests.class, NATests.class,
-		QuantileTests.class, QuickSelectTests.class, ShuffleTests.class,
-		SparseMartixTest.class})
+		QuantileTests.class, QuickSelectTests.class,
+		SetSeedTests.class,
+		ShuffleTests.class,
+		SparseMartixTest.class,
+		SubsetTests.class})
 public class AllFeatureTests {
 
 }
