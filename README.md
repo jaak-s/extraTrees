@@ -7,7 +7,7 @@ The software is available in R (2.15.2 and up).
 
 ```R
 ## Installing:
-install.package("extraTrees")
+install.packages("extraTrees")
 
 ## Loading ExtraTrees:
 library("extraTrees")
