@@ -1,12 +1,149 @@
-/build
-/.classpath
-/.project
-/.settings
-/target
-*~
-.Rhistory
+**/.settings/
+**/.classpath
+**/.project
+**/.metadata
+#**/bin/
+**/*.2delete
+**/target/
+**/build/
+*.egg-info
+.idea/
+*.iml
+*.eml
+
+
+# Ignore all dotfiles...
+#.*
+
+.#*
+
+
+
+
+# except for .gitignore
+!.gitignore
+!.gitattributes
+
+!.dockerignore
+!.travis.yml
+
+
+!.python-version
+
+
+# python
+venv/
+
+
+###################
+# Compiled source #
+###################
+*.com
 *.class
-# Package Files #
-*.jar
-*.war
-*.ear
+docs
+/src/*.o
+/src/*.o-*
+/src/*.d
+/src/*.so
+
+*.dll
+*.exe
+*.o
+*.so
+
+
+############
+# setup.py #
+############
+
+/build/
+/dist/
+
+*.pyc
+*.egg
+*.whl
+
+*.egg-info/
+
+##########
+# pytest #
+##########
+
+/.pytest_cache/
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+
+### *.jar
+
+*.rar
+*.tar
+#*.zip
+
+# Logs and databases #
+######################
+*.log
+*.tlog
+*.sqlite
+/logs/
+
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+
+# general
+*~
+
+# Eclipse
+.settings
+.project
+.classpath
+
+# IDEA
+/.idea
+/.idea_modules
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# SPARK
+metastore_db/
+/doc/_build/
+*.~undo-tree~
+.RData
+.Rproj.user
+..Rcheck
+.Rhistory
+Rplots.*
+inst/doc
+.httr-oauth
+vignettes/*.R
+.DS_Store
+/clion-test.R
+/BROWSE
+/GPATH
+/GRTAGS
+/GTAGS
+/TAGS
+/.dir-locals.el
+.obsidian/
+/issues
+/home
+/logs
+/temp
+/.drake
+bench-libs
+doc
+Meta

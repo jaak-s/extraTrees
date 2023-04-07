@@ -1,0 +1,12 @@
+/build
+/.classpath
+/.project
+/.settings
+/target
+*~
+.Rhistory
+*.class
+# Package Files #
+*.jar
+*.war
+*.ear
